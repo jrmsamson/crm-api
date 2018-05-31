@@ -1,3 +1,5 @@
 FROM postgres:10
 
 ENV POSTGRES_PASSWORD=crmapi
+
+EXPOSE 5432
