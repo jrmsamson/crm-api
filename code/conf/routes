@@ -1,4 +1,4 @@
 
 
-GET     /                           controllers.TestController.test
+GET     /        com.crmapi.controllers.TestController.test
 

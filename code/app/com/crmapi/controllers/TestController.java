@@ -1,4 +1,4 @@
-package controllers;
+package com.crmapi.controllers;
 
 import play.mvc.*;
 

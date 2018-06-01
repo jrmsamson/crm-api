@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration>
+    <jdbc>
+        <driver>org.postgresql.Driver</driver>
+        <url>jdbc:postgresql://postgres/postgres</url>
+        <user>postgres</user>
+        <password>crmapi</password>
+    </jdbc>
+
+    <generator>
+        <database>
+            <name>org.jooq.util.postgres.PostgresDatabase</name>
+            <inputSchema>crm</inputSchema>
+
+            <forcedTypes>
+                <forcedType>
+                    <userType>java.time.LocalDateTime</userType>
+                    <converter>com.crmapi.model.converters.TimestampToLocalDateTimeConverter</converter>
+                    <types>Timestamp</types>
+                </forcedType>
+            </forcedTypes>
+
+            <includes>.*</includes>
+        </database>
+
+        <generate>
+            <daos>true</daos>
+            <pojos>true</pojos>
+            <validationAnnotations>true</validationAnnotations>
+        </generate>
+
+        <target>
+            <packageName>model.jooq</packageName>
+            <directory>app/</directory>
+        </target>
+
+        <strategy>
+            <name>com.crmapi.util.JooqGeneratorStrategy</name>
+        </strategy>
+
+    </generator>
+
+</configuration>
