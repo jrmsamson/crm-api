@@ -2,7 +2,9 @@ package services;
 
 import model.entities.UserRequest;
 import model.entities.UserResponse;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import repositories.UserRepository;
 import services.impl.UserServiceImpl;
 
@@ -22,8 +24,12 @@ public class UserServiceTest {
     private UserRepository userRepositoryMock;
 
     public UserServiceTest() {
-        userService = new UserServiceImpl(userRepositoryMock);
+    }
+
+    @Before
+    public void setUp() {
         userRepositoryMock = mock(UserRepository.class);
+        userService = new UserServiceImpl(userRepositoryMock);
     }
 
     @Test
