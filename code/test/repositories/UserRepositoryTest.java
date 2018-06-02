@@ -28,9 +28,10 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
     private Database database;
     private Optional<UserResponse> userCreated;
+    private DSLContext dslContext;
 
-    @Before
-    public void setUp() {
+    public UserRepositoryTest() {
+        this.userRepository = new UserRepositoryImpl();
         this.database = Databases.createFrom(
                 "org.postgresql.Driver",
                 "jdbc:postgresql://postgres:5432/postgres",
@@ -40,15 +41,15 @@ public class UserRepositoryTest {
                 )
         );
 
-        DSLContext dslContext = DSL.using(this.database.getConnection());
+        dslContext = DSL.using(this.database.getConnection());
+    }
 
-        dslContext.transaction(configuration -> {
-            this.userRepository = new UserRepositoryImpl();
-            ((UserRepositoryImpl) this.userRepository).setConfiguration(configuration);
-        });
-
+    @Before
+    public void setUp() {
+        dslContext.transaction(configuration ->
+            ((UserRepositoryImpl) this.userRepository).setConfiguration(configuration)
+        );
         Evolutions.applyEvolutions(database);
-
         setUpFixture();
     }
 
