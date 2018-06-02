@@ -1,4 +1,4 @@
-package com.crmapi.util;
+package util;
 
 import com.google.common.base.Joiner;
 import org.jooq.util.DefaultGeneratorStrategy;
@@ -6,7 +6,7 @@ import org.jooq.util.Definition;
 
 public class JooqGeneratorStrategy extends DefaultGeneratorStrategy {
 
-    private static final String MODEL_PACKAGE_NAME = "com.crmapi.model";
+    private static final String MODEL_PACKAGE_NAME = "model";
     private static final String POJOS_PACKAGE_NAME = "pojos";
     private static final String PACKAGE_SEPARATOR = ".";
 

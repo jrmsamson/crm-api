@@ -1,4 +1,4 @@
-package com.crmapi.controllers;
+package controllers;
 
 import org.junit.Test;
 import play.Application;
@@ -12,7 +12,7 @@ import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.GET;
 import static play.test.Helpers.route;
 
-public class TestControllerTest extends WithApplication {
+public class UserControllerTest extends WithApplication {
 
     @Override
     protected Application provideApplication() {

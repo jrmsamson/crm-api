@@ -10,16 +10,38 @@ BEGIN
 END;;
 $generate_uuid_body$ LANGUAGE plpgsql;;
 
+CREATE OR REPLACE FUNCTION update_modified_timestamp()
+  RETURNS trigger AS $update_modified_timestamp_body$
+BEGIN
+  IF NEW.modified IS NULL THEN
+    NEW.modified = now();;
+  END IF;;
+  RETURN NEW;;
+END;;
+$update_modified_timestamp_body$ LANGUAGE plpgsql;;
+
+CREATE OR REPLACE FUNCTION update_created_timestamp()
+  RETURNS trigger AS $update_created_timestamp_body$
+BEGIN
+  IF NEW.created IS NULL THEN
+    NEW.created = now();;
+  END IF;;
+  RETURN NEW;;
+END;;
+$update_created_timestamp_body$ LANGUAGE plpgsql;;
+
 CREATE TABLE CRM.USER
 (
   ID        BIGSERIAL     PRIMARY KEY,
   UUID      UUID,
   NAME      VARCHAR(50)   NOT NULL,
   SURNAME   VARCHAR(50)   NOT NULL,
-  CREATED   TIMESTAMP     DEFAULT       CURRENT_TIMESTAMP
+  ACTIVE    BOOLEAN       NOT NULL    DEFAULT TRUE,
+  CREATED   TIMESTAMP,
+  MODIFIED  TIMESTAMP
 );;
 
-CREATE UNIQUE INDEX USER_NAME_UINDEX ON CRM.USER (NAME);;
+CREATE UNIQUE INDEX USER_NAME_SURNAME_UINDEX ON CRM.USER (NAME, SURNAME);;
 CREATE UNIQUE INDEX USER_UUID_UINDEX ON CRM.USER (UUID);;
 
 CREATE TRIGGER USER_UUID_TRIGGER
@@ -28,8 +50,21 @@ CREATE TRIGGER USER_UUID_TRIGGER
   FOR EACH ROW
 EXECUTE PROCEDURE generate_uuid();;
 
+CREATE TRIGGER USER_CREATED_TRIGGER
+  BEFORE INSERT
+  ON CRM.USER
+  FOR EACH ROW
+EXECUTE PROCEDURE update_created_timestamp();;
+
+CREATE TRIGGER USER_MODIFIED_TRIGGER
+  BEFORE INSERT OR UPDATE
+  ON CRM.USER
+  FOR EACH ROW
+EXECUTE PROCEDURE update_modified_timestamp();;
 
 # --- !Downs
 
 DROP TABLE CRM.USER;;
 DROP FUNCTION generate_uuid();;
+DROP FUNCTION update_modified_timestamp();;
+DROP FUNCTION update_created_timestamp();;

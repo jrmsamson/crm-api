@@ -12,15 +12,11 @@
             <name>org.jooq.util.postgres.PostgresDatabase</name>
             <inputSchema>crm</inputSchema>
 
-            <forcedTypes>
-                <forcedType>
-                    <userType>java.time.LocalDateTime</userType>
-                    <converter>com.crmapi.model.converters.TimestampToLocalDateTimeConverter</converter>
-                    <types>Timestamp</types>
-                </forcedType>
-            </forcedTypes>
-
             <includes>.*</includes>
+            <excludes>
+                 CREATED | MODIFIED
+            </excludes>
+            <includeExcludeColumns>true</includeExcludeColumns>
         </database>
 
         <generate>
