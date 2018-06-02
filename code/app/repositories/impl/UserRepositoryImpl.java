@@ -20,7 +20,7 @@ import static model.jooq.Tables.USER;
 
 public class UserRepositoryImpl extends BaseRepository implements UserRepository {
 
-    public Optional<UUID> addUser(User user) {
+    public Optional<UUID> addUser(UserRequest user) {
         try {
             return doAddUser(user);
         } catch (DataAccessException exception) {
@@ -34,7 +34,7 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
         return exception.getMessage().contains("user_name_surname_uindex");
     }
 
-    private Optional<UUID> doAddUser(User user) {
+    private Optional<UUID> doAddUser(UserRequest user) {
         UserRecord userRecord = create.newRecord(USER, user);
 
         Optional<UserRecord> userCreated = create

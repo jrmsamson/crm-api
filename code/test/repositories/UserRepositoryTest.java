@@ -53,9 +53,7 @@ public class UserRepositoryTest {
     }
 
     private void setUpFixture() {
-        User user = new User();
-        user.setName("Jerome");
-        user.setSurname("Samson");
+        UserRequest user = new UserRequest("Jerome", "Samson");
         userRepository.addUser(user).ifPresent(
                 userCreatedUUID -> this.userCreated = userRepository.getUser(userCreatedUUID)
         );
@@ -80,9 +78,7 @@ public class UserRepositoryTest {
 
     @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
     public void shouldNotBeAbleToCreateANewUserWithTheSameNameAndSurname() {
-        User user = new User();
-        user.setName("Jerome");
-        user.setSurname("Samson");
+        UserRequest user = new UserRequest("Jerome", "Samson");
         userRepository.addUser(user);
     }
 
@@ -99,9 +95,7 @@ public class UserRepositoryTest {
     public void shouldGetOnlyThoseUsersActive() {
         userCreated.ifPresent(userCreated -> {
             userRepository.deleteUser(userCreated.getUuid());
-            User newUser = new User();
-            newUser.setName("JR");
-            newUser.setSurname("SAM");
+            UserRequest newUser = new UserRequest("JR", "SAM");
             UUID newUserUUID = userRepository.addUser(newUser).get();
             List<UserResponse> users = userRepository.getUsersActive();
 
