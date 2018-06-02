@@ -1,10 +1,10 @@
 package services;
 
+import com.crmapi.exceptions.UserRequestException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import repositories.UserRepository;
 import services.impl.UserServiceImpl;
 
@@ -23,9 +23,6 @@ public class UserServiceTest {
     private UserService userService;
     private UserRepository userRepositoryMock;
 
-    public UserServiceTest() {
-    }
-
     @Before
     public void setUp() {
         userRepositoryMock = mock(UserRepository.class);
@@ -39,6 +36,12 @@ public class UserServiceTest {
         when(userRepositoryMock.addUser(userRequest)).thenReturn(Optional.of(uuidMocked));
         UUID newUserUuid = userService.addUser(userRequest).get();
         assertEquals(uuidMocked, newUserUuid);
+    }
+
+    @Test(expected = UserRequestException.class)
+    public void shouldThrowAnUserRequestExceptionWhenNameOrSurnameAreEmptyWhenItsGoingToCreateANewUser() {
+        UserRequest userRequest = new UserRequest("Jerome", "");
+        userService.addUser(userRequest);
     }
 
     @Test
