@@ -1,11 +1,11 @@
 package model.entities;
 
-public class UserData {
+public class UserRequest {
 
     private String name;
     private String surname;
 
-    public UserData(String name, String surname) {
+    public UserRequest(String name, String surname) {
         this.name = name;
         this.surname = surname;
     }

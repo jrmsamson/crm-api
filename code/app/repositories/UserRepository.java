@@ -1,6 +1,6 @@
 package repositories;
 
-import model.entities.UserData;
+import model.entities.UserRequest;
 import model.entities.UserResponse;
 import model.pojos.User;
 import org.jooq.DSLContext;
@@ -11,13 +11,13 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    Optional<UUID> addUser(DSLContext dslContext, User user);
+    Optional<UUID> addUser(User user);
 
-    void editUser(DSLContext dslContext, UUID userUuid, UserData user);
+    void editUser(UUID userUuid, UserRequest user);
 
-    void deleteUser(DSLContext dslContext, UUID userUuid);
+    void deleteUser(UUID userUuid);
 
-    Optional<UserResponse> getUser(DSLContext dslContext, UUID userUuid);
+    Optional<UserResponse> getUser(UUID userUuid);
 
-    List<UserResponse> getUsersActive(DSLContext dslContext);
+    List<UserResponse> getUsersActive();
 }

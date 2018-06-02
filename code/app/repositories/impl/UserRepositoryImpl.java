@@ -1,13 +1,13 @@
 package repositories.impl;
 
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.UserData;
+import model.entities.UserRequest;
 import model.entities.UserResponse;
 import model.jooq.tables.records.UserRecord;
 import model.pojos.User;
 import org.jooq.exception.DataAccessException;
+import repositories.BaseRepository;
 import repositories.UserRepository;
-import org.jooq.DSLContext;
 import org.jooq.Record3;
 import org.jooq.SelectSelectStep;
 
@@ -18,11 +18,11 @@ import java.util.UUID;
 import static model.jooq.Tables.USER;
 
 
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl extends BaseRepository implements UserRepository {
 
-    public Optional<UUID> addUser(DSLContext dslContext, User user) {
+    public Optional<UUID> addUser(User user) {
         try {
-            return doAddUser(dslContext, user);
+            return doAddUser(user);
         } catch (DataAccessException exception) {
             if (isConstraintUserAndSurnameUniqueException(exception))
                 throw new UserWithSameNameAndSurnameAlreadyExistException();
@@ -34,10 +34,11 @@ public class UserRepositoryImpl implements UserRepository {
         return exception.getMessage().contains("user_name_surname_uindex");
     }
 
-    private Optional<UUID> doAddUser(DSLContext dslContext, User user) {
-        UserRecord userRecord = dslContext.newRecord(USER, user);
+    private Optional<UUID> doAddUser(User user) {
+        UserRecord userRecord = create.newRecord(USER, user);
 
-        Optional<UserRecord> userCreated = dslContext.insertInto(USER)
+        Optional<UserRecord> userCreated = create
+                .insertInto(USER)
                 .set(userRecord)
                 .returning(USER.UUID)
                 .fetchOptional();
@@ -46,8 +47,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void editUser(DSLContext dslContext, UUID userUuid, UserData user) {
-        dslContext
+    public void editUser(UUID userUuid, UserRequest user) {
+        create
                 .update(USER)
                 .set(USER.NAME, user.getName())
                 .set(USER.SURNAME, user.getSurname())
@@ -56,16 +57,16 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteUser(DSLContext dslContext, UUID userUuid) {
-        dslContext
+    public void deleteUser(UUID userUuid) {
+        create
                 .update(USER)
                 .set(USER.ACTIVE, Boolean.FALSE)
                 .execute();
     }
 
     @Override
-    public Optional<UserResponse> getUser(DSLContext dslContext, UUID userUuid) {
-        return selectUser(dslContext)
+    public Optional<UserResponse> getUser(UUID userUuid) {
+        return selectUser()
                 .from(USER)
                 .where(USER.ACTIVE.eq(Boolean.TRUE)
                         .and(
@@ -75,15 +76,15 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<UserResponse> getUsersActive(DSLContext dslContext) {
-        return selectUser(dslContext)
+    public List<UserResponse> getUsersActive() {
+        return selectUser()
                 .from(USER)
                 .where(USER.ACTIVE.eq(Boolean.TRUE))
                 .fetchInto(UserResponse.class);
     }
 
-    private SelectSelectStep<Record3<String, String, UUID>> selectUser(DSLContext dslContext) {
-        return dslContext
+    private SelectSelectStep<Record3<String, String, UUID>> selectUser() {
+        return create
                 .select(
                         USER.NAME,
                         USER.SURNAME,

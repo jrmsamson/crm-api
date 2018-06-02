@@ -1,10 +1,9 @@
 package repositories;
 
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.UserData;
+import model.entities.UserRequest;
 import model.entities.UserResponse;
 import model.pojos.User;
-import repositories.UserRepository;
 import repositories.impl.UserRepositoryImpl;
 import com.google.common.collect.ImmutableMap;
 import org.jooq.DSLContext;
@@ -28,12 +27,10 @@ public class UserRepositoryTest {
 
     private UserRepository userRepository;
     private Database database;
-    private DSLContext dslContext;
     private Optional<UserResponse> userCreated;
 
     @Before
     public void setUp() {
-        this.userRepository = new UserRepositoryImpl();
         this.database = Databases.createFrom(
                 "org.postgresql.Driver",
                 "jdbc:postgresql://postgres:5432/postgres",
@@ -42,7 +39,13 @@ public class UserRepositoryTest {
                         "password", "crmapi"
                 )
         );
-        this.dslContext = DSL.using(this.database.getConnection());
+
+        DSLContext dslContext = DSL.using(this.database.getConnection());
+
+        dslContext.transaction(configuration -> {
+            this.userRepository = new UserRepositoryImpl();
+            ((UserRepositoryImpl) this.userRepository).setConfiguration(configuration);
+        });
 
         Evolutions.applyEvolutions(database);
 
@@ -53,8 +56,8 @@ public class UserRepositoryTest {
         User user = new User();
         user.setName("Jerome");
         user.setSurname("Samson");
-        userRepository.addUser(dslContext, user).ifPresent(
-                userCreatedUUID -> this.userCreated = userRepository.getUser(dslContext, userCreatedUUID)
+        userRepository.addUser(user).ifPresent(
+                userCreatedUUID -> this.userCreated = userRepository.getUser(userCreatedUUID)
         );
     }
 
@@ -66,9 +69,9 @@ public class UserRepositoryTest {
     @Test
     public void shouldEditUser() {
         userCreated.ifPresent(userCreated -> {
-            UserData user = new UserData("JR", "S");
-            userRepository.editUser(dslContext, userCreated.getUuid(), user);
-            UserResponse userEdited = userRepository.getUser(dslContext, userCreated.getUuid()).get();
+            UserRequest user = new UserRequest("JR", "S");
+            userRepository.editUser(userCreated.getUuid(), user);
+            UserResponse userEdited = userRepository.getUser(userCreated.getUuid()).get();
             assertEquals(userCreated.getUuid(), userEdited.getUuid());
             assertEquals(user.getName(), userEdited.getName());
             assertEquals(user.getSurname(), userEdited.getSurname());
@@ -80,14 +83,14 @@ public class UserRepositoryTest {
         User user = new User();
         user.setName("Jerome");
         user.setSurname("Samson");
-        userRepository.addUser(dslContext, user);
+        userRepository.addUser(user);
     }
 
     @Test
     public void shouldDeleteUser() {
         userCreated.ifPresent(userCreated -> {
-            userRepository.deleteUser(dslContext, userCreated.getUuid());
-            Optional<UserResponse> user = userRepository.getUser(dslContext, userCreated.getUuid());
+            userRepository.deleteUser(userCreated.getUuid());
+            Optional<UserResponse> user = userRepository.getUser(userCreated.getUuid());
             assertFalse(user.isPresent());
         });
     }
@@ -95,12 +98,12 @@ public class UserRepositoryTest {
     @Test
     public void shouldGetOnlyThoseUsersActive() {
         userCreated.ifPresent(userCreated -> {
-            userRepository.deleteUser(dslContext, userCreated.getUuid());
+            userRepository.deleteUser(userCreated.getUuid());
             User newUser = new User();
             newUser.setName("JR");
             newUser.setSurname("SAM");
-            UUID newUserUUID = userRepository.addUser(dslContext, newUser).get();
-            List<UserResponse> users = userRepository.getUsersActive(dslContext);
+            UUID newUserUUID = userRepository.addUser(newUser).get();
+            List<UserResponse> users = userRepository.getUsersActive();
 
             assertEquals(1, users.size());
             assertEquals(users.get(0).getUuid(), newUserUUID);
