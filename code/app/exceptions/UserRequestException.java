@@ -1,4 +1,4 @@
-package com.crmapi.exceptions;
+package exceptions;
 
 public class UserRequestException extends RuntimeException {
 

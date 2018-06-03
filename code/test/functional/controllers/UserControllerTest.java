@@ -1,4 +1,4 @@
-package controllers;
+package functional.controllers;
 
 import org.junit.Test;
 import play.Application;
@@ -20,10 +20,10 @@ public class UserControllerTest extends WithApplication {
     }
 
     @Test
-    public void testIndex() {
+    public void shouldReturnAllUsersActive() {
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(GET)
-                .uri("/");
+                .uri("/users");
 
         Result result = route(app, request);
         assertEquals(OK, result.status());

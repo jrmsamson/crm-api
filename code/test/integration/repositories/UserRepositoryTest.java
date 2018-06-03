@@ -1,9 +1,9 @@
-package repositories;
+package integration.repositories;
 
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
-import model.pojos.User;
+import repositories.UserRepository;
 import repositories.impl.UserRepositoryImpl;
 import com.google.common.collect.ImmutableMap;
 import org.jooq.DSLContext;
@@ -42,13 +42,11 @@ public class UserRepositoryTest {
         );
 
         dslContext = DSL.using(this.database.getConnection());
+        this.userRepository.setDslContext(dslContext);
     }
 
     @Before
     public void setUp() {
-        dslContext.transaction(configuration ->
-            ((UserRepositoryImpl) this.userRepository).setConfiguration(configuration)
-        );
         Evolutions.applyEvolutions(database);
         setUpFixture();
     }

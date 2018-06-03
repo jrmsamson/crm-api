@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserService {
+public interface UserService extends BaseService {
 
     Optional<UUID> addUser(UserRequest userRequest);
 

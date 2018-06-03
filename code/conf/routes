@@ -1,4 +1,4 @@
 
 
-GET     /        controllers.TestController.test
+GET     /users        @controllers.UserController.getUsersActive
 

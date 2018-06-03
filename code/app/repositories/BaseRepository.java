@@ -1,15 +1,9 @@
 package repositories;
 
-import org.jooq.Configuration;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
+public interface BaseRepository {
 
-public abstract class BaseRepository {
+    void setDslContext(DSLContext dslContext);
 
-    protected DSLContext create;
-
-    public void setConfiguration(Configuration configuration) {
-        create = DSL.using(configuration);
-    }
 }

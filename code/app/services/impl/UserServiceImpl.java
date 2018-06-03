@@ -1,6 +1,6 @@
 package services.impl;
 
-import com.crmapi.exceptions.UserRequestException;
+import exceptions.UserRequestException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
 import repositories.UserRepository;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
     private UserRepository userRepository;
 
@@ -21,7 +21,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    @Override
     public Optional<UUID> addUser(UserRequest userRequest) {
         Notification userRequestNotification = userRequest.validation();
         if (userRequestNotification.hasErrors())
@@ -29,18 +28,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.addUser(userRequest);
     }
 
-    @Override
     public void editUser(UUID userUuid, UserRequest userRequest) {
         userRepository.editUser(userUuid, userRequest);
     }
 
-    @Override
     public void deleteUser(UUID userUuid) {
         userRepository.deleteUser(userUuid);
     }
 
-    @Override
     public List<UserResponse> getUsersActive() {
+        userRepository.setDslContext(dslContext);
         return userRepository.getUsersActive();
     }
 }

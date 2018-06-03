@@ -1,5 +1,6 @@
-package model.entities;
+package unit.model.entities;
 
+import model.entities.UserRequest;
 import org.junit.Test;
 import util.Notification;
 

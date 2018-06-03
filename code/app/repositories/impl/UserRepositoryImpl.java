@@ -18,7 +18,7 @@ import java.util.UUID;
 import static model.jooq.Tables.USER;
 
 
-public class UserRepositoryImpl extends BaseRepository implements UserRepository {
+public class UserRepositoryImpl extends BaseRepositoryImpl implements UserRepository {
 
     public Optional<UUID> addUser(UserRequest user) {
         try {

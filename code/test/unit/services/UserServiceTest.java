@@ -1,11 +1,12 @@
-package services;
+package unit.services;
 
-import com.crmapi.exceptions.UserRequestException;
+import exceptions.UserRequestException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
 import org.junit.Before;
 import org.junit.Test;
 import repositories.UserRepository;
+import services.UserService;
 import services.impl.UserServiceImpl;
 
 import java.util.ArrayList;

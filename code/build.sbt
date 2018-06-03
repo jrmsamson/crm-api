@@ -22,11 +22,11 @@ libraryDependencies ++= Seq(
   evolutions,
   filters,
   javaJdbc          %     Test,
-  "org.postgresql"  %     "postgresql"      %   postgresql              withSources() withJavadoc(),
-  "org.jooq"        %     "jooq"            %   jooqVersion             withSources() withJavadoc(),
-  "org.jooq"        %     "jooq-meta"       %   jooqVersion             withSources() withJavadoc(),
-  "org.jooq"        %     "jooq-codegen"    %   jooqVersion             withSources() withJavadoc(),
-  "org.mockito"     %     "mockito-core"    %   mockitoVersion   %      Test,
+  "org.postgresql"  %     "postgresql"                %   postgresql              withSources() withJavadoc(),
+  "org.jooq"        %     "jooq"                      %   jooqVersion             withSources() withJavadoc(),
+  "org.jooq"        %     "jooq-meta"                 %   jooqVersion             withSources() withJavadoc(),
+  "org.jooq"        %     "jooq-codegen"              %   jooqVersion             withSources() withJavadoc(),
+  "org.mockito"     %     "mockito-core"              %   mockitoVersion      %      Test
 )
 
 /**
