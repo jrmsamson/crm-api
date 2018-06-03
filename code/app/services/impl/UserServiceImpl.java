@@ -3,7 +3,7 @@ package services.impl;
 import exceptions.UserRequestException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
-import repositories.UserRepository;
+import repositories.RepositoryFactory;
 import services.UserService;
 import util.Notification;
 
@@ -14,30 +14,34 @@ import java.util.UUID;
 
 public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-
     @Inject
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserServiceImpl(RepositoryFactory repositoryFactory) {
+        // For testing purpose
+        super(repositoryFactory);
     }
 
     public Optional<UUID> addUser(UserRequest userRequest) {
         Notification userRequestNotification = userRequest.validation();
         if (userRequestNotification.hasErrors())
             throw new UserRequestException(userRequestNotification.errorMessage());
-        return userRepository.addUser(userRequest);
+        return repositoryFactory.getUserRepository().addUser(userRequest);
     }
 
     public void editUser(UUID userUuid, UserRequest userRequest) {
-        userRepository.editUser(userUuid, userRequest);
+        repositoryFactory
+                .getUserRepository()
+                .editUser(userUuid, userRequest);
     }
 
     public void deleteUser(UUID userUuid) {
-        userRepository.deleteUser(userUuid);
+        repositoryFactory
+                .getUserRepository()
+                .deleteUser(userUuid);
     }
 
     public List<UserResponse> getUsersActive() {
-        userRepository.setDslContext(dslContext);
-        return userRepository.getUsersActive();
+        return repositoryFactory
+                .getUserRepository()
+                .getUsersActive();
     }
 }

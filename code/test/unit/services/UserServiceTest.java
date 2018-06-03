@@ -5,6 +5,7 @@ import model.entities.UserRequest;
 import model.entities.UserResponse;
 import org.junit.Before;
 import org.junit.Test;
+import repositories.RepositoryFactory;
 import repositories.UserRepository;
 import services.UserService;
 import services.impl.UserServiceImpl;
@@ -22,19 +23,21 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     private UserService userService;
-    private UserRepository userRepositoryMock;
+    private UserRepository userRepository;
 
     @Before
     public void setUp() {
-        userRepositoryMock = mock(UserRepository.class);
-        userService = new UserServiceImpl(userRepositoryMock);
+        userRepository = mock(UserRepository.class);
+        RepositoryFactory repositoryFactoryMock = mock(RepositoryFactory.class);
+        when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepository);
+        userService = new UserServiceImpl(repositoryFactoryMock);
     }
 
     @Test
     public void shouldCreateANewUser() {
         UserRequest userRequest = new UserRequest("Jerome", "Samson");
         UUID uuidMocked = UUID.randomUUID();
-        when(userRepositoryMock.addUser(userRequest)).thenReturn(Optional.of(uuidMocked));
+        when(userService.addUser(userRequest)).thenReturn(Optional.of(uuidMocked));
         UUID newUserUuid = userService.addUser(userRequest).get();
         assertEquals(uuidMocked, newUserUuid);
     }
@@ -50,14 +53,14 @@ public class UserServiceTest {
         UserRequest userRequest = new UserRequest("JRM", "SAM");
         UUID uuidMocked = UUID.randomUUID();
         userService.editUser(uuidMocked, userRequest);
-        verify(userRepositoryMock).editUser(uuidMocked, userRequest);
+        verify(userRepository).editUser(uuidMocked, userRequest);
     }
 
     @Test
     public void shouldDeleteAnUser() {
         UUID uuidMocked = UUID.randomUUID();
         userService.deleteUser(uuidMocked);
-        verify(userRepositoryMock).deleteUser(uuidMocked);
+        verify(userRepository).deleteUser(uuidMocked);
     }
 
     @Test
@@ -65,7 +68,7 @@ public class UserServiceTest {
         List<UserResponse> usersMocked = new ArrayList<>();
         usersMocked.add(new UserResponse("Jerome", "Samson", UUID.randomUUID()));
         usersMocked.add(new UserResponse("JRM", "SAM", UUID.randomUUID()));
-        when(userRepositoryMock.getUsersActive()).thenReturn(usersMocked);
+        when(userRepository.getUsersActive()).thenReturn(usersMocked);
 
         List<UserResponse> users = userService.getUsersActive();
 

@@ -10,6 +10,9 @@ public class UserRequest {
     private String name;
     private String surname;
 
+    public UserRequest() {
+    }
+
     public UserRequest(String name, String surname) {
         this.name = name;
         this.surname = surname;

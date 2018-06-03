@@ -3,16 +3,15 @@ package integration.repositories;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
+import play.Application;
+import play.inject.guice.GuiceApplicationBuilder;
 import repositories.UserRepository;
 import repositories.impl.UserRepositoryImpl;
-import com.google.common.collect.ImmutableMap;
-import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import play.db.Database;
-import play.db.Databases;
 import play.db.evolutions.Evolutions;
 
 import java.util.List;
@@ -28,21 +27,14 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
     private Database database;
     private Optional<UserResponse> userCreated;
-    private DSLContext dslContext;
 
     public UserRepositoryTest() {
-        this.userRepository = new UserRepositoryImpl();
-        this.database = Databases.createFrom(
-                "org.postgresql.Driver",
-                "jdbc:postgresql://postgres:5432/postgres",
-                ImmutableMap.of(
-                        "username", "postgres",
-                        "password", "crmapi"
-                )
+        Application application = new GuiceApplicationBuilder().build();
+        database = application.injector().instanceOf(Database.class);
+        userRepository = new UserRepositoryImpl();
+        userRepository.setDslContext(
+                DSL.using(this.database.getConnection())
         );
-
-        dslContext = DSL.using(this.database.getConnection());
-        this.userRepository.setDslContext(dslContext);
     }
 
     @Before
