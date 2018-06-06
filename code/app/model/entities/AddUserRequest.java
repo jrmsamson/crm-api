@@ -1,21 +1,28 @@
 package model.entities;
 
+import enums.Role;
 import util.Notification;
 
-public class UserRequest {
+public class AddUserRequest {
 
     public static final String NAME_REQUIRED_MESSAGE = "Name is required";
     public static final String SURNAME_REQUIRED_MESSAGE = "Surname is required";
 
     private String name;
     private String surname;
+    private Role role;
+    private String username;
+    private String password;
 
-    public UserRequest() {
+    public AddUserRequest() {
     }
 
-    public UserRequest(String name, String surname) {
+    public AddUserRequest(String name, String surname, Role role, String username, String password) {
         this.name = name;
         this.surname = surname;
+        this.role = role;
+        this.username = username;
+        this.password = password;
     }
 
     public Notification validation() {
@@ -44,5 +51,29 @@ public class UserRequest {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

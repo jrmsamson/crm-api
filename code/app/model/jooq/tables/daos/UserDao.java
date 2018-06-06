@@ -4,13 +4,14 @@
 package model.jooq.tables.daos;
 
 
-import model.jooq.tables.User;
-import model.jooq.tables.records.UserRecord;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Generated;
+
+import model.jooq.tables.User;
+import model.jooq.tables.records.UserRecord;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
@@ -91,5 +92,26 @@ public class UserDao extends DAOImpl<UserRecord, model.pojos.User, Long> {
      */
     public List<model.pojos.User> fetchByActive(Boolean... values) {
         return fetch(User.USER.ACTIVE, values);
+    }
+
+    /**
+     * Fetch records that have <code>role_id IN (values)</code>
+     */
+    public List<model.pojos.User> fetchByRoleId(Integer... values) {
+        return fetch(User.USER.ROLE_ID, values);
+    }
+
+    /**
+     * Fetch records that have <code>token IN (values)</code>
+     */
+    public List<model.pojos.User> fetchByToken(String... values) {
+        return fetch(User.USER.TOKEN, values);
+    }
+
+    /**
+     * Fetch records that have <code>token_expiration IN (values)</code>
+     */
+    public List<model.pojos.User> fetchByTokenExpiration(LocalDateTime... values) {
+        return fetch(User.USER.TOKEN_EXPIRATION, values);
     }
 }

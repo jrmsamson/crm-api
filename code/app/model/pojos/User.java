@@ -5,6 +5,7 @@ package model.pojos;
 
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.annotation.Generated;
@@ -25,13 +26,16 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1305954633;
+    private static final long serialVersionUID = -700145931;
 
-    private Long    id;
-    private UUID    uuid;
-    private String  name;
-    private String  surname;
-    private Boolean active;
+    private Long          id;
+    private UUID          uuid;
+    private String        name;
+    private String        surname;
+    private Boolean       active;
+    private Integer       roleId;
+    private String        token;
+    private LocalDateTime tokenExpiration;
 
     public User() {}
 
@@ -41,20 +45,29 @@ public class User implements Serializable {
         this.name = value.name;
         this.surname = value.surname;
         this.active = value.active;
+        this.roleId = value.roleId;
+        this.token = value.token;
+        this.tokenExpiration = value.tokenExpiration;
     }
 
     public User(
-        Long    id,
-        UUID    uuid,
-        String  name,
-        String  surname,
-        Boolean active
+        Long          id,
+        UUID          uuid,
+        String        name,
+        String        surname,
+        Boolean       active,
+        Integer       roleId,
+        String        token,
+        LocalDateTime tokenExpiration
     ) {
         this.id = id;
         this.uuid = uuid;
         this.name = name;
         this.surname = surname;
         this.active = active;
+        this.roleId = roleId;
+        this.token = token;
+        this.tokenExpiration = tokenExpiration;
     }
 
     public Long getId() {
@@ -101,6 +114,31 @@ public class User implements Serializable {
         this.active = active;
     }
 
+    public Integer getRoleId() {
+        return this.roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
+
+    @Size(max = 50)
+    public String getToken() {
+        return this.token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public LocalDateTime getTokenExpiration() {
+        return this.tokenExpiration;
+    }
+
+    public void setTokenExpiration(LocalDateTime tokenExpiration) {
+        this.tokenExpiration = tokenExpiration;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("User (");
@@ -110,6 +148,9 @@ public class User implements Serializable {
         sb.append(", ").append(name);
         sb.append(", ").append(surname);
         sb.append(", ").append(active);
+        sb.append(", ").append(roleId);
+        sb.append(", ").append(token);
+        sb.append(", ").append(tokenExpiration);
 
         sb.append(")");
         return sb.toString();

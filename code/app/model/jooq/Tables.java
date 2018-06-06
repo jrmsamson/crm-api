@@ -4,9 +4,11 @@
 package model.jooq;
 
 
-import model.jooq.tables.User;
-
 import javax.annotation.Generated;
+
+import model.jooq.tables.Login;
+import model.jooq.tables.Role;
+import model.jooq.tables.User;
 
 
 /**
@@ -21,6 +23,16 @@ import javax.annotation.Generated;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>crm.login</code>.
+     */
+    public static final Login LOGIN = model.jooq.tables.Login.LOGIN;
+
+    /**
+     * The table <code>crm.role</code>.
+     */
+    public static final Role ROLE = model.jooq.tables.Role.ROLE;
 
     /**
      * The table <code>crm.user</code>.

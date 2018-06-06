@@ -1,26 +1,45 @@
 package repositories.impl;
 
+import enums.Role;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.UserRequest;
+import model.entities.AddUserRequest;
+import model.entities.UpdateUserTokenRequest;
 import model.entities.UserResponse;
-import model.jooq.tables.records.UserRecord;
+import model.entities.UserTokenResponse;
 import model.pojos.User;
+import org.jooq.*;
 import org.jooq.exception.DataAccessException;
-import repositories.BaseRepository;
 import repositories.UserRepository;
-import org.jooq.Record3;
-import org.jooq.SelectSelectStep;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static model.jooq.Tables.ROLE;
 import static model.jooq.Tables.USER;
 
 
 public class UserRepositoryImpl extends BaseRepositoryImpl implements UserRepository {
 
-    public Optional<UUID> addUser(UserRequest user) {
+    public Optional<UserResponse> getUserById(Long userId) {
+        return selectUser()
+                .where(USER.ID.eq(userId))
+                .fetchOptionalInto(UserResponse.class);
+    }
+
+    public Optional<UserResponse> getUserByUuid(UUID userUuid) {
+        return selectUser()
+                .where(USER.ACTIVE.eq(Boolean.TRUE)
+                        .and(USER.UUID.eq(userUuid)
+                        )).fetchOptional(record -> new UserResponse(
+                        record.value1(),
+                        record.value2(),
+                        record.value3(),
+                        Role.lookup(record.value4())
+                ));
+    }
+
+    public Long addUser(User user) {
         try {
             return doAddUser(user);
         } catch (DataAccessException exception) {
@@ -34,24 +53,22 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
         return exception.getMessage().contains("user_name_surname_uindex");
     }
 
-    private Optional<UUID> doAddUser(UserRequest user) {
-        UserRecord userRecord = create.newRecord(USER, user);
-
-        Optional<UserRecord> userCreated = create
+    private Long doAddUser(User user) {
+        return create
                 .insertInto(USER)
-                .set(userRecord)
-                .returning(USER.UUID)
-                .fetchOptional();
-
-        return userCreated.map(UserRecord::getUuid);
+                .set(create.newRecord(USER, user))
+                .returning(USER.ID)
+                .fetchOne()
+                .getId();
     }
 
     @Override
-    public void editUser(UUID userUuid, UserRequest user) {
+    public void editUser(UUID userUuid, AddUserRequest user) {
         create
                 .update(USER)
                 .set(USER.NAME, user.getName())
                 .set(USER.SURNAME, user.getSurname())
+                .set(USER.ROLE_ID, getRoleId(user.getRole()))
                 .where(USER.UUID.eq(userUuid))
                 .execute();
     }
@@ -65,30 +82,64 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public Optional<UserResponse> getUser(UUID userUuid) {
+    public List<UserResponse> getUsersActive() {
         return selectUser()
-                .from(USER)
-                .where(USER.ACTIVE.eq(Boolean.TRUE)
-                        .and(
-                                USER.UUID.eq(userUuid))
-                )
-                .fetchOptionalInto(UserResponse.class);
+                .where(USER.ACTIVE.eq(Boolean.TRUE))
+                .fetch(record -> new UserResponse(
+                        record.value1(),
+                        record.value2(),
+                        record.value3(),
+                        Role.lookup(record.value4())
+                ));
     }
 
     @Override
-    public List<UserResponse> getUsersActive() {
-        return selectUser()
+    public Optional<Role> getUserRoleByUserId(Long userId) {
+        return create
+                .select(ROLE.NAME)
                 .from(USER)
-                .where(USER.ACTIVE.eq(Boolean.TRUE))
-                .fetchInto(UserResponse.class);
+                .innerJoin(ROLE).on(USER.ROLE_ID.eq(ROLE.ID))
+                .where(USER.ID.eq(userId))
+                .fetchOptional(record -> Role.lookup(record.value1()));
     }
 
-    private SelectSelectStep<Record3<String, String, UUID>> selectUser() {
+    @Override
+    public Optional<UserTokenResponse> getUserToken(Long userId) {
+        return create
+                .select(USER.TOKEN, USER.TOKEN_EXPIRATION)
+                .from(USER)
+                .where(USER.ID.eq(userId))
+                .fetchOptionalInto(UserTokenResponse.class);
+    }
+
+    public void updateUserToken(UpdateUserTokenRequest updateUserTokenRequest) {
+        create.update(USER)
+                .set(USER.TOKEN, updateUserTokenRequest.getToken())
+                .set(USER.TOKEN_EXPIRATION, updateUserTokenRequest.getTokenExpiration())
+                .where(USER.ID.eq(updateUserTokenRequest.getUserId()))
+                .execute();
+    }
+
+    private SelectOnConditionStep<Record4<String, String, UUID, String>> selectUser() {
         return create
                 .select(
                         USER.NAME,
                         USER.SURNAME,
-                        USER.UUID
+                        USER.UUID,
+                        ROLE.NAME
+                )
+                .from(USER)
+                .innerJoin(ROLE).on(USER.ROLE_ID.eq(ROLE.ID));
+    }
+
+    private SelectConditionStep<Record1<Integer>> getRoleId(Role role) {
+        return create
+                .select(ROLE.ID)
+                .from(ROLE)
+                .where(
+                        ROLE.NAME.lower().eq(
+                                role.name().toLowerCase()
+                        )
                 );
     }
 }

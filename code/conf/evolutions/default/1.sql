@@ -30,15 +30,27 @@ BEGIN
 END;;
 $update_created_timestamp_body$ LANGUAGE plpgsql;;
 
+CREATE TABLE CRM.ROLE
+(
+  ID              SERIAL            PRIMARY KEY,
+  NAME            VARCHAR(50)       NOT NULL
+);;
+
+INSERT INTO CRM.ROLE (NAME) VALUES ('Admin');;
+INSERT INTO CRM.ROLE (NAME) VALUES ('User');;
+
 CREATE TABLE CRM.USER
 (
-  ID        BIGSERIAL     PRIMARY KEY,
-  UUID      UUID,
-  NAME      VARCHAR(50)   NOT NULL,
-  SURNAME   VARCHAR(50)   NOT NULL,
-  ACTIVE    BOOLEAN       NOT NULL    DEFAULT TRUE,
-  CREATED   TIMESTAMP,
-  MODIFIED  TIMESTAMP
+  ID                    BIGSERIAL     PRIMARY KEY,
+  UUID                  UUID,
+  NAME                  VARCHAR(50)   NOT NULL,
+  SURNAME               VARCHAR(50)   NOT NULL,
+  ACTIVE                BOOLEAN       NOT NULL    DEFAULT TRUE,
+  ROLE_ID               SERIAL        NOT NULL,
+  TOKEN                 VARCHAR(50),
+  TOKEN_EXPIRATION      TIMESTAMP,
+  CREATED               TIMESTAMP,
+  MODIFIED              TIMESTAMP
 );;
 
 CREATE UNIQUE INDEX USER_NAME_SURNAME_UINDEX ON CRM.USER (NAME, SURNAME);;
@@ -64,6 +76,7 @@ EXECUTE PROCEDURE update_modified_timestamp();;
 
 # --- !Downs
 
+DROP TABLE CRM.ROLE;;
 DROP TABLE CRM.USER;;
 DROP FUNCTION generate_uuid();;
 DROP FUNCTION update_modified_timestamp();;

@@ -4,13 +4,15 @@
 package model.jooq;
 
 
-import model.jooq.tables.User;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import model.jooq.tables.Login;
+import model.jooq.tables.Role;
+import model.jooq.tables.User;
 
 import org.jooq.Catalog;
 import org.jooq.Sequence;
@@ -31,12 +33,22 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Crm extends SchemaImpl {
 
-    private static final long serialVersionUID = 1243705338;
+    private static final long serialVersionUID = 1876444361;
 
     /**
      * The reference instance of <code>crm</code>
      */
     public static final Crm CRM = new Crm();
+
+    /**
+     * The table <code>crm.login</code>.
+     */
+    public final Login LOGIN = model.jooq.tables.Login.LOGIN;
+
+    /**
+     * The table <code>crm.role</code>.
+     */
+    public final Role ROLE = model.jooq.tables.Role.ROLE;
 
     /**
      * The table <code>crm.user</code>.
@@ -68,7 +80,11 @@ public class Crm extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
-            Sequences.USER_ID_SEQ);
+            Sequences.LOGIN_ID_SEQ,
+            Sequences.LOGIN_USER_ID_SEQ,
+            Sequences.ROLE_ID_SEQ,
+            Sequences.USER_ID_SEQ,
+            Sequences.USER_ROLE_ID_SEQ);
     }
 
     @Override
@@ -80,6 +96,8 @@ public class Crm extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Login.LOGIN,
+            Role.ROLE,
             User.USER);
     }
 }

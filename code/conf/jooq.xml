@@ -16,6 +16,14 @@
             <excludes>
                  CREATED | MODIFIED
             </excludes>
+
+            <forcedTypes>
+                <forcedType>
+                    <userType>java.time.LocalDateTime</userType>
+                    <converter>util.TimestampToLocalDatetimeConverter</converter>
+                    <types>Timestamp.*</types>
+                </forcedType>
+            </forcedTypes>
             <includeExcludeColumns>true</includeExcludeColumns>
         </database>
 
@@ -31,7 +39,7 @@
         </target>
 
         <strategy>
-            <name>com.crmapi.util.JooqGeneratorStrategy</name>
+            <name>util.JooqGeneratorStrategy</name>
         </strategy>
 
     </generator>

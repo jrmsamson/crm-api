@@ -1,18 +1,22 @@
 package unit.services;
 
+import enums.Role;
 import exceptions.UserRequestException;
-import model.entities.UserRequest;
+import model.entities.AddLoginRequest;
+import model.entities.AddUserRequest;
 import model.entities.UserResponse;
+import model.pojos.User;
 import org.junit.Before;
 import org.junit.Test;
 import repositories.RepositoryFactory;
 import repositories.UserRepository;
+import services.LoginService;
+import services.RoleService;
 import services.UserService;
 import services.impl.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -23,52 +27,61 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     private UserService userService;
-    private UserRepository userRepository;
+    private UserRepository userRepositoryMock;
+    private RoleService roleServiceMock;
+    private LoginService loginServiceMock;
 
     @Before
     public void setUp() {
-        userRepository = mock(UserRepository.class);
+        userRepositoryMock = mock(UserRepository.class);
+        loginServiceMock = mock(LoginService.class);
+        roleServiceMock = mock(RoleService.class);
         RepositoryFactory repositoryFactoryMock = mock(RepositoryFactory.class);
-        when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepository);
-        userService = new UserServiceImpl(repositoryFactoryMock);
+        when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepositoryMock);
+        userService = new UserServiceImpl(repositoryFactoryMock, loginServiceMock, roleServiceMock);
+        setUpFixture();
+    }
+
+    private void setUpFixture() {
+        when(userRepositoryMock.addUser(new User())).thenReturn(0L);
+        AddUserRequest addUserRequest = new AddUserRequest("Jerome", "Samson", Role.USER, "jer0Me", "password");
+        userService.addUser(addUserRequest);
     }
 
     @Test
-    public void shouldCreateANewUser() {
-        UserRequest userRequest = new UserRequest("Jerome", "Samson");
-        UUID uuidMocked = UUID.randomUUID();
-        when(userService.addUser(userRequest)).thenReturn(Optional.of(uuidMocked));
-        UUID newUserUuid = userService.addUser(userRequest).get();
-        assertEquals(uuidMocked, newUserUuid);
+    public void shouldCreateANewUserWithLogin() {
+        verify(roleServiceMock).getRoleId(Role.USER);
+        // TODO
+//        verify(loginServiceMock).addLoginForUser(0L, new AddLoginRequest("jer0Me", "password"));
     }
 
     @Test(expected = UserRequestException.class)
     public void shouldThrowAnUserRequestExceptionWhenNameOrSurnameAreEmptyWhenItsGoingToCreateANewUser() {
-        UserRequest userRequest = new UserRequest("Jerome", "");
-        userService.addUser(userRequest);
+        AddUserRequest addUserRequest = new AddUserRequest("Jerome", "", Role.USER, "jer0Me", "password");
+        userService.addUser(addUserRequest);
     }
 
     @Test
     public void shouldEditAnUser() {
-        UserRequest userRequest = new UserRequest("JRM", "SAM");
+        AddUserRequest addUserRequest = new AddUserRequest("JRM", "SAM", Role.USER, "jer0Me", "password");
         UUID uuidMocked = UUID.randomUUID();
-        userService.editUser(uuidMocked, userRequest);
-        verify(userRepository).editUser(uuidMocked, userRequest);
+        userService.editUser(uuidMocked, addUserRequest);
+        verify(userRepositoryMock).editUser(uuidMocked, addUserRequest);
     }
 
     @Test
     public void shouldDeleteAnUser() {
         UUID uuidMocked = UUID.randomUUID();
         userService.deleteUser(uuidMocked);
-        verify(userRepository).deleteUser(uuidMocked);
+        verify(userRepositoryMock).deleteUser(uuidMocked);
     }
 
     @Test
     public void shouldGetAllUsersActive() {
         List<UserResponse> usersMocked = new ArrayList<>();
-        usersMocked.add(new UserResponse("Jerome", "Samson", UUID.randomUUID()));
-        usersMocked.add(new UserResponse("JRM", "SAM", UUID.randomUUID()));
-        when(userRepository.getUsersActive()).thenReturn(usersMocked);
+        usersMocked.add(new UserResponse("Jerome", "Samson", UUID.randomUUID(), Role.USER));
+        usersMocked.add(new UserResponse("JRM", "SAM", UUID.randomUUID(), Role.USER));
+        when(userRepositoryMock.getUsersActive()).thenReturn(usersMocked);
 
         List<UserResponse> users = userService.getUsersActive();
 
@@ -76,4 +89,5 @@ public class UserServiceTest {
             assertEquals(usersMocked.get(0), users.get(0));
         }
     }
+
 }

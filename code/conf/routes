@@ -1,5 +1,9 @@
 
 
+POST        /login                  @controllers.AuthenticationController.login
+GET         /logout                 @controllers.AuthenticationController.logout
+
+
 GET         /users                  @controllers.UserController.getUsersActive
 POST        /users                  @controllers.UserController.addUser
 PUT         /users/:uuid            @controllers.UserController.editUser(uuid: String)

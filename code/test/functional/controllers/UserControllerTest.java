@@ -1,6 +1,7 @@
 package functional.controllers;
 
-import model.entities.UserRequest;
+import enums.Role;
+import model.entities.AddUserRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +26,8 @@ public class UserControllerTest {
     private Application app;
 
     public UserControllerTest() {
-            app = new GuiceApplicationBuilder().build();
-            database = app.injector().instanceOf(Database.class);
+        app = new GuiceApplicationBuilder().build();
+        database = app.injector().instanceOf(Database.class);
     }
 
     @Before
@@ -45,11 +46,13 @@ public class UserControllerTest {
 
     @Test
     public void shouldBeAvailableAddANewUser() {
-        UserRequest userRequest = new UserRequest("Jerome", "Samson");
+        AddUserRequest addUserRequest = new AddUserRequest(
+                "Jerome", "Samson", Role.USER, "jer0Me" , "password"
+        );
 
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
-                .bodyJson(Json.toJson(userRequest))
+                .bodyJson(Json.toJson(addUserRequest))
                 .uri("/users");
         Result result = route(app, request);
         assertEquals(OK, result.status());
@@ -57,11 +60,13 @@ public class UserControllerTest {
 
     @Test
     public void shouldBeAvailableEditUser() {
-        UserRequest userRequest = new UserRequest("Jerome", "Samson");
+        AddUserRequest addUserRequest = new AddUserRequest(
+                "Jerome", "Samson", Role.USER, "jer0Me" , "password"
+        );
         UUID uuid = UUID.randomUUID();
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(PUT)
-                .bodyJson(Json.toJson(userRequest))
+                .bodyJson(Json.toJson(addUserRequest))
                 .uri("/users/" + uuid);
         Result result = route(app, request);
         assertEquals(OK, result.status());

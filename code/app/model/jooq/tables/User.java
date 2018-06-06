@@ -4,16 +4,17 @@
 package model.jooq.tables;
 
 
-import model.jooq.Crm;
-import model.jooq.Indexes;
-import model.jooq.Keys;
-import model.jooq.tables.records.UserRecord;
-
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Generated;
+
+import model.jooq.Crm;
+import model.jooq.Indexes;
+import model.jooq.Keys;
+import model.jooq.tables.records.UserRecord;
 
 import org.jooq.Field;
 import org.jooq.Identity;
@@ -25,6 +26,8 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
+
+import util.TimestampToLocalDatetimeConverter;
 
 
 /**
@@ -40,7 +43,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User extends TableImpl<UserRecord> {
 
-    private static final long serialVersionUID = 1595275306;
+    private static final long serialVersionUID = 1226539150;
 
     /**
      * The reference instance of <code>crm.user</code>
@@ -79,6 +82,21 @@ public class User extends TableImpl<UserRecord> {
      * The column <code>crm.user.active</code>.
      */
     public final TableField<UserRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("true", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+
+    /**
+     * The column <code>crm.user.role_id</code>.
+     */
+    public final TableField<UserRecord, Integer> ROLE_ID = createField("role_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('crm.user_role_id_seq'::regclass)", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+
+    /**
+     * The column <code>crm.user.token</code>.
+     */
+    public final TableField<UserRecord, String> TOKEN = createField("token", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+
+    /**
+     * The column <code>crm.user.token_expiration</code>.
+     */
+    public final TableField<UserRecord, LocalDateTime> TOKEN_EXPIRATION = createField("token_expiration", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new TimestampToLocalDatetimeConverter());
 
     /**
      * Create a <code>crm.user</code> table reference

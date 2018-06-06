@@ -1,7 +1,7 @@
 package controllers;
 
 import com.google.inject.Inject;
-import model.entities.UserRequest;
+import model.entities.AddUserRequest;
 import play.libs.Json;
 import play.mvc.*;
 import services.UserService;
@@ -30,27 +30,25 @@ public class UserController extends BaseController {
 
     @With(TransactionalAction.class)
     public CompletionStage<Result> addUser() {
-        UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
+        AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
         return CompletableFuture
-                .supplyAsync(() ->
-                        this.userService.addUser(userRequest)
-                ).thenApply(userUuid ->
-                        ok(Json.toJson(userUuid))
-                );
+                .runAsync(() ->
+                        this.userService.addUser(addUserRequest)
+                ).thenApply(aVoid -> ok());
     }
 
     @With(TransactionalAction.class)
     public CompletionStage<Result> editUser(String uuid) {
-        UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
+        AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
         return CompletableFuture.runAsync(() ->
-                this.userService.editUser(UUID.fromString(uuid), userRequest)
-        ).thenApply(userUuid -> ok());
+                this.userService.editUser(UUID.fromString(uuid), addUserRequest)
+        ).thenApply(aVoid -> ok());
     }
 
     @With(TransactionalAction.class)
     public CompletionStage<Result> deleteUser(String uuid) {
         return CompletableFuture.runAsync(() ->
                 this.userService.deleteUser(UUID.fromString(uuid))
-        ).thenApply(userUuid -> ok());
+        ).thenApply(aVoid -> ok());
     }
 }

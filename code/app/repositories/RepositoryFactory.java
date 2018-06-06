@@ -13,6 +13,12 @@ public class RepositoryFactory {
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private LoginRepository loginRepository;
+
+    @Inject
+    private RoleRepository roleRepository;
+
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
@@ -20,5 +26,15 @@ public class RepositoryFactory {
     public UserRepository getUserRepository() {
         userRepository.setDslContext(dslContext);
         return userRepository;
+    }
+
+    public LoginRepository getLoginRepository() {
+        loginRepository.setDslContext(dslContext);
+        return loginRepository;
+    }
+
+    public RoleRepository getRoleRepository() {
+        roleRepository.setDslContext(dslContext);
+        return roleRepository;
     }
 }

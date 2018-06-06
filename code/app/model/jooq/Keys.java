@@ -4,11 +4,16 @@
 package model.jooq;
 
 
-import model.jooq.tables.User;
-import model.jooq.tables.records.UserRecord;
-
 import javax.annotation.Generated;
 
+import model.jooq.tables.Login;
+import model.jooq.tables.Role;
+import model.jooq.tables.User;
+import model.jooq.tables.records.LoginRecord;
+import model.jooq.tables.records.RoleRecord;
+import model.jooq.tables.records.UserRecord;
+
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
@@ -32,28 +37,41 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<LoginRecord, Long> IDENTITY_LOGIN = Identities0.IDENTITY_LOGIN;
+    public static final Identity<RoleRecord, Integer> IDENTITY_ROLE = Identities0.IDENTITY_ROLE;
     public static final Identity<UserRecord, Long> IDENTITY_USER = Identities0.IDENTITY_USER;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<LoginRecord> LOGIN_PKEY = UniqueKeys0.LOGIN_PKEY;
+    public static final UniqueKey<RoleRecord> ROLE_PKEY = UniqueKeys0.ROLE_PKEY;
     public static final UniqueKey<UserRecord> USER_PKEY = UniqueKeys0.USER_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<LoginRecord, UserRecord> LOGIN__LOGIN_USER_ID_FKEY = ForeignKeys0.LOGIN__LOGIN_USER_ID_FKEY;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
     private static class Identities0 {
+        public static Identity<LoginRecord, Long> IDENTITY_LOGIN = Internal.createIdentity(Login.LOGIN, Login.LOGIN.ID);
+        public static Identity<RoleRecord, Integer> IDENTITY_ROLE = Internal.createIdentity(Role.ROLE, Role.ROLE.ID);
         public static Identity<UserRecord, Long> IDENTITY_USER = Internal.createIdentity(User.USER, User.USER.ID);
     }
 
     private static class UniqueKeys0 {
+        public static final UniqueKey<LoginRecord> LOGIN_PKEY = Internal.createUniqueKey(Login.LOGIN, "login_pkey", Login.LOGIN.ID);
+        public static final UniqueKey<RoleRecord> ROLE_PKEY = Internal.createUniqueKey(Role.ROLE, "role_pkey", Role.ROLE.ID);
         public static final UniqueKey<UserRecord> USER_PKEY = Internal.createUniqueKey(User.USER, "user_pkey", User.USER.ID);
+    }
+
+    private static class ForeignKeys0 {
+        public static final ForeignKey<LoginRecord, UserRecord> LOGIN__LOGIN_USER_ID_FKEY = Internal.createForeignKey(model.jooq.Keys.USER_PKEY, Login.LOGIN, "login__login_user_id_fkey", Login.LOGIN.USER_ID);
     }
 }

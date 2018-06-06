@@ -24,7 +24,27 @@ import org.jooq.impl.SequenceImpl;
 public class Sequences {
 
     /**
+     * The sequence <code>crm.login_id_seq</code>
+     */
+    public static final Sequence<Long> LOGIN_ID_SEQ = new SequenceImpl<Long>("login_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>crm.login_user_id_seq</code>
+     */
+    public static final Sequence<Long> LOGIN_USER_ID_SEQ = new SequenceImpl<Long>("login_user_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>crm.role_id_seq</code>
+     */
+    public static final Sequence<Integer> ROLE_ID_SEQ = new SequenceImpl<Integer>("role_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
+
+    /**
      * The sequence <code>crm.user_id_seq</code>
      */
     public static final Sequence<Long> USER_ID_SEQ = new SequenceImpl<Long>("user_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>crm.user_role_id_seq</code>
+     */
+    public static final Sequence<Integer> USER_ROLE_ID_SEQ = new SequenceImpl<Integer>("user_role_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 }
