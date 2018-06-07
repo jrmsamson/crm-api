@@ -49,6 +49,7 @@ public class LoginRepositoryImpl extends BaseRepositoryImpl implements LoginRepo
     public Optional<UUID> getLoginPasswordSaltByUserId(Long userId) {
         return create.select(LOGIN.PASSWORD_SALT)
                 .from(LOGIN)
+                .where(LOGIN.USER_ID.eq(userId))
                 .fetchOptionalInto(UUID.class);
     }
 }

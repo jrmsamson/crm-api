@@ -1,6 +1,5 @@
 package integration.repositories;
 
-import enums.Role;
 import model.entities.*;
 import model.pojos.Login;
 import model.pojos.User;
@@ -28,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 public class LoginRepositoryTest  {
 
     private static final String USERNAME = "jer0Me";
-    private static final Long LOGIN_USER_ID_CREATED = 1L;
+    private static final Long LOGIN_USER_ID_CREATED = 2L;
     private static final UUID PASSWORD_SALT = UUID.randomUUID();
 
     private LoginRepository loginRepository;

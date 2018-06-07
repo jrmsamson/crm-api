@@ -22,8 +22,8 @@ import static play.test.Helpers.route;
 
 public class AuthenticationControllerTest {
 
-    public static final String USERNAME = "jer0Me";
-    public static final String PASSWORD = "password";
+    public static final String USERNAME = "admin";
+    public static final String PASSWORD = "admin";
     private Database database;
     private Application app;
 
@@ -35,19 +35,6 @@ public class AuthenticationControllerTest {
     @Before
     public void setUp() {
         Evolutions.applyEvolutions(database);
-        setUpFixture();
-    }
-
-    private void setUpFixture() {
-        AddUserRequest addUserRequest = new AddUserRequest(
-                "Jerome", "Samson", Role.USER, USERNAME , PASSWORD
-        );
-
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(POST)
-                .bodyJson(Json.toJson(addUserRequest))
-                .uri("/users");
-        route(app, request);
     }
 
     @Test
@@ -65,8 +52,15 @@ public class AuthenticationControllerTest {
     @Test
     public void shouldLogout() {
         Http.RequestBuilder request = new Http.RequestBuilder()
+                .method(POST)
+                .bodyJson(Json.toJson(new LoginRequest("admin", "admin")))
+                .uri(controllers.routes.AuthenticationController.login().url());
+        Http.Session session = route(app, request).session();
+
+        request = new Http.RequestBuilder()
                 .method(GET)
-                .uri("/logout");
+                .uri("/logout")
+                .session(session);
         Result result = route(app, request);
         assertEquals(OK, result.status());
     }

@@ -94,7 +94,7 @@ public class TransactionalAction extends Action<Transactional> {
     }
 
     private void closeConnectionToTheDatabase() {
-        JDBCUtils.safeClose(this.connection);
+        JDBCUtils.safeClose(connection);
     }
 
 }

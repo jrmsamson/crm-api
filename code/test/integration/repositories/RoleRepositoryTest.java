@@ -15,12 +15,12 @@ import repositories.impl.RoleRepositoryImpl;
 import java.util.Optional;
 import static org.junit.Assert.assertTrue;
 
-public class RoleTest {
+public class RoleRepositoryTest {
 
     private Database database;
     private RoleRepository roleRepository;
 
-    public RoleTest() {
+    public RoleRepositoryTest() {
         Application application = new GuiceApplicationBuilder().build();
         database = application.injector().instanceOf(Database.class);
         DSLContext dslContext = DSL.using(this.database.getConnection());

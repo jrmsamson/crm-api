@@ -9,7 +9,6 @@ import model.entities.UserTokenResponse;
 import model.pojos.User;
 import org.jooq.DSLContext;
 import play.Application;
-import play.Logger;
 import play.inject.guice.GuiceApplicationBuilder;
 import repositories.UserRepository;
 import repositories.impl.UserRepositoryImpl;
@@ -30,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 public class UserRepositoryTest {
 
+    private static final Long USER_ID = 1L;
     private static final Integer USER_ROLE_ID = 2;
 
     private UserRepository userRepository;
@@ -113,17 +113,16 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldReturnTheUserRole() {
-        Optional<Role> userRole = userRepository.getUserRoleByUserId(1L);
+        Optional<Role> userRole = userRepository.getUserRoleByUserId(USER_ID);
         assertTrue(userRole.isPresent());
     }
 
     @Test
     public void shouldUpdateUserToken() {
-        Long userId = 1L;
         String token = "mytoken";
         LocalDateTime tokenExpiration = LocalDateTime.now();
-        userRepository.updateUserToken(new UpdateUserTokenRequest(userId, token, tokenExpiration));
-        UserTokenResponse userTokenResponse = userRepository.getUserToken(userId).get();
+        userRepository.updateUserToken(new UpdateUserTokenRequest(USER_ID, token, tokenExpiration));
+        UserTokenResponse userTokenResponse = userRepository.getUserToken(USER_ID).get();
         assertEquals(token, userTokenResponse.getToken());
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
     }

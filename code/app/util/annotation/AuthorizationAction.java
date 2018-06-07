@@ -4,6 +4,7 @@ import exceptions.DatabaseConnectionException;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
+import org.jooq.tools.jdbc.JDBCUtils;
 import play.db.Database;
 import play.mvc.Action;
 import play.mvc.Http;
@@ -51,9 +52,11 @@ public class AuthorizationAction extends Action<Secured> {
         if (token.isPresent() && userId.isPresent()) {
             establishConnectionWithTheDatabase();
             connectJooqToTheDatabase();
-            return userService
+            Boolean result = userService
                     .getUserToken(userId.get())
                     .validate(token.get());
+            closeConnectionToTheDatabase();
+            return result;
         }
 
         return false;
@@ -90,5 +93,10 @@ public class AuthorizationAction extends Action<Secured> {
             throw new DatabaseConnectionException(e);
         }
     }
+
+    private void closeConnectionToTheDatabase() {
+        JDBCUtils.safeClose(connection);
+    }
+
 
 }
