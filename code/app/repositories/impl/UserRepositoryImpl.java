@@ -20,8 +20,9 @@ import java.util.UUID;
 import static model.jooq.Tables.ROLE;
 import static model.jooq.Tables.USER;
 
-
 public class UserRepositoryImpl extends BaseRepositoryImpl implements UserRepository {
+
+    private static final String USER_NAME_SURNAME_DB_CONSTRAINT = "user_name_surname_uindex";
 
     public Optional<UserResponse> getUserById(Long userId) {
         return selectUser()
@@ -52,7 +53,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     private boolean isConstraintUserAndSurnameUniqueException(DataAccessException exception) {
-        return exception.getMessage().contains("user_name_surname_uindex");
+        return exception.getMessage().contains(USER_NAME_SURNAME_DB_CONSTRAINT);
     }
 
     private Long doAddUser(User user) {

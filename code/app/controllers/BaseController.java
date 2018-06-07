@@ -1,8 +1,7 @@
 package controllers;
 
-import exceptions.TransactionException;
+import exceptions.TransactionConfigurationException;
 import org.jooq.DSLContext;
-import play.Logger;
 import play.mvc.Controller;
 import services.BaseService;
 import util.Constants;
@@ -20,16 +19,12 @@ public abstract class BaseController extends Controller {
     private void getDslContextFromTheRequestTransaction() {
         this.dslContext = (DSLContext) ctx().args.get(Constants.REQUEST_TRANSACTION_DSL_CONTEXT);
 
-        if (this.dslContext == null) {
-            throw new TransactionException("Error trying to get the transaction configuration!");
-        } else {
-            Logger.debug("The transaction configuration has been set correctly");
-        }
+        if (this.dslContext == null)
+            throw new TransactionConfigurationException();
     }
 
     private void getCurrentUserIdFromTheRequestContext() {
         this.currentUserId = (Long) ctx().args.get(Constants.REQUEST_CONTEXT_USER_ID);
-        Logger.info("" + currentUserId);
     }
 
 

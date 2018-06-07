@@ -1,6 +1,6 @@
 package util.annotation;
 
-import exceptions.DatabaseException;
+import exceptions.DatabaseConnectionException;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
@@ -40,7 +40,7 @@ public class AuthorizationAction extends Action<Secured> {
         }
 
         return CompletableFuture
-                .completedFuture(unauthorized("Invalid credentials"));
+                .completedFuture(unauthorized("You're not allowed to access this resource."));
     }
 
     private boolean hasValidToken(Http.Context ctx) {
@@ -58,7 +58,6 @@ public class AuthorizationAction extends Action<Secured> {
 
         return false;
     }
-
 
     private void saveUserIdIntoRequestContext(Http.Context ctx) {
         getUserIdFromTheSession(ctx)
@@ -88,7 +87,7 @@ public class AuthorizationAction extends Action<Secured> {
             connection = database.getDataSource().getConnection();
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            throw new DatabaseException("Error trying to establish connection with the database", e);
+            throw new DatabaseConnectionException(e);
         }
     }
 

@@ -1,16 +1,18 @@
 package util.annotation;
 
-import exceptions.DatabaseException;
+import exceptions.DatabaseCommitChangesException;
+import exceptions.DatabaseConnectionException;
+import exceptions.DatabaseRollbackChangesException;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.JDBCUtils;
-import play.Logger;
 import play.db.Database;
 import play.mvc.Action;
 import play.mvc.Result;
 import util.Constants;
+import util.HttpExceptionHandler;
 
 import javax.inject.Inject;
 import java.sql.Connection;
@@ -20,13 +22,16 @@ import static play.mvc.Http.Context;
 
 public class TransactionalAction extends Action<Transactional> {
 
+    private HttpExceptionHandler httpExceptionHandler;
+
     private Database database;
 
     private Connection connection;
 
     @Inject
-    public TransactionalAction(Database database) {
+    public TransactionalAction(Database database, HttpExceptionHandler httpExceptionHandler) {
         this.database = database;
+        this.httpExceptionHandler = httpExceptionHandler;
     }
 
     public CompletionStage<Result> call(Context context) {
@@ -49,8 +54,7 @@ public class TransactionalAction extends Action<Transactional> {
 
             rollbackDatabaseChanges();
 
-            Logger.error("Error", throwable);
-            return internalServerError("Error executing the action");
+            return httpExceptionHandler.handle(throwable);
         });
     }
 
@@ -59,7 +63,7 @@ public class TransactionalAction extends Action<Transactional> {
             connection = database.getDataSource().getConnection();
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            throw new DatabaseException("Error trying to establish connection with the database", e);
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -76,7 +80,7 @@ public class TransactionalAction extends Action<Transactional> {
             connection.commit();
             closeConnectionToTheDatabase();
         } catch (SQLException e) {
-            throw new DatabaseException("Error trying to commit the database changes", e);
+            throw new DatabaseCommitChangesException(e);
         }
     }
 
@@ -85,7 +89,7 @@ public class TransactionalAction extends Action<Transactional> {
             connection.rollback();
             closeConnectionToTheDatabase();
         } catch (SQLException e) {
-            throw new DatabaseException("Error trying to roll back the database changes", e);
+            throw new DatabaseRollbackChangesException(e);
         }
     }
 
