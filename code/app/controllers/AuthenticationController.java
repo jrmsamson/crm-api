@@ -4,18 +4,21 @@ import model.entities.LoginRequest;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
-import play.mvc.With;
 import services.AuthenticationService;
-import util.TransactionalAction;
+import util.annotation.Secured;
+import util.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import static util.Constants.ROLE_SESSION_KEY;
+import static util.Constants.TOKEN_SESSION_KEY;
+import static util.Constants.USER_ID_SESSION_KEY;
 
+
+@Transactional
 public class AuthenticationController extends BaseController {
-
-    private static final String TOKEN_KEY = "token";
 
     private final AuthenticationService authenticationService;
 
@@ -28,23 +31,28 @@ public class AuthenticationController extends BaseController {
         init(authenticationService);
     }
 
-    @With(TransactionalAction.class)
     public CompletionStage<Result> login() {
         LoginRequest loginRequest = Json.fromJson(request().body().asJson(), LoginRequest.class);
 
         return CompletableFuture.supplyAsync(() ->
                 authenticationService.login(loginRequest)
-        ).thenApplyAsync(token -> {
-                    session(TOKEN_KEY, token);
-                    return ok();
-                },ec.current()
+        ).thenApplyAsync(userSession -> {
+            session(USER_ID_SESSION_KEY, userSession.getUserId().toString());
+            session(ROLE_SESSION_KEY, userSession.getUserId().toString());
+            session(TOKEN_SESSION_KEY, userSession.getToken());
+            return ok();
+            }, ec.current()
         );
     }
 
-    @With(TransactionalAction.class)
-    public Result logout() {
-        // TODO remove token from database;
-        session().clear();
-        return ok();
+    @Secured
+    public CompletionStage<Result> logout() {
+        return CompletableFuture.runAsync(authenticationService::logout).thenApplyAsync(
+                aVoid -> {
+                    session().clear();
+                    return ok();
+                },
+                ec.current()
+        );
     }
 }

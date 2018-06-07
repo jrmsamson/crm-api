@@ -6,6 +6,7 @@ import exceptions.UserRequestException;
 import model.entities.AddLoginRequest;
 import model.entities.AddUserRequest;
 import model.entities.UserResponse;
+import model.entities.UserTokenResponse;
 import model.pojos.User;
 import repositories.RepositoryFactory;
 import services.LoginService;
@@ -73,4 +74,21 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .getUserRoleByUserId(userId)
                 .orElseThrow(UserDoesNotExistException::new);
     }
+
+    @Override
+    public UserTokenResponse getUserToken(Long userId) {
+        return repositoryFactory
+                .getUserRepository()
+                .getUserToken(userId)
+                .orElseThrow(UserDoesNotExistException::new);
+    }
+
+    @Override
+    public void removeCurrentUserToken() {
+        repositoryFactory
+                .getUserRepository()
+                .removeUserToken(currentUserId);
+    }
+
+
 }

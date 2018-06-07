@@ -9,8 +9,10 @@ import model.entities.UserTokenResponse;
 import model.pojos.User;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import repositories.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -117,6 +119,14 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .set(USER.TOKEN, updateUserTokenRequest.getToken())
                 .set(USER.TOKEN_EXPIRATION, updateUserTokenRequest.getTokenExpiration())
                 .where(USER.ID.eq(updateUserTokenRequest.getUserId()))
+                .execute();
+    }
+
+    @Override
+    public void removeUserToken(Long currentUserId) {
+        create.update(USER)
+                .set(USER.TOKEN, DSL.val((String) null))
+                .set(USER.TOKEN_EXPIRATION, DSL.val((LocalDateTime) null))
                 .execute();
     }
 

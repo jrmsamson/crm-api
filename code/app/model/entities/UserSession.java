@@ -2,14 +2,16 @@ package model.entities;
 
 import enums.Role;
 
-public class UserSessionData {
+public class UserSession {
 
     private Long userId;
     private Role role;
+    private String token;
 
-    public UserSessionData(Long userId, Role role) {
+    public UserSession(Long userId, Role role, String token) {
         this.userId = userId;
         this.role = role;
+        this.token = token;
     }
 
     public Long getUserId() {
@@ -26,5 +28,13 @@ public class UserSessionData {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

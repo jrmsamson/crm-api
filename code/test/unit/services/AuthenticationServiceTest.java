@@ -33,7 +33,7 @@ public class AuthenticationServiceTest {
         userService = mock(UserService.class);
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
         when(repositoryFactory.getLoginRepository()).thenReturn(loginRepository);
-        authenticationService = new AuthenticationServiceImpl(repositoryFactory);
+        authenticationService = new AuthenticationServiceImpl(repositoryFactory, userService);
     }
 
     private void setUpLoginFixture() {

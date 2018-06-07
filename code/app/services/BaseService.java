@@ -4,5 +4,6 @@ import org.jooq.DSLContext;
 
 public interface BaseService {
 
-    public void init(DSLContext dslContext);
+    void setTransaction(DSLContext dslContext);
+    void setCurrentUserId(Long id);
 }

@@ -5,12 +5,15 @@ import model.entities.AddUserRequest;
 import play.libs.Json;
 import play.mvc.*;
 import services.UserService;
-import util.TransactionalAction;
+import util.annotation.Secured;
+import util.annotation.Transactional;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+@Secured
+@Transactional
 public class UserController extends BaseController {
 
     private UserService userService;
@@ -21,14 +24,12 @@ public class UserController extends BaseController {
         init(userService);
     }
 
-    @With(TransactionalAction.class)
     public CompletionStage<Result> getUsersActive() {
         return CompletableFuture
                 .supplyAsync(() -> this.userService.getUsersActive())
-                .thenApply(users -> ok());
+                .thenApply(users -> ok(Json.toJson(users)));
     }
 
-    @With(TransactionalAction.class)
     public CompletionStage<Result> addUser() {
         AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
         return CompletableFuture
@@ -37,7 +38,6 @@ public class UserController extends BaseController {
                 ).thenApply(aVoid -> ok());
     }
 
-    @With(TransactionalAction.class)
     public CompletionStage<Result> editUser(String uuid) {
         AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
         return CompletableFuture.runAsync(() ->
@@ -45,7 +45,6 @@ public class UserController extends BaseController {
         ).thenApply(aVoid -> ok());
     }
 
-    @With(TransactionalAction.class)
     public CompletionStage<Result> deleteUser(String uuid) {
         return CompletableFuture.runAsync(() ->
                 this.userService.deleteUser(UUID.fromString(uuid))

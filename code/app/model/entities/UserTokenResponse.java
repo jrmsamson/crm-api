@@ -1,5 +1,8 @@
 package model.entities;
 
+import play.Logger;
+import util.Notification;
+
 import java.time.LocalDateTime;
 
 public class UserTokenResponse {
@@ -10,6 +13,13 @@ public class UserTokenResponse {
     public UserTokenResponse(String token, LocalDateTime tokenExpiration) {
         this.token = token;
         this.tokenExpiration = tokenExpiration;
+    }
+
+    public Boolean validate(String token) {
+        return token != null
+                || !token.isEmpty()
+                || token.equals(this.token)
+                || tokenExpiration.isAfter(LocalDateTime.now());
     }
 
     public String getToken() {

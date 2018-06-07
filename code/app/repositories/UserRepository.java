@@ -31,4 +31,6 @@ public interface UserRepository extends BaseRepository {
     Optional<UserTokenResponse> getUserToken(Long userId);
 
     void updateUserToken(UpdateUserTokenRequest updateUserTokenRequest);
+
+    void removeUserToken(Long currentUserId);
 }

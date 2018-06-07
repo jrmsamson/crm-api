@@ -1,4 +1,4 @@
-package util;
+package util.annotation;
 
 import exceptions.DatabaseException;
 import org.jooq.DSLContext;
@@ -10,6 +10,7 @@ import play.Logger;
 import play.db.Database;
 import play.mvc.Action;
 import play.mvc.Result;
+import util.Constants;
 
 import javax.inject.Inject;
 import java.sql.Connection;
@@ -17,7 +18,7 @@ import java.sql.SQLException;
 import java.util.concurrent.CompletionStage;
 import static play.mvc.Http.Context;
 
-public class TransactionalAction extends Action.Simple {
+public class TransactionalAction extends Action<Transactional> {
 
     private Database database;
 
