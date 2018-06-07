@@ -10,6 +10,8 @@ services:
     tty: true
     ports:
       - 9000:9000
+    environment:
+      TZ: Europe/London
 
   postgres:
     build:
