@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Customer extends TableImpl<CustomerRecord> {
 
-    private static final long serialVersionUID = 2005009914;
+    private static final long serialVersionUID = -681447712;
 
     /**
      * The reference instance of <code>crm.customer</code>
@@ -75,6 +75,11 @@ public class Customer extends TableImpl<CustomerRecord> {
      * The column <code>crm.customer.surname</code>.
      */
     public final TableField<CustomerRecord, String> SURNAME = createField("surname", org.jooq.impl.SQLDataType.VARCHAR(50).nullable(false), this, "");
+
+    /**
+     * The column <code>crm.customer.photo_url</code>.
+     */
+    public final TableField<CustomerRecord, String> PHOTO_URL = createField("photo_url", org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
      * The column <code>crm.customer.active</code>.

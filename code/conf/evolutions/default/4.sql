@@ -6,6 +6,7 @@ CREATE TABLE CRM.CUSTOMER
   UUID                  UUID,
   NAME                  VARCHAR(50)   NOT NULL,
   SURNAME               VARCHAR(50)   NOT NULL,
+  PHOTO_URL             VARCHAR(100),
   ACTIVE                BOOLEAN       NOT NULL      DEFAULT TRUE,
   CREATED_BY            BIGSERIAL     REFERENCES    CRM.USER(id),
   CREATED               TIMESTAMP,

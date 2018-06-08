@@ -4,13 +4,23 @@ import java.util.UUID;
 
 public class CustomerResponse {
 
+    private UUID uuid;
     private String name;
     private String surname;
-    private UUID uuid;
+    private String photoUrl;
 
-    public CustomerResponse(String name, String surname, UUID uuid) {
+    public CustomerResponse(UUID uuid, String name, String surname, String photoUrl) {
+        this.uuid = uuid;
         this.name = name;
         this.surname = surname;
+        this.photoUrl = photoUrl;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -30,11 +40,11 @@ public class CustomerResponse {
         this.surname = surname;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

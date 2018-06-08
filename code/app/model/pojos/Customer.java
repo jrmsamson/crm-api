@@ -25,12 +25,13 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Customer implements Serializable {
 
-    private static final long serialVersionUID = -1587347347;
+    private static final long serialVersionUID = 726173238;
 
     private Long    id;
     private UUID    uuid;
     private String  name;
     private String  surname;
+    private String  photoUrl;
     private Boolean active;
     private Long    createdBy;
     private Long    modifiedBy;
@@ -42,6 +43,7 @@ public class Customer implements Serializable {
         this.uuid = value.uuid;
         this.name = value.name;
         this.surname = value.surname;
+        this.photoUrl = value.photoUrl;
         this.active = value.active;
         this.createdBy = value.createdBy;
         this.modifiedBy = value.modifiedBy;
@@ -52,6 +54,7 @@ public class Customer implements Serializable {
         UUID    uuid,
         String  name,
         String  surname,
+        String  photoUrl,
         Boolean active,
         Long    createdBy,
         Long    modifiedBy
@@ -60,6 +63,7 @@ public class Customer implements Serializable {
         this.uuid = uuid;
         this.name = name;
         this.surname = surname;
+        this.photoUrl = photoUrl;
         this.active = active;
         this.createdBy = createdBy;
         this.modifiedBy = modifiedBy;
@@ -101,6 +105,15 @@ public class Customer implements Serializable {
         this.surname = surname;
     }
 
+    @Size(max = 100)
+    public String getPhotoUrl() {
+        return this.photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
     public Boolean getActive() {
         return this.active;
     }
@@ -133,6 +146,7 @@ public class Customer implements Serializable {
         sb.append(", ").append(uuid);
         sb.append(", ").append(name);
         sb.append(", ").append(surname);
+        sb.append(", ").append(photoUrl);
         sb.append(", ").append(active);
         sb.append(", ").append(createdBy);
         sb.append(", ").append(modifiedBy);

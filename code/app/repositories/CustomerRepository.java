@@ -18,4 +18,6 @@ public interface CustomerRepository extends BaseRepository {
     void editCustomer(Customer customer);
 
     void deleteCustomer(UUID uuid);
+
+    void updateCustomerPhotoName(Customer customer);
 }

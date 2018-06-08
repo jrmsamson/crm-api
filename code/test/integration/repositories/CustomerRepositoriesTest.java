@@ -2,7 +2,6 @@ package integration.repositories;
 
 import model.entities.CustomerResponse;
 import model.pojos.Customer;
-import model.pojos.User;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -10,12 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 import play.Application;
 import play.db.Database;
-import play.db.evolutions.Evolution;
 import play.db.evolutions.Evolutions;
 import play.inject.guice.GuiceApplicationBuilder;
-import repositories.UserRepository;
 import repositories.impl.CustomerRepositoryImpl;
-import repositories.impl.UserRepositoryImpl;
 
 import java.util.List;
 
@@ -79,6 +75,18 @@ public class CustomerRepositoriesTest {
                 customerRepository.getCustomerByUuid(lastCustomerCreated.getUuid()).get();
         assertEquals("JRM", customerEdited.getName());
         assertEquals("SAM", customerEdited.getSurname());
+    }
+
+    @Test
+    public void shouldEditCustomerPhotoName() {
+        String photoUrl = "myphotourl";
+        Customer customer = new Customer();
+        customer.setUuid(lastCustomerCreated.getUuid());
+        customer.setPhotoUrl(photoUrl);
+        customerRepository.updateCustomerPhotoName(customer);
+        CustomerResponse customerEdited = customerRepository
+                .getCustomerByUuid(lastCustomerCreated.getUuid()).get();
+        assertEquals(photoUrl, customerEdited.getPhotoUrl());
     }
 
     @Test
