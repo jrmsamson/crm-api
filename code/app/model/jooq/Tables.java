@@ -6,6 +6,7 @@ package model.jooq;
 
 import javax.annotation.Generated;
 
+import model.jooq.tables.Customer;
 import model.jooq.tables.Login;
 import model.jooq.tables.Role;
 import model.jooq.tables.User;
@@ -23,6 +24,11 @@ import model.jooq.tables.User;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>crm.customer</code>.
+     */
+    public static final Customer CUSTOMER = model.jooq.tables.Customer.CUSTOMER;
 
     /**
      * The table <code>crm.login</code>.

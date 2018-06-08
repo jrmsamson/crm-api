@@ -28,7 +28,6 @@
         </database>
 
         <generate>
-            <daos>true</daos>
             <pojos>true</pojos>
             <validationAnnotations>true</validationAnnotations>
         </generate>

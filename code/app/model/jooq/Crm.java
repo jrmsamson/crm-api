@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
+import model.jooq.tables.Customer;
 import model.jooq.tables.Login;
 import model.jooq.tables.Role;
 import model.jooq.tables.User;
@@ -33,12 +34,17 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Crm extends SchemaImpl {
 
-    private static final long serialVersionUID = 1876444361;
+    private static final long serialVersionUID = -943704719;
 
     /**
      * The reference instance of <code>crm</code>
      */
     public static final Crm CRM = new Crm();
+
+    /**
+     * The table <code>crm.customer</code>.
+     */
+    public final Customer CUSTOMER = model.jooq.tables.Customer.CUSTOMER;
 
     /**
      * The table <code>crm.login</code>.
@@ -80,6 +86,9 @@ public class Crm extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
+            Sequences.CUSTOMER_CREATED_BY_SEQ,
+            Sequences.CUSTOMER_ID_SEQ,
+            Sequences.CUSTOMER_MODIFIED_BY_SEQ,
             Sequences.LOGIN_ID_SEQ,
             Sequences.LOGIN_USER_ID_SEQ,
             Sequences.ROLE_ID_SEQ,
@@ -96,6 +105,7 @@ public class Crm extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Customer.CUSTOMER,
             Login.LOGIN,
             Role.ROLE,
             User.USER);

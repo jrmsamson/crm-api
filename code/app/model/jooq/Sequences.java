@@ -24,6 +24,21 @@ import org.jooq.impl.SequenceImpl;
 public class Sequences {
 
     /**
+     * The sequence <code>crm.customer_created_by_seq</code>
+     */
+    public static final Sequence<Long> CUSTOMER_CREATED_BY_SEQ = new SequenceImpl<Long>("customer_created_by_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>crm.customer_id_seq</code>
+     */
+    public static final Sequence<Long> CUSTOMER_ID_SEQ = new SequenceImpl<Long>("customer_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>crm.customer_modified_by_seq</code>
+     */
+    public static final Sequence<Long> CUSTOMER_MODIFIED_BY_SEQ = new SequenceImpl<Long>("customer_modified_by_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
      * The sequence <code>crm.login_id_seq</code>
      */
     public static final Sequence<Long> LOGIN_ID_SEQ = new SequenceImpl<Long>("login_id_seq", Crm.CRM, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

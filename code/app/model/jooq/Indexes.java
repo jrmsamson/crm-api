@@ -6,6 +6,7 @@ package model.jooq;
 
 import javax.annotation.Generated;
 
+import model.jooq.tables.Customer;
 import model.jooq.tables.Login;
 import model.jooq.tables.Role;
 import model.jooq.tables.User;
@@ -32,6 +33,9 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
+    public static final Index CUSTOMER_NAME_SURNAME_UINDEX = Indexes0.CUSTOMER_NAME_SURNAME_UINDEX;
+    public static final Index CUSTOMER_PKEY = Indexes0.CUSTOMER_PKEY;
+    public static final Index CUSTOMER_UUID_UINDEX = Indexes0.CUSTOMER_UUID_UINDEX;
     public static final Index LOGIN_PKEY = Indexes0.LOGIN_PKEY;
     public static final Index LOGIN_USERNAME_UINDEX = Indexes0.LOGIN_USERNAME_UINDEX;
     public static final Index ROLE_PKEY = Indexes0.ROLE_PKEY;
@@ -44,6 +48,9 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     private static class Indexes0 {
+        public static Index CUSTOMER_NAME_SURNAME_UINDEX = Internal.createIndex("customer_name_surname_uindex", Customer.CUSTOMER, new OrderField[] { Customer.CUSTOMER.NAME, Customer.CUSTOMER.SURNAME }, true);
+        public static Index CUSTOMER_PKEY = Internal.createIndex("customer_pkey", Customer.CUSTOMER, new OrderField[] { Customer.CUSTOMER.ID }, true);
+        public static Index CUSTOMER_UUID_UINDEX = Internal.createIndex("customer_uuid_uindex", Customer.CUSTOMER, new OrderField[] { Customer.CUSTOMER.UUID }, true);
         public static Index LOGIN_PKEY = Internal.createIndex("login_pkey", Login.LOGIN, new OrderField[] { Login.LOGIN.ID }, true);
         public static Index LOGIN_USERNAME_UINDEX = Internal.createIndex("login_username_uindex", Login.LOGIN, new OrderField[] { Login.LOGIN.USERNAME }, true);
         public static Index ROLE_PKEY = Internal.createIndex("role_pkey", Role.ROLE, new OrderField[] { Role.ROLE.ID }, true);
