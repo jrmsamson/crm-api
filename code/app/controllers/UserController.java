@@ -1,9 +1,11 @@
 package controllers;
 
 import com.google.inject.Inject;
+import model.entities.AddLoginRequest;
 import model.entities.AddUserRequest;
 import play.libs.Json;
 import play.mvc.*;
+import services.LoginService;
 import services.UserService;
 import util.annotation.Secured;
 import util.annotation.Transactional;
@@ -17,10 +19,12 @@ import java.util.concurrent.CompletionStage;
 public class UserController extends BaseController {
 
     private UserService userService;
+    private LoginService loginService;
 
     @Inject
-    public UserController(UserService userService) {
+    public UserController(UserService userService, LoginService loginService) {
         this.userService = userService;
+        this.loginService = loginService;
         init(userService);
     }
 
@@ -34,7 +38,13 @@ public class UserController extends BaseController {
         AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
         return CompletableFuture
                 .runAsync(() ->
-                        this.userService.addUser(addUserRequest)
+                        loginService.addLoginForUser(
+                                new AddLoginRequest(
+                                        addUserRequest.getUsername(),
+                                        addUserRequest.getPassword(),
+                                        userService.addUser(addUserRequest)
+                                )
+                        )
                 ).thenApply(aVoid -> ok());
     }
 

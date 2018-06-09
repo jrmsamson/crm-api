@@ -4,7 +4,7 @@ import model.entities.LoginRequest;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
-import services.AuthenticationService;
+import services.LoginService;
 import util.annotation.Secured;
 import util.annotation.Transactional;
 
@@ -18,24 +18,24 @@ import static util.Constants.USER_ID_SESSION_KEY;
 
 
 @Transactional
-public class AuthenticationController extends BaseController {
+public class LoginController extends BaseController {
 
-    private final AuthenticationService authenticationService;
+    private final LoginService loginService;
 
     private HttpExecutionContext ec;
 
     @Inject
-    public AuthenticationController(AuthenticationService authenticationService, HttpExecutionContext ec) {
+    public LoginController(LoginService loginService, HttpExecutionContext ec) {
         this.ec = ec;
-        this.authenticationService = authenticationService;
-        init(authenticationService);
+        this.loginService = loginService;
+        init(this.loginService);
     }
 
     public CompletionStage<Result> login() {
         LoginRequest loginRequest = Json.fromJson(request().body().asJson(), LoginRequest.class);
 
         return CompletableFuture.supplyAsync(() ->
-                authenticationService.login(loginRequest)
+                loginService.login(loginRequest)
         ).thenApplyAsync(userSession -> {
             session(USER_ID_SESSION_KEY, userSession.getUserId().toString());
             session(ROLE_SESSION_KEY, userSession.getUserId().toString());
@@ -47,7 +47,7 @@ public class AuthenticationController extends BaseController {
 
     @Secured
     public CompletionStage<Result> logout() {
-        return CompletableFuture.runAsync(authenticationService::logout).thenApplyAsync(
+        return CompletableFuture.runAsync(loginService::logout).thenApplyAsync(
                 aVoid -> {
                     session().clear();
                     return ok();

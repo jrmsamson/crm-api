@@ -52,14 +52,23 @@ public class AuthorizationAction extends Action<Secured> {
         if (token.isPresent() && userId.isPresent()) {
             establishConnectionWithTheDatabase();
             connectJooqToTheDatabase();
-            Boolean result = userService
+            Boolean tokenValid = userService
                     .getUserToken(userId.get())
                     .validate(token.get());
+
+            if (tokenValid)
+                increaseTokenExpiration(userId.get());
+
+
             closeConnectionToTheDatabase();
-            return result;
+            return tokenValid;
         }
 
         return false;
+    }
+
+    private void increaseTokenExpiration(Long userId) {
+        userService.updateUserTokenExpiration(userId);
     }
 
     private void saveUserIdIntoRequestContext(Http.Context ctx) {

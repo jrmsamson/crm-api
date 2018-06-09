@@ -1,13 +1,9 @@
 package repositories;
 
 import enums.Role;
-import model.entities.AddUserRequest;
-import model.entities.UpdateUserTokenRequest;
-import model.entities.UserResponse;
-import model.entities.UserTokenResponse;
+import model.entities.*;
 import model.pojos.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,4 +29,6 @@ public interface UserRepository extends BaseRepository {
     void updateUserToken(UpdateUserTokenRequest updateUserTokenRequest);
 
     void removeUserToken(Long currentUserId);
+
+    void updateUserTokenExpiration(UpdateUserTokenExpiration updateUserTokenExpiration);
 }

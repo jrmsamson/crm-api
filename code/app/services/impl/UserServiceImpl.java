@@ -3,33 +3,30 @@ package services.impl;
 import enums.Role;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
-import model.entities.AddLoginRequest;
-import model.entities.AddUserRequest;
-import model.entities.UserResponse;
-import model.entities.UserTokenResponse;
+import model.entities.*;
 import model.pojos.User;
 import repositories.RepositoryFactory;
-import services.LoginService;
 import services.RoleService;
 import services.UserService;
+import util.CryptoUtils;
 import util.Notification;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
+    private static final Integer TOKEN_EXPIRATION_DURATION_MINUTES = 30;
+
     private RoleService roleService;
-    private LoginService loginService;
 
     @Inject
     public UserServiceImpl(RepositoryFactory repositoryFactory,
-                           LoginService loginService,
                            RoleService roleService) {
         // For testing purpose
         super(repositoryFactory);
-        this.loginService = loginService;
         this.roleService = roleService;
     }
 
@@ -43,11 +40,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         user.setSurname(addUserRequest.getSurname());
         user.setRoleId(roleService.getRoleId(addUserRequest.getRole()));
 
-        Long userId = repositoryFactory.getUserRepository().addUser(user);
-        AddLoginRequest addLoginRequest = new AddLoginRequest(addUserRequest.getUsername(), addUserRequest.getPassword());
-        loginService.addLoginForUser(userId, addLoginRequest);
-
-        return userId;
+        return  repositoryFactory.getUserRepository().addUser(user);
     }
 
     public void editUser(UUID userUuid, AddUserRequest addUserRequest) {
@@ -88,6 +81,34 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         repositoryFactory
                 .getUserRepository()
                 .removeUserToken(currentUserId);
+    }
+
+    public void updateUserTokenExpiration(Long userId) {
+        repositoryFactory
+                .getUserRepository()
+                .updateUserTokenExpiration(new UpdateUserTokenExpiration(
+                        userId,
+                        getTokenExpiration()
+                ));
+    }
+
+    public String buildUserToken(Long userId) {
+        String token = CryptoUtils.generateSecureRandomToken();
+        repositoryFactory.getUserRepository().updateUserToken(
+                new UpdateUserTokenRequest(
+                        userId,
+                        token,
+                        getTokenExpiration()
+                )
+        );
+
+        return token;
+    }
+
+    private LocalDateTime getTokenExpiration() {
+        return LocalDateTime
+                .now()
+                .plusMinutes(TOKEN_EXPIRATION_DURATION_MINUTES);
     }
 
 

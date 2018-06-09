@@ -1,10 +1,18 @@
 package services;
 
 import model.entities.AddLoginRequest;
+import model.entities.EditPasswordRequest;
+import model.entities.LoginRequest;
+import model.entities.UserSession;
 
 public interface LoginService extends BaseService {
 
-    void addLoginForUser(Long userId, AddLoginRequest addLoginRequest);
+    UserSession login(LoginRequest loginRequest);
 
-    void editLoginPassword(Long userId, String password);
+    void logout();
+
+    void addLoginForUser(AddLoginRequest addLoginRequest);
+
+    void editLoginPassword(EditPasswordRequest editPasswordRequest);
+
 }

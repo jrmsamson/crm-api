@@ -23,4 +23,8 @@ public interface UserService extends BaseService {
     UserTokenResponse getUserToken(Long userId);
 
     void removeCurrentUserToken();
+
+    String buildUserToken(Long userId);
+
+    void updateUserTokenExpiration(Long userId);
 }

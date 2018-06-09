@@ -29,16 +29,14 @@ public class UserServiceTest {
     private UserService userService;
     private UserRepository userRepositoryMock;
     private RoleService roleServiceMock;
-    private LoginService loginServiceMock;
 
     @Before
     public void setUp() {
         userRepositoryMock = mock(UserRepository.class);
-        loginServiceMock = mock(LoginService.class);
         roleServiceMock = mock(RoleService.class);
         RepositoryFactory repositoryFactoryMock = mock(RepositoryFactory.class);
         when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepositoryMock);
-        userService = new UserServiceImpl(repositoryFactoryMock, loginServiceMock, roleServiceMock);
+        userService = new UserServiceImpl(repositoryFactoryMock, roleServiceMock);
         setUpFixture();
     }
 

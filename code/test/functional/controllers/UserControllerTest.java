@@ -1,5 +1,7 @@
 package functional.controllers;
 
+import controllers.LoginController;
+import controllers.routes;
 import enums.Role;
 import model.entities.AddUserRequest;
 import model.entities.LoginRequest;
@@ -45,7 +47,7 @@ public class UserControllerTest {
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(new LoginRequest("admin", "admin")))
-                .uri(controllers.routes.AuthenticationController.login().url());
+                .uri(controllers.routes.LoginController.login().url());
         session = route(app, request).session();
     }
 

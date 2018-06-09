@@ -1,7 +1,6 @@
 package functional.controllers;
 
-import enums.Role;
-import model.entities.AddUserRequest;
+import controllers.LoginController;
 import model.entities.LoginRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -20,14 +19,14 @@ import static play.mvc.Http.HttpVerbs.GET;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.route;
 
-public class AuthenticationControllerTest {
+public class LoginControllerTest {
 
     public static final String USERNAME = "admin";
     public static final String PASSWORD = "admin";
     private Database database;
     private Application app;
 
-    public AuthenticationControllerTest() {
+    public LoginControllerTest() {
         app = new GuiceApplicationBuilder().build();
         database = app.injector().instanceOf(Database.class);
     }
@@ -54,12 +53,12 @@ public class AuthenticationControllerTest {
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(new LoginRequest("admin", "admin")))
-                .uri(controllers.routes.AuthenticationController.login().url());
+                .uri(controllers.routes.LoginController.login().url());
         Http.Session session = route(app, request).session();
 
         request = new Http.RequestBuilder()
                 .method(GET)
-                .uri("/logout")
+                .uri(controllers.routes.LoginController.logout().url())
                 .session(session);
         Result result = route(app, request);
         assertEquals(OK, result.status());

@@ -4,13 +4,12 @@ public class AddLoginRequest {
 
     private String username;
     private String password;
+    private Long userId;
 
-    public AddLoginRequest() {
-    }
-
-    public AddLoginRequest(String username, String password) {
+    public AddLoginRequest(String username, String password, Long userId) {
         this.username = username;
         this.password = password;
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -27,5 +26,13 @@ public class AddLoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

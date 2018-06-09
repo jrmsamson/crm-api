@@ -1,10 +1,12 @@
 
 
-POST        /login                  @controllers.AuthenticationController.login
-GET         /logout                 @controllers.AuthenticationController.logout
+POST        /login                  @controllers.LoginController.login
+GET         /logout                 @controllers.LoginController.logout
 
 
 GET         /users                  @controllers.UserController.getUsersActive
-POST        /users                  @controllers.UserController.addUser
+POST        /users                  @controllers.UserController.addUser()
 PUT         /users/:uuid            @controllers.UserController.editUser(uuid: String)
 DELETE      /users/:uuid            @controllers.UserController.deleteUser(uuid: String)
+
+POST        /images/upload          @controllers.ImageController.uploadImage
