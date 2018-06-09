@@ -9,4 +9,4 @@ POST        /users                  @controllers.UserController.addUser()
 PUT         /users/:uuid            @controllers.UserController.editUser(uuid: String)
 DELETE      /users/:uuid            @controllers.UserController.deleteUser(uuid: String)
 
-POST        /images/upload          @controllers.ImageController.uploadImage
+POST        /images/upload          @controllers.UploadController.uploadImage

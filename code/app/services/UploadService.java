@@ -2,7 +2,7 @@ package services;
 
 import java.io.File;
 
-public interface ImageService extends BaseService {
+public interface UploadService extends BaseService {
 
     File moveImageFromTmpToImagesFolder(String imageFileName);
 }

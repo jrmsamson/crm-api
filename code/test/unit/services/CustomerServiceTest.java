@@ -11,7 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import repositories.CustomerRepository;
 import repositories.RepositoryFactory;
 import services.CustomerService;
-import services.ImageService;
+import services.UploadService;
 import services.impl.CustomerServiceImpl;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class CustomerServiceTest {
     private static final String imageFileName = "photoname.jpg";
 
     private CustomerService customerService;
-    private ImageService imageService;
+    private UploadService uploadService;
     private CustomerRepository customerRepository;
     private CustomerRequest customerRequest;
 
@@ -37,10 +37,10 @@ public class CustomerServiceTest {
 
     public CustomerServiceTest() {
         customerRepository = mock(CustomerRepository.class);
-        imageService = mock(ImageService.class);
+        uploadService = mock(UploadService.class);
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
         when(repositoryFactory.getCustomerRepository()).thenReturn(customerRepository);
-        customerService = new CustomerServiceImpl(repositoryFactory, imageService);
+        customerService = new CustomerServiceImpl(repositoryFactory, uploadService);
         customerService.setCurrentUserId(1L);
     }
 
@@ -48,7 +48,7 @@ public class CustomerServiceTest {
     public void setUpFixture() {
         customerRequest = new CustomerRequest("Jerome", "Samson", imageFileName);
         File file = mock(File.class);
-        when(imageService.moveImageFromTmpToImagesFolder(imageFileName)).thenReturn(file);
+        when(uploadService.moveImageFromTmpToImagesFolder(imageFileName)).thenReturn(file);
         when(file.getPath()).thenReturn(imageFileName);
     }
 

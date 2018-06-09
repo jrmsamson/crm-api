@@ -4,7 +4,7 @@ import exceptions.ImageDoesNotExistException;
 import exceptions.ImageFolderNotCreatedException;
 import play.Application;
 import repositories.RepositoryFactory;
-import services.ImageService;
+import services.UploadService;
 import util.ConfigPath;
 
 import javax.inject.Inject;
@@ -13,14 +13,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-public class ImageServiceImpl extends BaseServiceImpl implements ImageService {
+public class UploadServiceImpl extends BaseServiceImpl implements UploadService {
 
 
     private final String TMP_PATH;
     private final String IMAGES_PATH;
 
     @Inject
-    public ImageServiceImpl(RepositoryFactory repositoryFactory, Application application) {
+    public UploadServiceImpl(RepositoryFactory repositoryFactory, Application application) {
         super(repositoryFactory);
         TMP_PATH = application.config().getString(ConfigPath.TMP_PATH_CONFIG);
         IMAGES_PATH = application.config().getString(ConfigPath.IMAGES_PATH_CONFIG);

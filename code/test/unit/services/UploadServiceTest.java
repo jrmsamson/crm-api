@@ -4,8 +4,8 @@ import org.junit.Test;
 import play.Application;
 import play.inject.guice.GuiceApplicationBuilder;
 import repositories.RepositoryFactory;
-import services.ImageService;
-import services.impl.ImageServiceImpl;
+import services.UploadService;
+import services.impl.UploadServiceImpl;
 import util.ConfigPath;
 
 import java.io.File;
@@ -14,17 +14,17 @@ import java.io.IOException;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class ImageServiceTest {
+public class UploadServiceTest {
 
     private final String TMP_PATH;
     private final String IMAGE_PATH;
 
-    private ImageService imageService;
+    private UploadService uploadService;
 
-    public ImageServiceTest() {
+    public UploadServiceTest() {
         Application application = new GuiceApplicationBuilder().build();
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        imageService = new ImageServiceImpl(repositoryFactory, application);
+        uploadService = new UploadServiceImpl(repositoryFactory, application);
         TMP_PATH = application.config().getString(ConfigPath.TMP_PATH_CONFIG);
         IMAGE_PATH = application.config().getString(ConfigPath.IMAGES_PATH_CONFIG);
     }
@@ -33,7 +33,7 @@ public class ImageServiceTest {
     public void shouldMoveImageFromTmpToImageFolder() throws IOException {
         String imageFileName = "myimage.png";
         new File(TMP_PATH + imageFileName).createNewFile();
-        imageService.moveImageFromTmpToImagesFolder(imageFileName);
+        uploadService.moveImageFromTmpToImagesFolder(imageFileName);
         File newFilePath = new File(IMAGE_PATH + imageFileName);
         assertTrue(newFilePath.exists());
         newFilePath.delete();

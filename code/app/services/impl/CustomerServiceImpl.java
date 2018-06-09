@@ -4,7 +4,7 @@ import model.entities.CustomerRequest;
 import model.pojos.Customer;
 import repositories.RepositoryFactory;
 import services.CustomerService;
-import services.ImageService;
+import services.UploadService;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -12,13 +12,13 @@ import java.util.UUID;
 
 public class CustomerServiceImpl extends BaseServiceImpl implements CustomerService {
 
-    private final ImageService imageService;
+    private final UploadService uploadService;
 
     @Inject
-    public CustomerServiceImpl(RepositoryFactory repositoryFactory, ImageService imageService) {
+    public CustomerServiceImpl(RepositoryFactory repositoryFactory, UploadService uploadService) {
         // For testing purpose
         super(repositoryFactory);
-        this.imageService = imageService;
+        this.uploadService = uploadService;
     }
 
     public void addCustomer(CustomerRequest customerRequest) {
@@ -49,7 +49,7 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
         customer.setCreatedBy(currentUserId);
         customer.setModifiedBy(currentUserId);
 
-        File imageFile = imageService.moveImageFromTmpToImagesFolder(customerRequest.getPhotoFileName());
+        File imageFile = uploadService.moveImageFromTmpToImagesFolder(customerRequest.getPhotoFileName());
         customer.setPhotoUrl(imageFile.getPath());
 
         return customer;
