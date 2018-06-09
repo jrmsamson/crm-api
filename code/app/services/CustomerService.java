@@ -1,7 +1,9 @@
 package services;
 
 import model.entities.CustomerRequest;
+import model.entities.CustomerResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CustomerService extends BaseService {
@@ -10,5 +12,7 @@ public interface CustomerService extends BaseService {
 
     void editCustomer(UUID customerUUID, CustomerRequest customerRequest);
 
-    void deleteUser(UUID customerUUID);
+    void deleteCustomer(UUID customerUUID);
+
+    List<CustomerResponse> getCustomersActive();
 }

@@ -31,7 +31,7 @@ public class CustomerRequest {
         this.surname = surname;
     }
 
-    public String getPhotoFileName() {
+    public String getPhotoName() {
         return photoName;
     }
 

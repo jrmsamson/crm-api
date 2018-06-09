@@ -1,6 +1,7 @@
 package services.impl;
 
 import model.entities.CustomerRequest;
+import model.entities.CustomerResponse;
 import model.pojos.Customer;
 import repositories.RepositoryFactory;
 import services.CustomerService;
@@ -8,6 +9,7 @@ import services.UploadService;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 public class CustomerServiceImpl extends BaseServiceImpl implements CustomerService {
@@ -35,11 +37,16 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
                 .editCustomer(customer);
     }
 
-    @Override
-    public void deleteUser(UUID customerUUID) {
+    public void deleteCustomer(UUID customerUUID) {
         repositoryFactory
                 .getCustomerRepository()
                 .deleteCustomer(customerUUID);
+    }
+
+    public List<CustomerResponse> getCustomersActive() {
+        return repositoryFactory
+                .getCustomerRepository()
+                .getCustomersActive();
     }
 
     private Customer buildCustomer(CustomerRequest customerRequest) {
@@ -49,7 +56,7 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
         customer.setCreatedBy(currentUserId);
         customer.setModifiedBy(currentUserId);
 
-        File imageFile = uploadService.moveImageFromTmpToImagesFolder(customerRequest.getPhotoFileName());
+        File imageFile = uploadService.moveFileToImagesFolder(customerRequest.getPhotoName());
         customer.setPhotoUrl(imageFile.getPath());
 
         return customer;

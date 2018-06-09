@@ -38,7 +38,7 @@ public class UploadServiceImpl extends BaseServiceImpl implements UploadService 
         }
     }
 
-    public File moveImageFromTmpToImagesFolder(String imageFileName) {
+    public File moveFileToImagesFolder(String imageFileName) {
         File tempFile = new File(TMP_PATH + imageFileName);
         File imageFile = new File(IMAGES_PATH + imageFileName);
 

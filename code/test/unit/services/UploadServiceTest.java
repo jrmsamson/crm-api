@@ -33,7 +33,7 @@ public class UploadServiceTest {
     public void shouldMoveImageFromTmpToImageFolder() throws IOException {
         String imageFileName = "myimage.png";
         new File(TMP_PATH + imageFileName).createNewFile();
-        uploadService.moveImageFromTmpToImagesFolder(imageFileName);
+        uploadService.moveFileToImagesFolder(imageFileName);
         File newFilePath = new File(IMAGE_PATH + imageFileName);
         assertTrue(newFilePath.exists());
         newFilePath.delete();

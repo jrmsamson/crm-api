@@ -11,7 +11,7 @@ public interface CustomerRepository extends BaseRepository {
 
     Optional<CustomerResponse> getCustomerByUuid(UUID uuid);
 
-    List<CustomerResponse> getAllCustomerActive();
+    List<CustomerResponse> getCustomersActive();
 
     void addCustomer(Customer customer);
 

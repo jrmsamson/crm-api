@@ -20,7 +20,7 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
                 .fetchOptionalInto(CustomerResponse.class);
     }
 
-    public List<CustomerResponse> getAllCustomerActive() {
+    public List<CustomerResponse> getCustomersActive() {
         return selectCustomer()
                 .where(CUSTOMER.ACTIVE.eq(Boolean.TRUE))
                 .orderBy(CUSTOMER.ID.asc())

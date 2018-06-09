@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface UploadService extends BaseService {
 
-    File moveImageFromTmpToImagesFolder(String imageFileName);
+    File moveFileToImagesFolder(String imageFileName);
 }

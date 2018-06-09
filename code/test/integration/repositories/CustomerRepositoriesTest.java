@@ -53,7 +53,7 @@ public class CustomerRepositoriesTest {
         customer.setCreatedBy(1L);
         customer.setModifiedBy(1L);
         customerRepository.addCustomer(customer);
-        List<CustomerResponse> customers = customerRepository.getAllCustomerActive();
+        List<CustomerResponse> customers = customerRepository.getCustomersActive();
         lastCustomerCreated = customers.get(customers.size() - 1);
     }
 
@@ -92,7 +92,7 @@ public class CustomerRepositoriesTest {
     @Test
     public void shouldDeleteCustomer() {
         customerRepository.deleteCustomer(lastCustomerCreated.getUuid());
-        List<CustomerResponse> customers = customerRepository.getAllCustomerActive();
+        List<CustomerResponse> customers = customerRepository.getCustomersActive();
         assertEquals(0, customers.size());
     }
 

@@ -48,7 +48,7 @@ public class CustomerServiceTest {
     public void setUpFixture() {
         customerRequest = new CustomerRequest("Jerome", "Samson", imageFileName);
         File file = mock(File.class);
-        when(uploadService.moveImageFromTmpToImagesFolder(imageFileName)).thenReturn(file);
+        when(uploadService.moveFileToImagesFolder(imageFileName)).thenReturn(file);
         when(file.getPath()).thenReturn(imageFileName);
     }
 
@@ -82,8 +82,14 @@ public class CustomerServiceTest {
     @Test
     public void shouldDeleteCustomer() {
         UUID customerUUID = UUID.randomUUID();
-        customerService.deleteUser(customerUUID);
+        customerService.deleteCustomer(customerUUID);
         verify(customerRepository).deleteCustomer(customerUUID);
+    }
+
+    @Test
+    public void shouldGetCustomersActive() {
+        customerService.getCustomersActive();
+        verify(customerRepository).getCustomersActive();
     }
 
 
