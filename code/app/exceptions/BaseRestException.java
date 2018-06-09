@@ -10,6 +10,12 @@ public class BaseRestException extends RuntimeException {
         this.errorMessage = errorMessage;
     }
 
+    public BaseRestException(Integer statusCode, String errorMessage, Throwable cause) {
+        super(cause);
+        this.statusCode = statusCode;
+        this.errorMessage = errorMessage;
+    }
+
     public Integer getStatusCode() {
         return statusCode;
     }

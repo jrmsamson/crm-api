@@ -1,6 +1,17 @@
 package util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Constants {
+
+    public static final Map<String, String> IMAGE_CONTENT_TYPE_EXTENSIONS = new HashMap<String, String>()
+    {
+        {
+            put("image/jpeg", ".jpg");
+            put("image/png", ".png");
+        }
+    };
 
     public static final String REQUEST_TRANSACTION_DSL_CONTEXT = "transactionDslContext";
     public static final String REQUEST_CONTEXT_USER_ID = "currentUserId";

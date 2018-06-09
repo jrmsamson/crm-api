@@ -1,20 +1,16 @@
 package util;
 
 import com.google.inject.AbstractModule;
+import repositories.CustomerRepository;
 import repositories.LoginRepository;
 import repositories.RoleRepository;
 import repositories.UserRepository;
+import repositories.impl.CustomerRepositoryImpl;
 import repositories.impl.LoginRepositoryImpl;
 import repositories.impl.RoleRepositoryImpl;
 import repositories.impl.UserRepositoryImpl;
-import services.AuthenticationService;
-import services.LoginService;
-import services.RoleService;
-import services.UserService;
-import services.impl.AuthenticationServiceImpl;
-import services.impl.LoginServiceImpl;
-import services.impl.RoleServiceImpl;
-import services.impl.UserServiceImpl;
+import services.*;
+import services.impl.*;
 
 public class GuiceDependencyInjectionModule extends AbstractModule {
 
@@ -27,5 +23,8 @@ public class GuiceDependencyInjectionModule extends AbstractModule {
         bind(LoginRepository.class).to(LoginRepositoryImpl.class);
         bind(RoleRepository.class).to(RoleRepositoryImpl.class);
         bind(RoleService.class).to(RoleServiceImpl.class);
+        bind(CustomerRepository.class).to(CustomerRepositoryImpl.class);
+        bind(CustomerService.class).to(CustomerServiceImpl.class);
+        bind(ImageService.class).to(ImageServiceImpl.class);
     }
 }

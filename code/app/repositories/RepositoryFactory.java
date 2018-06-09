@@ -19,6 +19,9 @@ public class RepositoryFactory {
     @Inject
     private RoleRepository roleRepository;
 
+    @Inject
+    private CustomerRepository customerRepository;
+
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
@@ -36,5 +39,10 @@ public class RepositoryFactory {
     public RoleRepository getRoleRepository() {
         roleRepository.setDslContext(dslContext);
         return roleRepository;
+    }
+
+    public CustomerRepository getCustomerRepository() {
+        customerRepository.setDslContext(dslContext);
+        return customerRepository;
     }
 }
