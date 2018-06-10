@@ -1,14 +1,14 @@
-package model.entities;
+package model.entities.responses;
 
 import enums.Role;
 
-public class UserSession {
+public class UserSessionResponse {
 
     private Long userId;
     private Role role;
     private String token;
 
-    public UserSession(Long userId, Role role, String token) {
+    public UserSessionResponse(Long userId, Role role, String token) {
         this.userId = userId;
         this.role = role;
         this.token = token;

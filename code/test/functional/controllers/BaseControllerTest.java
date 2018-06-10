@@ -1,6 +1,6 @@
 package functional.controllers;
 
-import model.entities.LoginRequest;
+import model.entities.requests.LoginRequest;
 import org.junit.After;
 import org.junit.Before;
 import play.Application;

@@ -1,7 +1,7 @@
 package integration.repositories;
 
 import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
-import model.entities.CustomerResponse;
+import model.entities.responses.CustomerResponse;
 import model.pojos.Customer;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

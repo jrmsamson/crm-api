@@ -2,7 +2,10 @@ package repositories.impl;
 
 import enums.Role;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.*;
+import model.entities.requests.UpdateUserTokenExpirationRequest;
+import model.entities.requests.UpdateUserTokenRequest;
+import model.entities.responses.UserResponse;
+import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
@@ -123,10 +126,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public void updateUserTokenExpiration(UpdateUserTokenExpiration updateUserTokenExpiration) {
+    public void updateUserTokenExpiration(UpdateUserTokenExpirationRequest updateUserTokenExpirationRequest) {
         create.update(USER)
-                .set(USER.TOKEN_EXPIRATION, updateUserTokenExpiration.getTokenExpiration())
-                .where(USER.ID.eq(updateUserTokenExpiration.getUserId()))
+                .set(USER.TOKEN_EXPIRATION, updateUserTokenExpirationRequest.getTokenExpiration())
+                .where(USER.ID.eq(updateUserTokenExpirationRequest.getUserId()))
                 .execute();
     }
 

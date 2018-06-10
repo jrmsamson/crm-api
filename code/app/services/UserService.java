@@ -1,10 +1,10 @@
 package services;
 
 import enums.Role;
-import model.entities.AddUserResponse;
-import model.entities.UserRequest;
-import model.entities.UserResponse;
-import model.entities.UserTokenResponse;
+import model.entities.responses.AddUserResponse;
+import model.entities.requests.UserRequest;
+import model.entities.responses.UserResponse;
+import model.entities.responses.UserTokenResponse;
 
 import java.util.List;
 import java.util.UUID;

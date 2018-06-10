@@ -1,6 +1,6 @@
 package repositories;
 
-import model.entities.CustomerResponse;
+import model.entities.responses.CustomerResponse;
 import model.pojos.Customer;
 
 import java.util.List;

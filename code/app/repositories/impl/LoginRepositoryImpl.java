@@ -1,16 +1,11 @@
 package repositories.impl;
 
-import exceptions.LoginNotExistException;
 import exceptions.LoginWithTheSameUsernameAlreadyExistException;
-import model.entities.LoginResponse;
-import model.jooq.tables.records.LoginRecord;
+import model.entities.responses.LoginResponse;
 import model.pojos.Login;
-import org.jooq.UpdateSetFirstStep;
 import org.jooq.exception.DataAccessException;
 import repositories.LoginRepository;
 
-import javax.xml.crypto.Data;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -2,9 +2,9 @@ package unit.services;
 
 import exceptions.CustomerDoesNotExistException;
 import exceptions.ImageExtensionNotSupportedException;
-import model.entities.CustomerRequest;
-import model.entities.CustomerResponse;
-import model.entities.UpdateCustomerPhotoRequest;
+import model.entities.requests.CustomerRequest;
+import model.entities.responses.CustomerResponse;
+import model.entities.requests.UpdateCustomerPhotoRequest;
 import model.pojos.Customer;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,13 +1,17 @@
-package model.entities;
+package model.entities.responses;
 
-public class EditPasswordRequest {
+import java.util.UUID;
+
+public class LoginResponse {
 
     private Long userId;
     private String password;
+    private UUID passwordSalt;
 
-    public EditPasswordRequest(Long userId, String password) {
+    public LoginResponse(Long userId, String password, UUID passwordSalt) {
         this.userId = userId;
         this.password = password;
+        this.passwordSalt = passwordSalt;
     }
 
     public Long getUserId() {
@@ -24,5 +28,13 @@ public class EditPasswordRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public UUID getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    public void setPasswordSalt(UUID passwordSalt) {
+        this.passwordSalt = passwordSalt;
     }
 }

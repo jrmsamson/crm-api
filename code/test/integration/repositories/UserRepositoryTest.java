@@ -2,7 +2,10 @@ package integration.repositories;
 
 import enums.Role;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.*;
+import model.entities.requests.UpdateUserTokenExpirationRequest;
+import model.entities.requests.UpdateUserTokenRequest;
+import model.entities.responses.UserResponse;
+import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
 import org.jooq.DSLContext;
 import play.Application;
@@ -131,7 +134,7 @@ public class UserRepositoryTest {
     @Test
     public void shouldUpdateUserTokenExpiration() {
         LocalDateTime tokenExpiration = LocalDateTime.now();
-        userRepository.updateUserTokenExpiration(new UpdateUserTokenExpiration(USER_ID, tokenExpiration));
+        userRepository.updateUserTokenExpiration(new UpdateUserTokenExpirationRequest(USER_ID, tokenExpiration));
         UserTokenResponse userTokenResponse = userRepository.getUserToken(USER_ID).get();
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
     }

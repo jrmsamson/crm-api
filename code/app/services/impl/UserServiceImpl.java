@@ -4,7 +4,12 @@ import enums.Role;
 import exceptions.RoleDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
-import model.entities.*;
+import model.entities.requests.UpdateUserTokenExpirationRequest;
+import model.entities.requests.UpdateUserTokenRequest;
+import model.entities.requests.UserRequest;
+import model.entities.responses.AddUserResponse;
+import model.entities.responses.UserResponse;
+import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
 import repositories.RepositoryFactory;
 import services.UserService;
@@ -99,7 +104,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     public void updateUserTokenExpiration(Long userId) {
         repositoryFactory
                 .getUserRepository()
-                .updateUserTokenExpiration(new UpdateUserTokenExpiration(
+                .updateUserTokenExpiration(new UpdateUserTokenExpirationRequest(
                         userId,
                         getTokenExpiration()
                 ));

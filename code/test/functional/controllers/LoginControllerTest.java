@@ -1,8 +1,6 @@
 package functional.controllers;
 
-import controllers.LoginController;
-import controllers.routes;
-import model.entities.LoginRequest;
+import model.entities.requests.LoginRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

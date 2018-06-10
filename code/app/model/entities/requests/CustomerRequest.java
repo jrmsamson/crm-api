@@ -1,4 +1,4 @@
-package model.entities;
+package model.entities.requests;
 
 public class CustomerRequest {
 

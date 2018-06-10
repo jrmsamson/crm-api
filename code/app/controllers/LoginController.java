@@ -1,6 +1,6 @@
 package controllers;
 
-import model.entities.LoginRequest;
+import model.entities.requests.LoginRequest;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;

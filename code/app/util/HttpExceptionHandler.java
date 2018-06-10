@@ -2,7 +2,7 @@ package util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import exceptions.BaseRestException;
-import model.entities.ErrorResponse;
+import model.entities.responses.ErrorResponse;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.Result;

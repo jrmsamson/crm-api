@@ -1,9 +1,9 @@
 package services;
 
-import model.entities.AddCustomerResponse;
-import model.entities.CustomerRequest;
-import model.entities.CustomerResponse;
-import model.entities.UpdateCustomerPhotoRequest;
+import model.entities.responses.AddCustomerResponse;
+import model.entities.requests.CustomerRequest;
+import model.entities.responses.CustomerResponse;
+import model.entities.requests.UpdateCustomerPhotoRequest;
 
 import java.io.File;
 import java.util.List;

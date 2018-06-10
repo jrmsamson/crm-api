@@ -1,25 +1,22 @@
-package model.entities;
+package model.entities.responses;
 
 import java.time.LocalDateTime;
 
-public class UpdateUserTokenRequest {
+public class UserTokenResponse {
 
-    private Long userId;
     private String token;
     private LocalDateTime tokenExpiration;
 
-    public UpdateUserTokenRequest(Long userId, String token, LocalDateTime tokenExpiration) {
-        this.userId = userId;
+    public UserTokenResponse(String token, LocalDateTime tokenExpiration) {
         this.token = token;
         this.tokenExpiration = tokenExpiration;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public Boolean validate(String token) {
+        return token != null
+                || !token.isEmpty()
+                || token.equals(this.token)
+                || tokenExpiration.isAfter(LocalDateTime.now());
     }
 
     public String getToken() {

@@ -1,15 +1,16 @@
-package model.entities;
+package model.entities.requests;
 
-public class AddEditLogin {
+public class LoginRequest {
 
     private String username;
     private String password;
-    private Long userId;
 
-    public AddEditLogin(String username, String password, Long userId) {
+    public LoginRequest() {
+    }
+
+    public LoginRequest(String username, String password) {
         this.username = username;
         this.password = password;
-        this.userId = userId;
     }
 
     public String getUsername() {
@@ -28,11 +29,4 @@ public class AddEditLogin {
         this.password = password;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 }

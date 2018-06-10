@@ -1,6 +1,6 @@
 package repositories;
 
-import model.entities.LoginResponse;
+import model.entities.responses.LoginResponse;
 import model.pojos.Login;
 
 import java.util.Optional;

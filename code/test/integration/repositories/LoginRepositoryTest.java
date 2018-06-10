@@ -1,6 +1,6 @@
 package integration.repositories;
 
-import model.entities.*;
+import model.entities.responses.LoginResponse;
 import model.pojos.Login;
 import model.pojos.User;
 import org.jooq.DSLContext;

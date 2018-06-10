@@ -2,7 +2,10 @@ package unit.services;
 
 import enums.Role;
 import exceptions.IncorrectUsernameOrPasswordException;
-import model.entities.*;
+import model.entities.requests.AddEditLoginRequest;
+import model.entities.requests.LoginRequest;
+import model.entities.responses.LoginResponse;
+import model.entities.responses.UserSessionResponse;
 import model.pojos.Login;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,8 +71,8 @@ public class LoginServiceTest {
         when(loginRepository.getLoginByUsername(USERNAME)).thenReturn(
                 Optional.of(new LoginResponse(1L, passwordChecksum, PASSWORD_SALT))
         );
-        UserSession userSession = loginService.login(loginRequest);
-        assertNotNull(userSession);
+        UserSessionResponse userSessionResponse = loginService.login(loginRequest);
+        assertNotNull(userSessionResponse);
     }
 
     @Test(expected = IncorrectUsernameOrPasswordException.class)
@@ -87,8 +90,8 @@ public class LoginServiceTest {
 
     @Test
     public void shouldAddLoginWithAPasswordCyphered() {
-        AddEditLogin addEditLogin = new AddEditLogin(USERNAME, PASSWORD, USER_ID);
-        loginService.addLoginForUser(addEditLogin);
+        AddEditLoginRequest addEditLoginRequest = new AddEditLoginRequest(USERNAME, PASSWORD, USER_ID);
+        loginService.addLoginForUser(addEditLoginRequest);
         verify(loginRepository).addLogin(any());
     }
 
@@ -99,7 +102,7 @@ public class LoginServiceTest {
         UUID passwordSalt = UUID.randomUUID();
         Long userId = 1L;
         when(loginRepository.getLoginPasswordSaltByUserId(userId)).thenReturn(Optional.of(passwordSalt));
-        loginService.editLogin(new AddEditLogin(username, password, userId));
+        loginService.editLogin(new AddEditLoginRequest(username, password, userId));
 
         verify(loginRepository).editLogin(loginCaptor.capture());
         Login login = loginCaptor.getValue();

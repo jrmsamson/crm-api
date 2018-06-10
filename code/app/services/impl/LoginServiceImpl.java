@@ -2,7 +2,10 @@ package services.impl;
 
 import exceptions.IncorrectUsernameOrPasswordException;
 import exceptions.LoginNotExistException;
-import model.entities.*;
+import model.entities.requests.AddEditLoginRequest;
+import model.entities.requests.LoginRequest;
+import model.entities.responses.LoginResponse;
+import model.entities.responses.UserSessionResponse;
 import model.pojos.Login;
 import repositories.RepositoryFactory;
 import services.LoginService;
@@ -23,7 +26,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         this.userService = userService;
     }
 
-    public UserSession login(LoginRequest loginRequest) {
+    public UserSessionResponse login(LoginRequest loginRequest) {
         LoginResponse loginResponse = repositoryFactory
                 .getLoginRepository()
                 .getLoginByUsername(loginRequest.getUsername())
@@ -34,8 +37,8 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         return buildUserSession(loginResponse);
     }
 
-    private UserSession buildUserSession(LoginResponse loginResponse) {
-        return new UserSession(
+    private UserSessionResponse buildUserSession(LoginResponse loginResponse) {
+        return new UserSessionResponse(
                 loginResponse.getUserId(),
                 userService.getUserRole(loginResponse.getUserId()),
                 userService.buildUserToken(loginResponse.getUserId())
@@ -54,49 +57,49 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         userService.removeCurrentUserToken();
     }
 
-    public void addLoginForUser(AddEditLogin addEditLogin) {
+    public void addLoginForUser(AddEditLoginRequest addEditLoginRequest) {
         repositoryFactory
                 .getLoginRepository()
-                .addLogin(buildAddLogin(addEditLogin));
+                .addLogin(buildAddLogin(addEditLoginRequest));
     }
 
-    private Login buildAddLogin(AddEditLogin addEditLogin) {
+    private Login buildAddLogin(AddEditLoginRequest addEditLoginRequest) {
         UUID passwordSalt = UUID.randomUUID();
         String passwordCheckSum = CryptoUtils.generatePasswordCheckSum(
-                addEditLogin.getPassword(), passwordSalt
+                addEditLoginRequest.getPassword(), passwordSalt
         );
 
         Login login = new Login();
-        login.setUsername(addEditLogin.getUsername());
+        login.setUsername(addEditLoginRequest.getUsername());
         login.setPassword(passwordCheckSum);
         login.setPasswordSalt(passwordSalt);
-        login.setUserId(addEditLogin.getUserId());
+        login.setUserId(addEditLoginRequest.getUserId());
 
         return login;
     }
 
-    public void editLogin(AddEditLogin addEditLogin) {
+    public void editLogin(AddEditLoginRequest addEditLoginRequest) {
         repositoryFactory
                 .getLoginRepository()
-                .editLogin(buildEditLogin(addEditLogin));
+                .editLogin(buildEditLogin(addEditLoginRequest));
     }
 
-    private Login buildEditLogin(AddEditLogin addEditLogin) {
+    private Login buildEditLogin(AddEditLoginRequest addEditLoginRequest) {
         UUID passwordSalt = repositoryFactory
                 .getLoginRepository()
-                .getLoginPasswordSaltByUserId(addEditLogin.getUserId())
+                .getLoginPasswordSaltByUserId(addEditLoginRequest.getUserId())
                 .orElseThrow(LoginNotExistException::new);
 
         Login login = new Login();
-        login.setUsername(addEditLogin.getUsername());
+        login.setUsername(addEditLoginRequest.getUsername());
         login.setPassword(
                 CryptoUtils.generatePasswordCheckSum(
-                        addEditLogin.getPassword(),
+                        addEditLoginRequest.getPassword(),
                         passwordSalt
                 )
         );
 
-        login.setUserId(addEditLogin.getUserId());
+        login.setUserId(addEditLoginRequest.getUserId());
 
         return login;
     }

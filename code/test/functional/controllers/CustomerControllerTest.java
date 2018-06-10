@@ -1,14 +1,11 @@
 package functional.controllers;
 
 
-import akka.http.impl.util.JavaMapping;
 import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controllers.routes;
-import model.entities.AddCustomerResponse;
-import model.entities.CustomerRequest;
+import model.entities.responses.AddCustomerResponse;
+import model.entities.requests.CustomerRequest;
 import org.junit.Test;
-import play.Logger;
 import play.libs.Json;
 import akka.stream.IOResult;
 import akka.stream.Materializer;

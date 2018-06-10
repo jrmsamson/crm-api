@@ -1,9 +1,9 @@
 package controllers;
 
 import com.google.inject.Inject;
-import model.entities.AddEditLogin;
-import model.entities.AddUserResponse;
-import model.entities.UserRequest;
+import model.entities.requests.AddEditLoginRequest;
+import model.entities.responses.AddUserResponse;
+import model.entities.requests.UserRequest;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.*;
@@ -45,7 +45,7 @@ public class UserController extends BaseController {
                     AddUserResponse addUserResponse = userService.addUser(userRequest);
 
                     loginService.addLoginForUser(
-                            new AddEditLogin(
+                            new AddEditLoginRequest(
                                     userRequest.getUsername(),
                                     userRequest.getPassword(),
                                     userService.getUserIdByUuid(addUserResponse.getUserUuid())
@@ -64,7 +64,7 @@ public class UserController extends BaseController {
         UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
         return CompletableFuture.runAsync(() -> {
                 loginService.editLogin(
-                        new AddEditLogin(
+                        new AddEditLoginRequest(
                                 userRequest.getUsername(),
                                 userRequest.getPassword(),
                                 userService.getUserIdByUuid(UUID.fromString(uuid))

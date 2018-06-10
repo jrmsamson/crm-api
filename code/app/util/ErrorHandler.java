@@ -1,6 +1,6 @@
 package util;
 
-import model.entities.ErrorResponse;
+import model.entities.responses.ErrorResponse;
 import play.Logger;
 import play.http.HttpErrorHandler;
 import play.libs.Json;

@@ -1,26 +1,15 @@
 package functional.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controllers.routes;
 import enums.Role;
-import model.entities.AddCustomerResponse;
-import model.entities.AddUserResponse;
-import model.entities.UserRequest;
-import model.entities.LoginRequest;
-import org.junit.After;
+import model.entities.responses.AddUserResponse;
+import model.entities.requests.UserRequest;
 import org.junit.Before;
 import org.junit.Test;
-import play.Application;
 import play.Logger;
-import play.db.Database;
-import play.db.evolutions.Evolutions;
-import play.inject.guice.GuiceApplicationBuilder;
 import play.libs.Json;
-import play.mvc.Http;
-import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static play.mvc.Http.HttpVerbs.POST;
@@ -73,7 +62,6 @@ public class UserControllerTest extends BaseControllerTest {
     @Test
     public void shouldBeAvailableDeleteUser() throws IOException {
         AddUserResponse addUserResponse = getAddUserResponseFromResult();
-        Logger.info(addUserResponse.getUserUuid().toString());
         buildRequest(DELETE, BASE_URL + "/" + addUserResponse.getUserUuid());
         makeRequest();
         assertEquals(OK, result.status());

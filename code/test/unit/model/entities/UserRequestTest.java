@@ -1,7 +1,7 @@
 package unit.model.entities;
 
 import enums.Role;
-import model.entities.UserRequest;
+import model.entities.requests.UserRequest;
 import org.junit.Test;
 import util.Notification;
 
