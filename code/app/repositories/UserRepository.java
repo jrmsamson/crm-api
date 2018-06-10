@@ -12,7 +12,7 @@ public interface UserRepository extends BaseRepository {
 
     Long addUser(User user);
 
-    void editUser(UUID userUuid, AddUserRequest user);
+    void editUser(User user);
 
     void deleteUser(UUID userUuid);
 

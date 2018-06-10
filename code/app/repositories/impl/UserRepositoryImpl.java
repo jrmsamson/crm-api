@@ -63,13 +63,13 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public void editUser(UUID userUuid, AddUserRequest user) {
+    public void editUser(User user) {
         create
                 .update(USER)
                 .set(USER.NAME, user.getName())
                 .set(USER.SURNAME, user.getSurname())
-                .set(USER.ROLE_ID, getRoleId(user.getRole()))
-                .where(USER.UUID.eq(userUuid))
+                .set(USER.ROLE_ID, user.getRoleId())
+                .where(USER.UUID.eq(user.getUuid()))
                 .execute();
     }
 
@@ -146,16 +146,5 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 )
                 .from(USER)
                 .innerJoin(ROLE).on(USER.ROLE_ID.eq(ROLE.ID));
-    }
-
-    private SelectConditionStep<Record1<Integer>> getRoleId(Role role) {
-        return create
-                .select(ROLE.ID)
-                .from(ROLE)
-                .where(
-                        ROLE.NAME.lower().eq(
-                                role.name().toLowerCase()
-                        )
-                );
     }
 }

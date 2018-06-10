@@ -16,7 +16,6 @@ import play.Application;
 import play.inject.guice.GuiceApplicationBuilder;
 import repositories.CustomerRepository;
 import repositories.RepositoryFactory;
-import scala.tools.cmd.Opt;
 import services.CustomerService;
 import services.impl.CustomerServiceImpl;
 import util.ConfigPath;

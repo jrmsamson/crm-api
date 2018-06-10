@@ -1,9 +1,7 @@
 package functional.controllers;
 
-import controllers.LoginController;
-import controllers.routes;
 import enums.Role;
-import model.entities.AddUserRequest;
+import model.entities.UserRequest;
 import model.entities.LoginRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -63,13 +61,13 @@ public class UserControllerTest {
 
     @Test
     public void shouldBeAvailableAddANewUser() {
-        AddUserRequest addUserRequest = new AddUserRequest(
+        UserRequest userRequest = new UserRequest(
                 "Jerome", "Samson", Role.USER, "jer0Me" , "password"
         );
 
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
-                .bodyJson(Json.toJson(addUserRequest))
+                .bodyJson(Json.toJson(userRequest))
                 .uri(baseUrl)
                 .session(session);
         Result result = route(app, request);
@@ -78,13 +76,13 @@ public class UserControllerTest {
 
     @Test
     public void shouldBeAvailableEditUser() {
-        AddUserRequest addUserRequest = new AddUserRequest(
+        UserRequest userRequest = new UserRequest(
                 "Jerome", "Samson", Role.USER, "jer0Me" , "password"
         );
         UUID uuid = UUID.randomUUID();
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(PUT)
-                .bodyJson(Json.toJson(addUserRequest))
+                .bodyJson(Json.toJson(userRequest))
                 .uri(baseUrl + "/" + uuid)
                 .session(session);
         Result result = route(app, request);

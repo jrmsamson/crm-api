@@ -65,8 +65,12 @@ public class UserRepositoryTest {
     @Test
     public void shouldEditUser() {
         userCreated.ifPresent(userCreated -> {
-            AddUserRequest user = new AddUserRequest("JR", "S", Role.USER, null, null);
-            userRepository.editUser(userCreated.getUuid(), user);
+            User user = new User();
+            user.setName("JR");
+            user.setSurname("R");
+            user.setRoleId(2);
+            user.setUuid(userCreated.getUuid());
+            userRepository.editUser(user);
             UserResponse userEdited = userRepository.getUserByUuid(userCreated.getUuid()).get();
             assertEquals(userCreated.getUuid(), userEdited.getUuid());
             assertEquals(user.getName(), userEdited.getName());

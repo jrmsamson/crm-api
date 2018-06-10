@@ -3,7 +3,7 @@ package model.entities;
 import enums.Role;
 import util.Notification;
 
-public class AddUserRequest {
+public class UserRequest {
 
     public static final String NAME_REQUIRED_MESSAGE = "Name is required";
     public static final String SURNAME_REQUIRED_MESSAGE = "Surname is required";
@@ -14,10 +14,10 @@ public class AddUserRequest {
     private String username;
     private String password;
 
-    public AddUserRequest() {
+    public UserRequest() {
     }
 
-    public AddUserRequest(String name, String surname, Role role, String username, String password) {
+    public UserRequest(String name, String surname, Role role, String username, String password) {
         this.name = name;
         this.surname = surname;
         this.role = role;

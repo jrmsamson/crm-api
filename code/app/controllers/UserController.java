@@ -2,7 +2,7 @@ package controllers;
 
 import com.google.inject.Inject;
 import model.entities.AddLoginRequest;
-import model.entities.AddUserRequest;
+import model.entities.UserRequest;
 import play.libs.Json;
 import play.mvc.*;
 import services.LoginService;
@@ -35,23 +35,23 @@ public class UserController extends BaseController {
     }
 
     public CompletionStage<Result> addUser() {
-        AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
+        UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
         return CompletableFuture
                 .runAsync(() ->
                         loginService.addLoginForUser(
                                 new AddLoginRequest(
-                                        addUserRequest.getUsername(),
-                                        addUserRequest.getPassword(),
-                                        userService.addUser(addUserRequest)
+                                        userRequest.getUsername(),
+                                        userRequest.getPassword(),
+                                        userService.addUser(userRequest)
                                 )
                         )
                 ).thenApply(aVoid -> ok());
     }
 
     public CompletionStage<Result> editUser(String uuid) {
-        AddUserRequest addUserRequest = Json.fromJson(request().body().asJson(), AddUserRequest.class);
+        UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
         return CompletableFuture.runAsync(() ->
-                this.userService.editUser(UUID.fromString(uuid), addUserRequest)
+                this.userService.editUser(UUID.fromString(uuid), userRequest)
         ).thenApply(aVoid -> ok());
     }
 

@@ -1,12 +1,12 @@
 package services.impl;
 
 import enums.Role;
+import exceptions.RoleDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
 import model.entities.*;
 import model.pojos.User;
 import repositories.RepositoryFactory;
-import services.RoleService;
 import services.UserService;
 import util.CryptoUtils;
 import util.Notification;
@@ -20,33 +20,42 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
     private static final Integer TOKEN_EXPIRATION_DURATION_MINUTES = 30;
 
-    private RoleService roleService;
 
     @Inject
-    public UserServiceImpl(RepositoryFactory repositoryFactory,
-                           RoleService roleService) {
+    public UserServiceImpl(RepositoryFactory repositoryFactory) {
         // For testing purpose
         super(repositoryFactory);
-        this.roleService = roleService;
     }
 
-    public Long addUser(AddUserRequest addUserRequest) {
-        Notification userRequestNotification = addUserRequest.validation();
+    public Long addUser(UserRequest userRequest) {
+        Notification userRequestNotification = userRequest.validation();
         if (userRequestNotification.hasErrors())
             throw new UserRequestException(userRequestNotification.errorMessage());
 
-        User user = new User();
-        user.setName(addUserRequest.getName());
-        user.setSurname(addUserRequest.getSurname());
-        user.setRoleId(roleService.getRoleId(addUserRequest.getRole()));
-
-        return  repositoryFactory.getUserRepository().addUser(user);
+        return repositoryFactory.getUserRepository().addUser(buildUser(userRequest));
     }
 
-    public void editUser(UUID userUuid, AddUserRequest addUserRequest) {
+    private Integer getUserRoleId(Role role) {
+        return repositoryFactory
+                .getRoleRepository()
+                .getRoleId(role)
+                .orElseThrow(RoleDoesNotExistException::new);
+    }
+
+    public void editUser(UUID userUuid, UserRequest userRequest) {
+        User user = buildUser(userRequest);
+        user.setUuid(userUuid);
         repositoryFactory
                 .getUserRepository()
-                .editUser(userUuid, addUserRequest);
+                .editUser(user);
+    }
+
+    private User buildUser(UserRequest userRequest) {
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setSurname(userRequest.getSurname());
+        user.setRoleId(getUserRoleId(userRequest.getRole()));
+        return user;
     }
 
     public void deleteUser(UUID userUuid) {
