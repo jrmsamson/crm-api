@@ -3,7 +3,7 @@
 - Play Framework
 - jOOq
 - mockito
-- PostgrsSQL
+- PostgreSQL
 
 # GET STARTED
 
