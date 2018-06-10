@@ -39,7 +39,8 @@ public class LoginRepositoryImpl extends BaseRepositoryImpl implements LoginRepo
                         LOGIN.PASSWORD_SALT
                 ).from(LOGIN)
                 .where(LOGIN.ACTIVE.eq(Boolean.TRUE)
-                        .and(LOGIN.USERNAME.eq(username))
+                        .and(LOGIN.USERNAME.lower()
+                                .eq(username.toLowerCase()))
                 )
                 .fetchOptionalInto(LoginResponse.class);
     }
