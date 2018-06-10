@@ -29,6 +29,7 @@ Afterwards, You will need to do two more steps in order to test the API.
     ![evolutions](evolution.png?raw=true "Database needs evolution")
 
 * Click on *Apply this script now!*
+* **Enjoy!**
 
 # Endpoints
 
