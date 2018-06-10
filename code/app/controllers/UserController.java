@@ -86,4 +86,15 @@ public class UserController extends BaseController {
 
         ).thenApplyAsync(aVoid -> ok(), ec.current());
     }
+
+
+    public CompletionStage<Result> getUserByUuid(String uuid) {
+        return CompletableFuture.supplyAsync(() ->
+                userService.getUserByUuid(UUID.fromString(uuid))
+        ).thenApply(
+                userResponse -> ok(
+                        Json.toJson(userResponse)
+                )
+        );
+    }
 }

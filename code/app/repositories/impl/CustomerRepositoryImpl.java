@@ -20,7 +20,9 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
 
     public Optional<CustomerResponse> getCustomerByUuid(UUID uuid) {
         return selectCustomer()
-                .where(CUSTOMER.UUID.eq(uuid))
+                .where(CUSTOMER.UUID.eq(uuid)
+                        .and(CUSTOMER.ACTIVE.eq(Boolean.TRUE))
+                )
                 .fetchOptionalInto(CustomerResponse.class);
     }
 
@@ -64,7 +66,7 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
         return exception.getMessage().contains(CUSTOMER_NAME_SURNAME_DB_CONSTRAINT);
     }
 
-    public void editCustomer(Customer customer) {
+    public void editCustomerByUuid(Customer customer) {
         create.update(CUSTOMER)
                 .set(CUSTOMER.NAME, customer.getName())
                 .set(CUSTOMER.SURNAME, customer.getSurname())
@@ -73,7 +75,7 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
                 .execute();
     }
 
-    public void deleteCustomer(UUID uuid) {
+    public void deleteCustomerUuid(UUID uuid) {
         create.update(CUSTOMER)
                 .set(CUSTOMER.ACTIVE, Boolean.FALSE)
                 .execute();

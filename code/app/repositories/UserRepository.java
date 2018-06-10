@@ -21,7 +21,7 @@ public interface UserRepository extends BaseRepository {
 
     Optional<UserResponse> getUserByUuid(UUID userUuid);
 
-    List<UserResponse> getUsersActive();
+    List<UserResponse> getUsersActive(Long currentUserId);
 
     Optional<Role> getUserRoleByUserId(Long userId);
 

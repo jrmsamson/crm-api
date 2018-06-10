@@ -101,7 +101,9 @@ public class CustomerController extends BaseController {
         return CompletableFuture.supplyAsync(() ->
                 customerService.getCustomerByUuid(UUID.fromString(uuid))
         ).thenApply(
-                aVoid -> ok()
+                customerResponse -> ok(
+                        Json.toJson(customerResponse)
+                )
         );
     }
 

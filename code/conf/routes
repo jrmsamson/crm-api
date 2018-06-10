@@ -1,10 +1,11 @@
 
 
 POST        /api/v1/login                                   @controllers.LoginController.login
-GET         /api/v1/logout                                  @controllers.LoginController.logout
+POST        /api/v1/logout                                  @controllers.LoginController.logout
 
 GET         /api/v1/users                                   @controllers.UserController.getUsersActive
 POST        /api/v1/users                                   @controllers.UserController.addUser()
+GET         /api/v1/users/:uuid                             @controllers.UserController.getUserByUuid(uuid: String)
 PUT         /api/v1/users/:uuid                             @controllers.UserController.editUser(uuid: String)
 DELETE      /api/v1/users/:uuid                             @controllers.UserController.deleteUser(uuid: String)
 

@@ -7,3 +7,14 @@ Once you have installed Docker in your machine, the only thing left is to execut
 **docker-compose up**
 
 Everything needed to run this project is already wired up. Therefore you do not need to do anything else, just execute the above command.
+
+# STACK
+
+- Play Framework 2.6
+- jOOq
+- mockito
+- PostgrsSQL
+
+# Endpoints
+
+List of Endpoints available [here](ENDPOINTS.md).

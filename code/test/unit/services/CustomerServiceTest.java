@@ -44,7 +44,6 @@ public class CustomerServiceTest {
 
     @Captor
     private ArgumentCaptor<Customer> customerArgumentCaptor;
-    private Customer customerCaptor;
 
     public CustomerServiceTest() {
         customerRepository = mock(CustomerRepository.class);
@@ -62,40 +61,43 @@ public class CustomerServiceTest {
         customerRequest = new CustomerRequest("Jerome", "Samson");
     }
 
-    private void verifyCustomerData() {
-        customerCaptor = customerArgumentCaptor.getValue();
-        assertEquals("Jerome", customerCaptor.getName());
-        assertEquals("Samson", customerCaptor.getSurname());
-        assertEquals(1L, customerCaptor.getCreatedBy(), 0);
-        assertEquals(1L, customerCaptor.getModifiedBy(), 0);
-    }
-
     @Test
     public void shouldAddCustomer() {
         customerService.addCustomer(customerRequest);
         verify(customerRepository).addCustomer(customerArgumentCaptor.capture());
-        verifyCustomerData();
-        assertNull(customerCaptor.getId());
-        assertNull(customerCaptor.getPhotoName());
-        assertNull(customerCaptor.getUuid());
+        Customer customer = customerArgumentCaptor.getValue();
+
+        assertEquals("Jerome", customer.getName());
+        assertEquals("Samson", customer.getSurname());
+        assertEquals(1L, customer.getCreatedBy(), 0);
+        assertEquals(1L, customer.getModifiedBy(), 0);
+        assertNull(customer.getId());
+        assertNull(customer.getPhotoName());
+        assertNull(customer.getUuid());
     }
 
     @Test
     public void shouldEditCustomer() {
         UUID customerUUID = UUID.randomUUID();
         customerService.editCustomer(customerUUID, customerRequest);
-        verify(customerRepository).editCustomer(
+        verify(customerRepository).editCustomerByUuid(
                 customerArgumentCaptor.capture()
         );
-        verifyCustomerData();
+        Customer customer = customerArgumentCaptor.getValue();
+        assertEquals("Jerome", customer.getName());
+        assertEquals("Samson", customer.getSurname());
+        assertEquals(1L, customer.getModifiedBy(), 0);
         assertEquals(customerUUID, customerArgumentCaptor.getValue().getUuid());
+        assertNull(customer.getId());
+        assertNull(customer.getCreatedBy());
+        assertNull(customer.getPhotoName());
     }
 
     @Test
     public void shouldDeleteCustomer() {
         UUID customerUUID = UUID.randomUUID();
         customerService.deleteCustomer(customerUUID);
-        verify(customerRepository).deleteCustomer(customerUUID);
+        verify(customerRepository).deleteCustomerUuid(customerUUID);
     }
 
     @Test
@@ -143,7 +145,7 @@ public class CustomerServiceTest {
 
     @Test(expected = ImageExtensionNotSupportedException.class)
     public void shouldAllowOnlyImageAsPhoto() throws IOException {
-        File file = new File("anyfile");
+        File file = new File("/tmp/anyfile");
         file.createNewFile();
 
         UUID userUuid = UUID.randomUUID();

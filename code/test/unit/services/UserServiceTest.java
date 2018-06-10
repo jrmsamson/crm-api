@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.MockitoJUnitRunner;
+import play.Logger;
 import repositories.RepositoryFactory;
 import repositories.RoleRepository;
 import repositories.UserRepository;
@@ -46,6 +47,7 @@ public class UserServiceTest {
         when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepositoryMock);
         when(repositoryFactoryMock.getRoleRepository()).thenReturn(roleRepository);
         userService = new UserServiceImpl(repositoryFactoryMock);
+        userService.setCurrentUserId(1L);
         setUpFixture();
     }
 
@@ -94,7 +96,7 @@ public class UserServiceTest {
         List<UserResponse> usersMocked = new ArrayList<>();
         usersMocked.add(new UserResponse("Jerome", "Samson", UUID.randomUUID(), Role.USER));
         usersMocked.add(new UserResponse("JRM", "SAM", UUID.randomUUID(), Role.USER));
-        when(userRepositoryMock.getUsersActive()).thenReturn(usersMocked);
+        when(userRepositoryMock.getUsersActive(1L)).thenReturn(usersMocked);
 
         List<UserResponse> users = userService.getUsersActive();
 
@@ -114,6 +116,25 @@ public class UserServiceTest {
     @Test(expected = UserDoesNotExistException.class)
     public void shouldThrowAnExceptionIfUserIdDoesNotExist() {
         userService.getUserIdByUuid(UUID.randomUUID());
+    }
+
+    @Test
+    public void shouldGetUserByUuid() {
+        UUID userUuid = UUID.randomUUID();
+        when(userRepositoryMock.getUserByUuid(userUuid)).thenReturn(
+                Optional.of(new UserResponse("", "",null, null))
+        );
+        userService.getUserByUuid(userUuid);
+        verify(userRepositoryMock).getUserByUuid(userUuid);
+    }
+
+    @Test(expected = UserDoesNotExistException.class)
+    public void shouldThrowAnExceptionIfDoesNotExistTheUserWhenItsGoingToFindHimByUuid() {
+        UUID userUuid = UUID.randomUUID();
+        when(userRepositoryMock.getUserByUuid(userUuid)).thenReturn(
+                Optional.empty()
+        );
+        userService.getUserByUuid(userUuid);
     }
 
 }

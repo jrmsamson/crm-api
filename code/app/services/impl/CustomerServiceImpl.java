@@ -58,7 +58,7 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
         customer.setUuid(customerUUID);
         repositoryFactory
                 .getCustomerRepository()
-                .editCustomer(customer);
+                .editCustomerByUuid(customer);
     }
 
     private Customer buildEditCustomer(CustomerRequest customerRequest) {
@@ -72,7 +72,7 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
     public void deleteCustomer(UUID customerUUID) {
         repositoryFactory
                 .getCustomerRepository()
-                .deleteCustomer(customerUUID);
+                .deleteCustomerUuid(customerUUID);
     }
 
     public List<CustomerResponse> getCustomersActive() {

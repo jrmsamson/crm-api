@@ -2,8 +2,6 @@ package integration.repositories;
 
 import enums.Role;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.requests.UpdateUserTokenExpirationRequest;
-import model.entities.requests.UpdateUserTokenRequest;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
@@ -108,7 +106,7 @@ public class UserRepositoryTest {
             user.setSurname("SAM");
             user.setRoleId(USER_ROLE_ID);
             userRepository.addUser(user);
-            List<UserResponse> users = userRepository.getUsersActive();
+            List<UserResponse> users = userRepository.getUsersActive(1L);
             assertEquals(1, users.size());
             assertEquals(users.get(0).getName(), "JR");
             assertEquals(users.get(0).getSurname(), "SAM");

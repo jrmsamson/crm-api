@@ -4,11 +4,13 @@ import enums.Role;
 import exceptions.DatabaseCommitChangesException;
 import exceptions.DatabaseConnectionException;
 import exceptions.RoleDoesNotExistException;
+import model.entities.responses.ErrorResponse;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.JDBCUtils;
 import play.db.Database;
+import play.libs.Json;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -46,7 +48,9 @@ public class AuthorizationAction extends Action<Secured> {
         }
 
         return CompletableFuture
-                .completedFuture(unauthorized("You're not allowed to access this resource."));
+                .completedFuture(unauthorized(Json.toJson(
+                        new ErrorResponse("You're not allowed to access this resource.")
+                )));
     }
     private boolean hasValidToken(Http.Context ctx) {
 

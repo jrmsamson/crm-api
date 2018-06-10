@@ -76,7 +76,7 @@ public class CustomerRepositoryTest {
         customer.setSurname("SAM");
         customer.setUuid(lastCustomerCreated.getUuid());
         customer.setModifiedBy(1L);
-        customerRepository.editCustomer(customer);
+        customerRepository.editCustomerByUuid(customer);
         CustomerResponse customerEdited =
                 customerRepository.getCustomerByUuid(lastCustomerCreated.getUuid()).get();
         assertEquals("JRM", customerEdited.getName());
@@ -97,7 +97,7 @@ public class CustomerRepositoryTest {
 
     @Test
     public void shouldDeleteCustomer() {
-        customerRepository.deleteCustomer(lastCustomerCreated.getUuid());
+        customerRepository.deleteCustomerUuid(lastCustomerCreated.getUuid());
         List<CustomerResponse> customers = customerRepository.getCustomersActive();
         assertEquals(0, customers.size());
     }

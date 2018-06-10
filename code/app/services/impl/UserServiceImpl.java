@@ -17,6 +17,7 @@ import util.Notification;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserServiceImpl extends BaseServiceImpl implements UserService {
@@ -74,7 +75,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     public List<UserResponse> getUsersActive() {
         return repositoryFactory
                 .getUserRepository()
-                .getUsersActive();
+                .getUsersActive(currentUserId);
     }
 
     public Role getUserRole(Long userId) {
@@ -84,7 +85,6 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .orElseThrow(UserDoesNotExistException::new);
     }
 
-    @Override
     public UserTokenResponse getUserToken(Long userId) {
         return repositoryFactory
                 .getUserRepository()
@@ -92,7 +92,6 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .orElseThrow(UserDoesNotExistException::new);
     }
 
-    @Override
     public void removeCurrentUserToken() {
         repositoryFactory
                 .getUserRepository()
@@ -108,11 +107,17 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .updateUserTokenExpirationByUserId(user);
     }
 
-    @Override
     public Long getUserIdByUuid(UUID userUuid) {
         return repositoryFactory
                 .getUserRepository()
                 .getUserIdByUuid(userUuid)
+                .orElseThrow(UserDoesNotExistException::new);
+    }
+
+    public UserResponse getUserByUuid(UUID userUuid) {
+        return repositoryFactory
+                .getUserRepository()
+                .getUserByUuid(userUuid)
                 .orElseThrow(UserDoesNotExistException::new);
     }
 
@@ -123,6 +128,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         );
         return token;
     }
+
 
     private User buildUserToken(Long userId, String token) {
         User user = new User();

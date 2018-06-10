@@ -56,6 +56,15 @@ public class CustomerControllerTest extends BaseControllerTest {
     }
 
     @Test
+    public void shouldGetCustomerByUuid() throws IOException {
+        setUpAddCustomerFixture();
+        AddCustomerResponse addCustomerResponse = getAddCustomerResponseFromResult();
+        buildRequest(GET, BASE_URL + "/" + addCustomerResponse.getCustomerUuid());
+        makeRequest();
+        assertEquals(OK, result.status());
+    }
+
+    @Test
     public void shouldGetCustomersActive() {
         buildRequest(GET, BASE_URL);
         makeRequest();

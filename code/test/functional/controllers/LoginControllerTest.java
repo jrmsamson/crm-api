@@ -56,7 +56,7 @@ public class LoginControllerTest {
         Http.Session session = route(app, request).session();
 
         request = new Http.RequestBuilder()
-                .method(GET)
+                .method(POST)
                 .uri(controllers.routes.LoginController.logout().url())
                 .session(session);
         Result result = route(app, request);

@@ -7,6 +7,7 @@ import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService extends BaseService {
@@ -30,4 +31,6 @@ public interface UserService extends BaseService {
     void renewUserToken(Long userId);
 
     Long getUserIdByUuid(UUID userUuid);
+
+    UserResponse getUserByUuid(UUID userUuid);
 }

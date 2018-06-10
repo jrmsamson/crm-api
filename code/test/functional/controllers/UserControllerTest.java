@@ -41,6 +41,14 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    public void shouldGetUserByUuid() throws IOException {
+        AddUserResponse addUserResponse = getAddUserResponseFromResult();
+        buildRequest(GET, BASE_URL + "/" + addUserResponse.getUserUuid());
+        makeRequest();
+        assertEquals(OK, result.status());
+    }
+
+    @Test
     public void shouldBeAvailableGetAllUsers() {
         buildRequest(GET, BASE_URL);
         makeRequest();

@@ -78,9 +78,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public List<UserResponse> getUsersActive() {
+    public List<UserResponse> getUsersActive(Long currentUserId) {
         return selectUser()
                 .where(USER.ACTIVE.eq(Boolean.TRUE))
+                .and(USER.ID.notEqual(currentUserId))
                 .fetch(record -> new UserResponse(
                         record.value1(),
                         record.value2(),
@@ -95,8 +96,9 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .select(ROLE.NAME)
                 .from(USER)
                 .innerJoin(ROLE).on(USER.ROLE_ID.eq(ROLE.ID))
-                .where(USER.ID.eq(userId))
-                .fetchOptional(record -> Role.lookup(record.value1()));
+                .where(USER.ID.eq(userId)
+                        .and(USER.ACTIVE.eq(Boolean.TRUE))
+                ).fetchOptional(record -> Role.lookup(record.value1()));
     }
 
     @Override
@@ -104,8 +106,9 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
         return create
                 .select(USER.TOKEN, USER.TOKEN_EXPIRATION)
                 .from(USER)
-                .where(USER.ID.eq(userId))
-                .fetchOptionalInto(UserTokenResponse.class);
+                .where(USER.ID.eq(userId)
+                        .and(USER.ACTIVE.eq(Boolean.TRUE))
+                ).fetchOptionalInto(UserTokenResponse.class);
     }
 
     public void updateUserTokenByUserId(User user) {
@@ -135,7 +138,9 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     public Optional<Long> getUserIdByUuid(UUID uuid) {
         return create.select(USER.ID)
                 .from(USER)
-                .where(USER.UUID.eq(uuid))
+                .where(USER.UUID.eq(uuid)
+                        .and(USER.ACTIVE.eq(Boolean.TRUE))
+                )
                 .fetchOptionalInto(Long.class);
     }
 
