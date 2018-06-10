@@ -32,6 +32,13 @@ Afterwards, You will need to do two more steps in order to test the API.
 * Click on *Apply this script now!*
 * **Enjoy!**
 
+In order to use the API, you should go to the Endpoints section and log in to the API with the following credentials:
+
+```
+Username: admin
+Password: admin
+```
+
 # Endpoints
 
 List of Endpoints available [here](ENDPOINTS.md).
