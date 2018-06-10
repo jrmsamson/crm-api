@@ -40,16 +40,33 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
         return new AddCustomerResponse(
                 repositoryFactory
                         .getCustomerRepository()
-                        .addCustomer(buildCustomer(customerRequest))
+                        .addCustomer(buildAddCustomer(customerRequest))
         );
     }
 
+    private Customer buildAddCustomer(CustomerRequest customerRequest) {
+        Customer customer = new Customer();
+        customer.setName(customerRequest.getName());
+        customer.setSurname(customerRequest.getSurname());
+        customer.setCreatedBy(currentUserId);
+        customer.setModifiedBy(currentUserId);
+        return customer;
+    }
+
     public void editCustomer(UUID customerUUID, CustomerRequest customerRequest) {
-        Customer customer = buildCustomer(customerRequest);
+        Customer customer = buildEditCustomer(customerRequest);
         customer.setUuid(customerUUID);
         repositoryFactory
                 .getCustomerRepository()
                 .editCustomer(customer);
+    }
+
+    private Customer buildEditCustomer(CustomerRequest customerRequest) {
+        Customer customer = new Customer();
+        customer.setName(customerRequest.getName());
+        customer.setSurname(customerRequest.getSurname());
+        customer.setModifiedBy(currentUserId);
+        return customer;
     }
 
     public void deleteCustomer(UUID customerUUID) {
@@ -122,15 +139,5 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
                 + updateCustomerPhotoRequest.getCustomerUuuid()
                 + IMAGE_CONTENT_TYPE_EXTENSIONS.get(updateCustomerPhotoRequest.getContentType());
     }
-
-    private Customer buildCustomer(CustomerRequest customerRequest) {
-        Customer customer = new Customer();
-        customer.setName(customerRequest.getName());
-        customer.setSurname(customerRequest.getSurname());
-        customer.setCreatedBy(currentUserId);
-        customer.setModifiedBy(currentUserId);
-        return customer;
-    }
-
 
 }
