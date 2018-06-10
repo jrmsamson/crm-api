@@ -73,7 +73,7 @@ public class UserRepositoryTest {
             user.setSurname("R");
             user.setRoleId(2);
             user.setUuid(userCreated.getUuid());
-            userRepository.editUser(user);
+            userRepository.editUserByUuid(user);
             UserResponse userEdited = userRepository.getUserByUuid(userCreated.getUuid()).get();
             assertEquals(userCreated.getUuid(), userEdited.getUuid());
             assertEquals(user.getName(), userEdited.getName());
@@ -93,7 +93,7 @@ public class UserRepositoryTest {
     @Test
     public void shouldDeleteUser() {
         userCreated.ifPresent(userCreated -> {
-            userRepository.deleteUser(userCreated.getUuid());
+            userRepository.deleteUserByUuid(userCreated.getUuid());
             Optional<UserResponse> user = userRepository.getUserByUuid(userCreated.getUuid());
             assertFalse(user.isPresent());
         });
@@ -102,7 +102,7 @@ public class UserRepositoryTest {
     @Test
     public void shouldGetOnlyThoseUsersActive() {
         userCreated.ifPresent(userCreated -> {
-            userRepository.deleteUser(userCreated.getUuid());
+            userRepository.deleteUserByUuid(userCreated.getUuid());
             User user = new User();
             user.setName("JR");
             user.setSurname("SAM");
@@ -125,8 +125,12 @@ public class UserRepositoryTest {
     public void shouldUpdateUserToken() {
         String token = "mytoken";
         LocalDateTime tokenExpiration = LocalDateTime.now();
-        userRepository.updateUserToken(new UpdateUserTokenRequest(USER_ID, token, tokenExpiration));
-        UserTokenResponse userTokenResponse = userRepository.getUserToken(USER_ID).get();
+        User user = new User();
+        user.setId(USER_ID);
+        user.setToken(token);
+        user.setTokenExpiration(tokenExpiration);
+        userRepository.updateUserTokenByUserId(user);
+        UserTokenResponse userTokenResponse = userRepository.getUserTokenByUserId(USER_ID).get();
         assertEquals(token, userTokenResponse.getToken());
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
     }
@@ -134,8 +138,11 @@ public class UserRepositoryTest {
     @Test
     public void shouldUpdateUserTokenExpiration() {
         LocalDateTime tokenExpiration = LocalDateTime.now();
-        userRepository.updateUserTokenExpiration(new UpdateUserTokenExpirationRequest(USER_ID, tokenExpiration));
-        UserTokenResponse userTokenResponse = userRepository.getUserToken(USER_ID).get();
+        User user = new User();
+        user.setId(USER_ID);
+        user.setTokenExpiration(tokenExpiration);
+        userRepository.updateUserTokenExpirationByUserId(user);
+        UserTokenResponse userTokenResponse = userRepository.getUserTokenByUserId(USER_ID).get();
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
     }
 

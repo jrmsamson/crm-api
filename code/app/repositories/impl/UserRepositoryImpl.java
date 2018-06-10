@@ -2,7 +2,6 @@ package repositories.impl;
 
 import enums.Role;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.requests.UpdateUserTokenExpirationRequest;
 import model.entities.requests.UpdateUserTokenRequest;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
@@ -60,7 +59,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public void editUser(User user) {
+    public void editUserByUuid(User user) {
         create
                 .update(USER)
                 .set(USER.NAME, user.getName())
@@ -71,7 +70,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public void deleteUser(UUID userUuid) {
+    public void deleteUserByUuid(UUID userUuid) {
         create
                 .update(USER)
                 .set(USER.ACTIVE, Boolean.FALSE)
@@ -101,7 +100,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     @Override
-    public Optional<UserTokenResponse> getUserToken(Long userId) {
+    public Optional<UserTokenResponse> getUserTokenByUserId(Long userId) {
         return create
                 .select(USER.TOKEN, USER.TOKEN_EXPIRATION)
                 .from(USER)
@@ -109,11 +108,11 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .fetchOptionalInto(UserTokenResponse.class);
     }
 
-    public void updateUserToken(UpdateUserTokenRequest updateUserTokenRequest) {
+    public void updateUserTokenByUserId(User user) {
         create.update(USER)
-                .set(USER.TOKEN, updateUserTokenRequest.getToken())
-                .set(USER.TOKEN_EXPIRATION, updateUserTokenRequest.getTokenExpiration())
-                .where(USER.ID.eq(updateUserTokenRequest.getUserId()))
+                .set(USER.TOKEN, user.getToken())
+                .set(USER.TOKEN_EXPIRATION, user.getTokenExpiration())
+                .where(USER.ID.eq(user.getId()))
                 .execute();
     }
 
@@ -125,11 +124,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .execute();
     }
 
-    @Override
-    public void updateUserTokenExpiration(UpdateUserTokenExpirationRequest updateUserTokenExpirationRequest) {
+    public void updateUserTokenExpirationByUserId(User user) {
         create.update(USER)
-                .set(USER.TOKEN_EXPIRATION, updateUserTokenExpirationRequest.getTokenExpiration())
-                .where(USER.ID.eq(updateUserTokenExpirationRequest.getUserId()))
+                .set(USER.TOKEN_EXPIRATION, user.getTokenExpiration())
+                .where(USER.ID.eq(user.getId()))
                 .execute();
     }
 

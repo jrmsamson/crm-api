@@ -1,5 +1,6 @@
 package util.annotation;
 
+import exceptions.DatabaseCommitChangesException;
 import exceptions.DatabaseConnectionException;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
@@ -57,9 +58,9 @@ public class AuthorizationAction extends Action<Secured> {
                     .validate(token.get());
 
             if (tokenValid)
-                increaseTokenExpiration(userId.get());
+                renewUserToken(userId.get());
 
-
+            commitDatabaseChanges();
             closeConnectionToTheDatabase();
             return tokenValid;
         }
@@ -67,8 +68,9 @@ public class AuthorizationAction extends Action<Secured> {
         return false;
     }
 
-    private void increaseTokenExpiration(Long userId) {
-        userService.updateUserTokenExpiration(userId);
+    private void renewUserToken(Long userId) {
+        userService.renewUserToken(userId);
+        commitDatabaseChanges();
     }
 
     private void saveUserIdIntoRequestContext(Http.Context ctx) {
@@ -107,5 +109,12 @@ public class AuthorizationAction extends Action<Secured> {
         JDBCUtils.safeClose(connection);
     }
 
+    private void commitDatabaseChanges() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            throw new DatabaseCommitChangesException(e);
+        }
+    }
 
 }

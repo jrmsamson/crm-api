@@ -75,7 +75,7 @@ public class UserServiceTest {
         UserRequest userRequest = new UserRequest("JRM", "SAM", Role.USER, null, null);
         UUID uuidMocked = UUID.randomUUID();
         userService.editUser(uuidMocked, userRequest);
-        verify(userRepositoryMock).editUser(userCaptor.capture());
+        verify(userRepositoryMock).editUserByUuid(userCaptor.capture());
         User user = userCaptor.getValue();
         assertEquals("JRM", user.getName());
         assertEquals("SAM", user.getSurname());
@@ -86,7 +86,7 @@ public class UserServiceTest {
     public void shouldDeleteAnUser() {
         UUID uuidMocked = UUID.randomUUID();
         userService.deleteUser(uuidMocked);
-        verify(userRepositoryMock).deleteUser(uuidMocked);
+        verify(userRepositoryMock).deleteUserByUuid(uuidMocked);
     }
 
     @Test

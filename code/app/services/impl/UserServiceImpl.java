@@ -4,8 +4,6 @@ import enums.Role;
 import exceptions.RoleDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
-import model.entities.requests.UpdateUserTokenExpirationRequest;
-import model.entities.requests.UpdateUserTokenRequest;
 import model.entities.requests.UserRequest;
 import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
@@ -56,7 +54,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         user.setUuid(userUuid);
         repositoryFactory
                 .getUserRepository()
-                .editUser(user);
+                .editUserByUuid(user);
     }
 
     private User buildUser(UserRequest userRequest) {
@@ -70,7 +68,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     public void deleteUser(UUID userUuid) {
         repositoryFactory
                 .getUserRepository()
-                .deleteUser(userUuid);
+                .deleteUserByUuid(userUuid);
     }
 
     public List<UserResponse> getUsersActive() {
@@ -90,7 +88,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     public UserTokenResponse getUserToken(Long userId) {
         return repositoryFactory
                 .getUserRepository()
-                .getUserToken(userId)
+                .getUserTokenByUserId(userId)
                 .orElseThrow(UserDoesNotExistException::new);
     }
 
@@ -101,13 +99,13 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .removeUserToken(currentUserId);
     }
 
-    public void updateUserTokenExpiration(Long userId) {
+    public void renewUserToken(Long userId) {
+        User user = new User();
+        user.setTokenExpiration(getTokenExpiration());
+        user.setId(userId);
         repositoryFactory
                 .getUserRepository()
-                .updateUserTokenExpiration(new UpdateUserTokenExpirationRequest(
-                        userId,
-                        getTokenExpiration()
-                ));
+                .updateUserTokenExpirationByUserId(user);
     }
 
     @Override
@@ -120,15 +118,18 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
     public String buildUserToken(Long userId) {
         String token = CryptoUtils.generateSecureRandomToken();
-        repositoryFactory.getUserRepository().updateUserToken(
-                new UpdateUserTokenRequest(
-                        userId,
-                        token,
-                        getTokenExpiration()
-                )
+        repositoryFactory.getUserRepository().updateUserTokenByUserId(
+                buildUserToken(userId, token)
         );
-
         return token;
+    }
+
+    private User buildUserToken(Long userId, String token) {
+        User user = new User();
+        user.setId(userId);
+        user.setToken(token);
+        user.setTokenExpiration(getTokenExpiration());
+        return user;
     }
 
     private LocalDateTime getTokenExpiration() {

@@ -15,9 +15,9 @@ public interface UserRepository extends BaseRepository {
 
     UUID addUser(User user);
 
-    void editUser(User user);
+    void editUserByUuid(User user);
 
-    void deleteUser(UUID userUuid);
+    void deleteUserByUuid(UUID userUuid);
 
     Optional<UserResponse> getUserByUuid(UUID userUuid);
 
@@ -25,13 +25,13 @@ public interface UserRepository extends BaseRepository {
 
     Optional<Role> getUserRoleByUserId(Long userId);
 
-    Optional<UserTokenResponse> getUserToken(Long userId);
+    Optional<UserTokenResponse> getUserTokenByUserId(Long userId);
 
-    void updateUserToken(UpdateUserTokenRequest updateUserTokenRequest);
+    void updateUserTokenByUserId(User user);
 
     void removeUserToken(Long currentUserId);
 
-    void updateUserTokenExpiration(UpdateUserTokenExpirationRequest updateUserTokenExpirationRequest);
+    void updateUserTokenExpirationByUserId(User user);
 
     Optional<Long> getUserIdByUuid(UUID uuid);
 }
