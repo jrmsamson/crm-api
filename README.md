@@ -1,3 +1,10 @@
+# STACK
+
+- Play Framework
+- jOOq
+- mockito
+- PostgrsSQL
+
 # GET STARTED
 
 The best way to get started with this project is to download Docker where you can do so here https://docs.docker.com/ 
@@ -8,12 +15,20 @@ Once you have installed Docker in your machine, the only thing left is to execut
 
 Everything needed to run this project is already wired up. Therefore you do not need to do anything else, just execute the above command.
 
-# STACK
+To know if everything is up correctly you should see the following messages:
 
-- Play Framework 2.6
-- jOOq
-- mockito
-- PostgrsSQL
+```
+Starting crm-api_postgres_1 ... done
+Starting crm-api_sbt_1      ... done
+```
+
+Afterwards, You will need to do two more steps in order to test the API.
+
+* Access to http://localhost:9000. You should see a message like this:
+
+    ![evolutions](evolution.png?raw=true "Database needs evolution")
+
+* Click on *Apply this script now!*
 
 # Endpoints
 
