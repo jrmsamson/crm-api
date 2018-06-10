@@ -21,12 +21,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
 
     private static final String USER_NAME_SURNAME_DB_CONSTRAINT = "user_name_surname_uindex";
 
-    public Optional<UserResponse> getUserById(Long userId) {
-        return selectUser()
-                .where(USER.ID.eq(userId))
-                .fetchOptionalInto(UserResponse.class);
-    }
-
     public Optional<UserResponse> getUserByUuid(UUID userUuid) {
         return selectUser()
                 .where(USER.ACTIVE.eq(Boolean.TRUE)
@@ -39,7 +33,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 ));
     }
 
-    public Long addUser(User user) {
+    public UUID addUser(User user) {
         try {
             return doAddUser(user);
         } catch (DataAccessException exception) {
@@ -53,13 +47,13 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
         return exception.getMessage().contains(USER_NAME_SURNAME_DB_CONSTRAINT);
     }
 
-    private Long doAddUser(User user) {
+    private UUID doAddUser(User user) {
         return create
                 .insertInto(USER)
                 .set(create.newRecord(USER, user))
-                .returning(USER.ID)
+                .returning(USER.UUID)
                 .fetchOne()
-                .getId();
+                .getUuid();
     }
 
     @Override
@@ -134,6 +128,14 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .set(USER.TOKEN_EXPIRATION, updateUserTokenExpiration.getTokenExpiration())
                 .where(USER.ID.eq(updateUserTokenExpiration.getUserId()))
                 .execute();
+    }
+
+    @Override
+    public Optional<Long> getUserIdByUuid(UUID uuid) {
+        return create.select(USER.ID)
+                .from(USER)
+                .where(USER.UUID.eq(uuid))
+                .fetchOptionalInto(Long.class);
     }
 
     private SelectOnConditionStep<Record4<String, String, UUID, String>> selectUser() {

@@ -1,12 +1,17 @@
 package functional.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import controllers.routes;
 import enums.Role;
+import model.entities.AddCustomerResponse;
+import model.entities.AddUserResponse;
 import model.entities.UserRequest;
 import model.entities.LoginRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import play.Application;
+import play.Logger;
 import play.db.Database;
 import play.db.evolutions.Evolutions;
 import play.inject.guice.GuiceApplicationBuilder;
@@ -14,6 +19,7 @@ import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -21,88 +27,63 @@ import static play.mvc.Http.HttpVerbs.POST;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.*;
 
-public class UserControllerTest {
+public class UserControllerTest extends BaseControllerTest {
 
-    private Database database;
-    private Application app;
-    private Http.Session session;
-    private String baseUrl;
-
+    private final String BASE_URL;
+    private UserRequest userRequest;
 
     public UserControllerTest() {
-        app = new GuiceApplicationBuilder().build();
-        database = app.injector().instanceOf(Database.class);
-        baseUrl = controllers.routes.UserController.getUsersActive().url();
+        BASE_URL = controllers.routes.UserController.getUsersActive().url();
     }
 
     @Before
-    public void setUp() {
-        Evolutions.applyEvolutions(database);
-        doLogin();
-    }
-
-    private void doLogin() {
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(POST)
-                .bodyJson(Json.toJson(new LoginRequest("admin", "admin")))
-                .uri(controllers.routes.LoginController.login().url());
-        session = route(app, request).session();
-    }
-
-    @Test
-    public void shouldBeAvailableGetAllUsers() {
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(GET)
-                .uri(baseUrl)
-                .session(session);
-        Result result = route(app, request);
-        assertEquals(OK, result.status());
+    public void setUpAddUserFixture() {
+        userRequest = new UserRequest(
+                "Jerome", "Samson", Role.USER, "jer0Me", "password"
+        );
+        buildRequest(POST, BASE_URL)
+                .bodyJson(Json.toJson(userRequest));
+        makeRequest();
     }
 
     @Test
     public void shouldBeAvailableAddANewUser() {
-        UserRequest userRequest = new UserRequest(
-                "Jerome", "Samson", Role.USER, "jer0Me" , "password"
-        );
+        assertEquals(CREATED, result.status());
+    }
 
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(POST)
-                .bodyJson(Json.toJson(userRequest))
-                .uri(baseUrl)
-                .session(session);
-        Result result = route(app, request);
+    @Test
+    public void shouldBeAvailableGetAllUsers() {
+        buildRequest(GET, BASE_URL);
+        makeRequest();
         assertEquals(OK, result.status());
     }
 
     @Test
-    public void shouldBeAvailableEditUser() {
-        UserRequest userRequest = new UserRequest(
-                "Jerome", "Samson", Role.USER, "jer0Me" , "password"
+    public void shouldBeAvailableEditUser() throws IOException {
+        AddUserResponse addUserResponse = getAddUserResponseFromResult();
+        userRequest = new UserRequest(
+                "JRM", "SAM", Role.USER, null, null
         );
-        UUID uuid = UUID.randomUUID();
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(PUT)
-                .bodyJson(Json.toJson(userRequest))
-                .uri(baseUrl + "/" + uuid)
-                .session(session);
-        Result result = route(app, request);
+        buildRequest(PUT, BASE_URL + "/" + addUserResponse.getUserUuid())
+                .bodyJson(Json.toJson(userRequest));
+        makeRequest();
         assertEquals(OK, result.status());
     }
 
     @Test
-    public void shouldBeAvailableDeleteUser() {
-        UUID uuid = UUID.randomUUID();
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(DELETE)
-                .uri(baseUrl + "/" + uuid)
-                .session(session);
-        Result result = route(app, request);
+    public void shouldBeAvailableDeleteUser() throws IOException {
+        AddUserResponse addUserResponse = getAddUserResponseFromResult();
+        Logger.info(addUserResponse.getUserUuid().toString());
+        buildRequest(DELETE, BASE_URL + "/" + addUserResponse.getUserUuid());
+        makeRequest();
         assertEquals(OK, result.status());
     }
 
-    @After
-    public void tearDown() {
-        Evolutions.cleanupEvolutions(database);
-        this.database.shutdown();
+    private AddUserResponse getAddUserResponseFromResult() throws IOException {
+        return Json.fromJson(
+                new ObjectMapper().readTree(contentAsString(result)),
+                AddUserResponse.class
+        );
     }
+
 }

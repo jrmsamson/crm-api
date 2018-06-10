@@ -99,4 +99,11 @@ public class LoginServiceTest {
         String passwordChecksum = CryptoUtils.generatePasswordCheckSum(password, passwordSalt) ;
         verify(loginRepository).editLoginPassword(userId, passwordChecksum);
     }
+
+    @Test
+    public void shouldDeleteLoginByUserId() {
+        Long userId = 1L;
+        loginService.deleteLoginByUserId(userId);
+        verify(loginRepository).deleteLoginByUserId(userId);
+    }
 }

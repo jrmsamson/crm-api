@@ -82,7 +82,7 @@ public class LoginRepositoryTest  {
     }
 
     @Test
-    public void shouldDeleteLogin() {
+    public void shouldDeleteLoginByUserId() {
         loginRepository.deleteLoginByUserId(LOGIN_USER_ID_CREATED);
         Optional<LoginResponse> loginPasswordResponse =
                 loginRepository.getLoginByUsername(USERNAME);

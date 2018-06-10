@@ -83,4 +83,11 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                 )
         );
     }
+
+    @Override
+    public void deleteLoginByUserId(Long userId) {
+        repositoryFactory
+                .getLoginRepository()
+                .deleteLoginByUserId(userId);
+    }
 }

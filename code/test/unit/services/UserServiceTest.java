@@ -1,6 +1,7 @@
 package unit.services;
 
 import enums.Role;
+import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
@@ -100,6 +101,19 @@ public class UserServiceTest {
         for (int i = 0; i < usersMocked.size(); i++) {
             assertEquals(usersMocked.get(0), users.get(0));
         }
+    }
+
+    @Test
+    public void shouldGetUserIdByUuid() {
+        UUID userUuid = UUID.randomUUID();
+        when(userRepositoryMock.getUserIdByUuid(userUuid)).thenReturn(Optional.of(1L));
+        userService.getUserIdByUuid(userUuid);
+        verify(userRepositoryMock).getUserIdByUuid(userUuid);
+    }
+
+    @Test(expected = UserDoesNotExistException.class)
+    public void shouldThrowAnExceptionIfUserIdDoesNotExist() {
+        userService.getUserIdByUuid(UUID.randomUUID());
     }
 
 }

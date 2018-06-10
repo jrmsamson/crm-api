@@ -15,4 +15,5 @@ public interface LoginService extends BaseService {
 
     void editLoginPassword(EditPasswordRequest editPasswordRequest);
 
+    void deleteLoginByUserId(Long userId);
 }

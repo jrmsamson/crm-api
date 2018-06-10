@@ -10,13 +10,11 @@ import java.util.UUID;
 
 public interface UserRepository extends BaseRepository {
 
-    Long addUser(User user);
+    UUID addUser(User user);
 
     void editUser(User user);
 
     void deleteUser(UUID userUuid);
-
-    Optional<UserResponse> getUserById(Long userId);
 
     Optional<UserResponse> getUserByUuid(UUID userUuid);
 
@@ -31,4 +29,6 @@ public interface UserRepository extends BaseRepository {
     void removeUserToken(Long currentUserId);
 
     void updateUserTokenExpiration(UpdateUserTokenExpiration updateUserTokenExpiration);
+
+    Optional<Long> getUserIdByUuid(UUID uuid);
 }

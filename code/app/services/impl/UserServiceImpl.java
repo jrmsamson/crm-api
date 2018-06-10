@@ -27,12 +27,16 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         super(repositoryFactory);
     }
 
-    public Long addUser(UserRequest userRequest) {
+    public AddUserResponse addUser(UserRequest userRequest) {
         Notification userRequestNotification = userRequest.validation();
         if (userRequestNotification.hasErrors())
             throw new UserRequestException(userRequestNotification.errorMessage());
 
-        return repositoryFactory.getUserRepository().addUser(buildUser(userRequest));
+        return new AddUserResponse(
+                repositoryFactory
+                .getUserRepository()
+                .addUser(buildUser(userRequest))
+        );
     }
 
     private Integer getUserRoleId(Role role) {
@@ -99,6 +103,14 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                         userId,
                         getTokenExpiration()
                 ));
+    }
+
+    @Override
+    public Long getUserIdByUuid(UUID userUuid) {
+        return repositoryFactory
+                .getUserRepository()
+                .getUserIdByUuid(userUuid)
+                .orElseThrow(UserDoesNotExistException::new);
     }
 
     public String buildUserToken(Long userId) {

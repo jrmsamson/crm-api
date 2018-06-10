@@ -1,6 +1,7 @@
 package services;
 
 import enums.Role;
+import model.entities.AddUserResponse;
 import model.entities.UserRequest;
 import model.entities.UserResponse;
 import model.entities.UserTokenResponse;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 public interface UserService extends BaseService {
 
-    Long addUser(UserRequest userRequest);
+    AddUserResponse addUser(UserRequest userRequest);
 
     void editUser(UUID userUuid, UserRequest userRequest);
 
@@ -27,4 +28,6 @@ public interface UserService extends BaseService {
     String buildUserToken(Long userId);
 
     void updateUserTokenExpiration(Long userId);
+
+    Long getUserIdByUuid(UUID userUuid);
 }

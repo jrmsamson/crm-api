@@ -52,7 +52,7 @@ public class UserRepositoryTest {
         user.setName("Jerome");
         user.setSurname("Samson");
         user.setRoleId(USER_ROLE_ID);
-        this.userCreated = userRepository.getUserById(
+        this.userCreated = userRepository.getUserByUuid(
                 userRepository.addUser(user)
         );
     }
@@ -134,6 +134,11 @@ public class UserRepositoryTest {
         userRepository.updateUserTokenExpiration(new UpdateUserTokenExpiration(USER_ID, tokenExpiration));
         UserTokenResponse userTokenResponse = userRepository.getUserToken(USER_ID).get();
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
+    }
+
+    @Test
+    public void shouldGetUserIdByUuid() {
+        userRepository.getUserIdByUuid(userCreated.get().getUuid());
     }
 
     @After

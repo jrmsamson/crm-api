@@ -2,8 +2,10 @@ package controllers;
 
 import com.google.inject.Inject;
 import model.entities.AddLoginRequest;
+import model.entities.AddUserResponse;
 import model.entities.UserRequest;
 import play.libs.Json;
+import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.*;
 import services.LoginService;
 import services.UserService;
@@ -20,9 +22,11 @@ public class UserController extends BaseController {
 
     private UserService userService;
     private LoginService loginService;
+    private HttpExecutionContext ec;
 
     @Inject
-    public UserController(UserService userService, LoginService loginService) {
+    public UserController(UserService userService, LoginService loginService, HttpExecutionContext ec) {
+        this.ec = ec;
         this.userService = userService;
         this.loginService = loginService;
         init(userService);
@@ -36,16 +40,24 @@ public class UserController extends BaseController {
 
     public CompletionStage<Result> addUser() {
         UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
-        return CompletableFuture
-                .runAsync(() ->
-                        loginService.addLoginForUser(
-                                new AddLoginRequest(
-                                        userRequest.getUsername(),
-                                        userRequest.getPassword(),
-                                        userService.addUser(userRequest)
-                                )
-                        )
-                ).thenApply(aVoid -> ok());
+        return CompletableFuture.supplyAsync(() -> {
+
+                    AddUserResponse addUserResponse = userService.addUser(userRequest);
+
+                    loginService.addLoginForUser(
+                            new AddLoginRequest(
+                                    userRequest.getUsername(),
+                                    userRequest.getPassword(),
+                                    userService.getUserIdByUuid(addUserResponse.getUserUuid())
+                            )
+                    );
+
+                    return addUserResponse;
+
+                }).thenApplyAsync(addUserResponse ->
+                        created(Json.toJson(addUserResponse)),
+                        ec.current()
+                );
     }
 
     public CompletionStage<Result> editUser(String uuid) {
@@ -56,8 +68,12 @@ public class UserController extends BaseController {
     }
 
     public CompletionStage<Result> deleteUser(String uuid) {
-        return CompletableFuture.runAsync(() ->
-                this.userService.deleteUser(UUID.fromString(uuid))
-        ).thenApply(aVoid -> ok());
+        return CompletableFuture.runAsync(() -> {
+                    loginService.deleteLoginByUserId(
+                            userService.getUserIdByUuid(UUID.fromString(uuid))
+                    );
+                    userService.deleteUser(UUID.fromString(uuid));
+                }
+        ).thenApplyAsync(aVoid -> ok(), ec.current());
     }
 }
