@@ -23,6 +23,7 @@ public class BaseControllerTest {
     protected Application app;
     protected Http.Session session;
     protected Http.RequestBuilder request;
+    protected Result result;
 
     public BaseControllerTest() {
         app = new GuiceApplicationBuilder().build();
@@ -58,6 +59,7 @@ public class BaseControllerTest {
     }
 
     protected Result makeRequest() {
-        return route(app, request);
+        result = route(app, request);
+        return result;
     }
 }

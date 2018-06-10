@@ -24,6 +24,5 @@ public class GuiceDependencyInjectionModule extends AbstractModule {
         bind(RoleService.class).to(RoleServiceImpl.class);
         bind(CustomerRepository.class).to(CustomerRepositoryImpl.class);
         bind(CustomerService.class).to(CustomerServiceImpl.class);
-        bind(UploadService.class).to(UploadServiceImpl.class);
     }
 }

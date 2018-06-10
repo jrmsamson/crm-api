@@ -13,7 +13,7 @@ public interface CustomerRepository extends BaseRepository {
 
     List<CustomerResponse> getCustomersActive();
 
-    void addCustomer(Customer customer);
+    UUID addCustomer(Customer customer);
 
     void editCustomer(Customer customer);
 

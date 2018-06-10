@@ -1,59 +1,120 @@
 package functional.controllers;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+
+import akka.http.impl.util.JavaMapping;
+import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import controllers.routes;
+import model.entities.AddCustomerResponse;
 import model.entities.CustomerRequest;
-import model.entities.CustomerResponse;
 import org.junit.Test;
 import play.Logger;
 import play.libs.Json;
-import util.ConfigPath;
+import akka.stream.IOResult;
+import akka.stream.Materializer;
+import akka.stream.javadsl.FileIO;
+import akka.util.ByteString;
+import play.libs.Files;
+import play.mvc.Http;
+import play.mvc.Result;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
+import java.util.concurrent.CompletionStage;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static play.test.Helpers.*;
+
+import java.util.UUID;
+
 import static play.mvc.Http.HttpVerbs.GET;
 import static play.mvc.Http.HttpVerbs.POST;
+import static play.mvc.Http.HttpVerbs.PUT;
+import static play.mvc.Http.Status.BAD_REQUEST;
+import static play.mvc.Http.Status.CREATED;
 import static play.mvc.Http.Status.OK;
-import static play.test.Helpers.contentAsString;
+import static play.test.Helpers.DELETE;
 
 public class CustomerControllerTest extends BaseControllerTest {
 
-    public static final String IMAGE_FILE_NAME = "myimage.jpg";
-    private final String TMP_PATH;
-    private final String IMAGE_PATH;
+    private final String BASE_URL;
     private CustomerRequest customerRequest;
 
     public CustomerControllerTest() {
-        TMP_PATH = app.config().getString(ConfigPath.TMP_PATH_CONFIG);
-        IMAGE_PATH = app.config().getString(ConfigPath.IMAGES_PATH_CONFIG);
+        BASE_URL = controllers.routes.CustomerController.getCustomersActive().url();
     }
 
-    @Test
-    public void shouldBeAvailableAddCustomer() throws IOException {
-        Path path = Files.createTempFile("", "");
-        Logger.info(path.toString());
-        customerRequest = new CustomerRequest("Jerome", "Samson", IMAGE_FILE_NAME);
-        buildRequest(POST, "/customers")
+    public void setUpAddCustomerFixture() {
+        customerRequest = new CustomerRequest("Jerome", "Samson");
+        buildRequest(POST, BASE_URL)
                 .bodyJson(Json.toJson(customerRequest));
         makeRequest();
-        assertEquals(OK, makeRequest().status());
     }
 
     @Test
-    public void shouldGetCustomersActive() throws IOException {
-        buildRequest(GET, "/customers");
-        List<CustomerResponse> customerResponses = new ObjectMapper()
-                .readValue(contentAsString(makeRequest()), new TypeReference<List<CustomerResponse>>(){});
-
-        assertEquals(1, customerResponses.size());
+    public void shouldBeAvailableAddCustomer() {
+        setUpAddCustomerFixture();
+        assertEquals(CREATED, result.status());
     }
 
     @Test
+    public void shouldGetCustomersActive() {
+        buildRequest(GET, BASE_URL);
+        makeRequest();
+        assertEquals(OK, result.status());
+    }
+
+    @Test()
     public void shouldBeAvailableEditCustomer() {
+        buildRequest(PUT, BASE_URL + "/" + UUID.randomUUID())
+                .bodyJson(Json.toJson(new CustomerRequest("", "")));
+        makeRequest();
+        assertEquals(OK, result.status());
+    }
+
+    @Test()
+    public void shouldBeAvailableDeleteCustomer() {
+        buildRequest(DELETE, BASE_URL + "/" + UUID.randomUUID());
+        makeRequest();
+        assertEquals(OK, result.status());
+    }
+
+    @Test()
+    public void shouldBeAvailableGetUserByUuid() {
+        buildRequest(GET, BASE_URL + "/" + UUID.randomUUID());
+        makeRequest();
+        assertEquals(BAD_REQUEST, result.status());
+    }
+
+    @Test
+    public void shouldBeAvailableUpdateCustomerPhoto() throws IOException {
+        setUpAddCustomerFixture();
+        AddCustomerResponse addCustomerResponse = getAddCustomerResponseFromResult();
+
+        Files.TemporaryFileCreator temporaryFileCreator = app.injector().instanceOf(Files.TemporaryFileCreator.class);
+        Materializer materializer = app.injector().instanceOf(Materializer.class);
+
+        File file = new File(getClass().getResource("/photo_test.png").getPath());
+
+        Source<ByteString, CompletionStage<IOResult>> source = FileIO.fromPath(file.toPath());
+        Http.MultipartFormData.FilePart<Source<ByteString, ?>> part =
+                new Http.MultipartFormData.FilePart<>("photo", "", "image/png", source);
+
+        buildRequest(POST, controllers.routes.CustomerController.updateCustomerPhoto(
+                addCustomerResponse.getCustomerUuid().toString()).url()
+
+        ).bodyMultipart(singletonList(part), temporaryFileCreator, materializer);
+
+        Result result = route(app, request);
+        assertEquals(OK, result.status());
+    }
+
+    private AddCustomerResponse getAddCustomerResponseFromResult() throws IOException {
+        return Json.fromJson(
+                new ObjectMapper().readTree(contentAsString(result)),
+                AddCustomerResponse.class
+        );
     }
 
 }

@@ -1,9 +1,11 @@
 package repositories.impl;
 
+import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
 import model.entities.CustomerResponse;
 import model.pojos.Customer;
 import org.jooq.Record4;
 import org.jooq.SelectJoinStep;
+import org.jooq.exception.DataAccessException;
 import repositories.CustomerRepository;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.UUID;
 import static model.jooq.Tables.CUSTOMER;
 
 public class CustomerRepositoryImpl extends BaseRepositoryImpl implements CustomerRepository {
+
+    private static final CharSequence CUSTOMER_NAME_SURNAME_DB_CONSTRAINT = "customer_name_surname_uindex";
 
     public Optional<CustomerResponse> getCustomerByUuid(UUID uuid) {
         return selectCustomer()
@@ -33,15 +37,31 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
                         CUSTOMER.UUID,
                         CUSTOMER.NAME,
                         CUSTOMER.SURNAME,
-                        CUSTOMER.PHOTO_URL
+                        CUSTOMER.PHOTO_NAME
                 )
                 .from(CUSTOMER);
     }
 
-    public void addCustomer(Customer customer) {
-        create.insertInto(CUSTOMER)
+    public UUID addCustomer(Customer customer) {
+        try {
+            return doAddCustomer(customer);
+        } catch (DataAccessException exception) {
+            if (isConstraintUserAndSurnameUniqueException(exception))
+                throw new CustomerWithSameNameAndSurnameAlreadyExistException();
+            throw exception;
+        }
+    }
+
+    private UUID doAddCustomer(Customer customer) {
+        return create.insertInto(CUSTOMER)
                 .set(create.newRecord(CUSTOMER, customer))
-                .execute();
+                .returning(CUSTOMER.UUID)
+                .fetchOne()
+                .getUuid();
+    }
+
+    private boolean isConstraintUserAndSurnameUniqueException(DataAccessException exception) {
+        return exception.getMessage().contains(CUSTOMER_NAME_SURNAME_DB_CONSTRAINT);
     }
 
     public void editCustomer(Customer customer) {
@@ -59,10 +79,9 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
                 .execute();
     }
 
-    @Override
     public void updateCustomerPhotoName(Customer customer) {
         create.update(CUSTOMER)
-                .set(CUSTOMER.PHOTO_URL, customer.getPhotoUrl())
+                .set(CUSTOMER.PHOTO_NAME, customer.getPhotoName())
                 .where(CUSTOMER.UUID.eq(customer.getUuid()))
                 .execute();
     }

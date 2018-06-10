@@ -1,16 +1,18 @@
 
 
-POST        /api/v1/login                   @controllers.LoginController.login
-GET         /api/v1/logout                  @controllers.LoginController.logout
+POST        /api/v1/login                                   @controllers.LoginController.login
+GET         /api/v1/logout                                  @controllers.LoginController.logout
 
-GET         /api/v1/users                   @controllers.UserController.getUsersActive
-POST        /api/v1/users                   @controllers.UserController.addUser()
-PUT         /api/v1/users/:uuid             @controllers.UserController.editUser(uuid: String)
-DELETE      /api/v1/users/:uuid             @controllers.UserController.deleteUser(uuid: String)
+GET         /api/v1/users                                   @controllers.UserController.getUsersActive
+POST        /api/v1/users                                   @controllers.UserController.addUser()
+PUT         /api/v1/users/:uuid                             @controllers.UserController.editUser(uuid: String)
+DELETE      /api/v1/users/:uuid                             @controllers.UserController.deleteUser(uuid: String)
 
-GET         /api/v1/customers               @controllers.CustomerController.getCustomersActive
-POST        /api/v1/customers               @controllers.CustomerController.addCustomer()
-PUT         /api/v1/customers/:uuid         @controllers.CustomerController.editCustomer(uuid: String)
-DELETE      /api/v1/customers/:uuid         @controllers.CustomerController.deleteCustomer(uuid: String)
+GET         /api/v1/customers                               @controllers.CustomerController.getCustomersActive
+POST        /api/v1/customers                               @controllers.CustomerController.addCustomer()
+GET         /api/v1/customers/:uuid                         @controllers.CustomerController.getCustomerByUuid(uuid: String)
+PUT         /api/v1/customers/:uuid                         @controllers.CustomerController.editCustomer(uuid: String)
+DELETE      /api/v1/customers/:uuid                         @controllers.CustomerController.deleteCustomer(uuid: String)
 
-POST        /images/upload                  @controllers.UploadController.uploadImage
+POST        /api/v1/customers/:uuid/photos/upload           @controllers.CustomerController.updateCustomerPhoto(uuid: String)
+GET         /api/v1/customers/photos/:imageName             @controllers.CustomerController.getCustomerPhoto(imageName: String)

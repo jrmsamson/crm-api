@@ -32,7 +32,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implements Record8<Long, UUID, String, String, String, Boolean, Long, Long> {
 
-    private static final long serialVersionUID = 619861207;
+    private static final long serialVersionUID = -672134243;
 
     /**
      * Setter for <code>crm.customer.id</code>.
@@ -95,17 +95,17 @@ public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implemen
     }
 
     /**
-     * Setter for <code>crm.customer.photo_url</code>.
+     * Setter for <code>crm.customer.photo_name</code>.
      */
-    public void setPhotoUrl(String value) {
+    public void setPhotoName(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>crm.customer.photo_url</code>.
+     * Getter for <code>crm.customer.photo_name</code>.
      */
     @Size(max = 100)
-    public String getPhotoUrl() {
+    public String getPhotoName() {
         return (String) get(4);
     }
 
@@ -220,7 +220,7 @@ public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implemen
      */
     @Override
     public Field<String> field5() {
-        return Customer.CUSTOMER.PHOTO_URL;
+        return Customer.CUSTOMER.PHOTO_NAME;
     }
 
     /**
@@ -284,7 +284,7 @@ public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implemen
      */
     @Override
     public String component5() {
-        return getPhotoUrl();
+        return getPhotoName();
     }
 
     /**
@@ -348,7 +348,7 @@ public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implemen
      */
     @Override
     public String value5() {
-        return getPhotoUrl();
+        return getPhotoName();
     }
 
     /**
@@ -416,7 +416,7 @@ public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implemen
      */
     @Override
     public CustomerRecord value5(String value) {
-        setPhotoUrl(value);
+        setPhotoName(value);
         return this;
     }
 
@@ -477,14 +477,14 @@ public class CustomerRecord extends UpdatableRecordImpl<CustomerRecord> implemen
     /**
      * Create a detached, initialised CustomerRecord
      */
-    public CustomerRecord(Long id, UUID uuid, String name, String surname, String photoUrl, Boolean active, Long createdBy, Long modifiedBy) {
+    public CustomerRecord(Long id, UUID uuid, String name, String surname, String photoName, Boolean active, Long createdBy, Long modifiedBy) {
         super(Customer.CUSTOMER);
 
         set(0, id);
         set(1, uuid);
         set(2, name);
         set(3, surname);
-        set(4, photoUrl);
+        set(4, photoName);
         set(5, active);
         set(6, createdBy);
         set(7, modifiedBy);

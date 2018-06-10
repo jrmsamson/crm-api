@@ -4,15 +4,13 @@ public class CustomerRequest {
 
     private String name;
     private String surname;
-    private String photoName;
 
     public CustomerRequest() {
     }
 
-    public CustomerRequest(String name, String surname, String photoName) {
+    public CustomerRequest(String name, String surname) {
         this.name = name;
         this.surname = surname;
-        this.photoName = photoName;
     }
 
     public String getName() {
@@ -29,13 +27,5 @@ public class CustomerRequest {
 
     public void setSurname(String surname) {
         this.surname = surname;
-    }
-
-    public String getPhotoName() {
-        return photoName;
-    }
-
-    public void setPhotoName(String photoName) {
-        this.photoName = photoName;
     }
 }

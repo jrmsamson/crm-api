@@ -1,5 +1,6 @@
 package integration.repositories;
 
+import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
 import model.entities.CustomerResponse;
 import model.pojos.Customer;
 import org.jooq.DSLContext;
@@ -17,7 +18,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class CustomerRepositoriesTest {
+public class CustomerRepositoryTest {
 
     private static final String NAME = "Jerome";
     private static final String SURNAME = "Samson";
@@ -26,7 +27,7 @@ public class CustomerRepositoriesTest {
     private Database database;
     private CustomerResponse lastCustomerCreated;
 
-    public CustomerRepositoriesTest() {
+    public CustomerRepositoryTest() {
         Application application = new GuiceApplicationBuilder().build();
         database = application.injector().instanceOf(Database.class);
         customerRepository = new CustomerRepositoryImpl();
@@ -58,9 +59,14 @@ public class CustomerRepositoriesTest {
     }
 
     @Test
-    public void shouldAddNewCustomer() {
+    public void shouldAddCustomer() {
         assertEquals("Jerome", lastCustomerCreated.getName());
         assertEquals("Samson", lastCustomerCreated.getSurname());
+    }
+
+    @Test(expected = CustomerWithSameNameAndSurnameAlreadyExistException.class)
+    public void shouldThrowAnExceptionWhenTheCustomerToBeAddedAlreadyExist() {
+        setUpFixture();
     }
 
     @Test
@@ -78,15 +84,15 @@ public class CustomerRepositoriesTest {
     }
 
     @Test
-    public void shouldEditCustomerPhotoName() {
-        String photoUrl = "myphotourl";
+    public void shouldUpdateCustomerPhotoUrl() {
+        String photoName = "myphotoname";
         Customer customer = new Customer();
         customer.setUuid(lastCustomerCreated.getUuid());
-        customer.setPhotoUrl(photoUrl);
+        customer.setPhotoName(photoName);
         customerRepository.updateCustomerPhotoName(customer);
         CustomerResponse customerEdited = customerRepository
                 .getCustomerByUuid(lastCustomerCreated.getUuid()).get();
-        assertEquals(photoUrl, customerEdited.getPhotoUrl());
+        assertEquals(photoName, customerEdited.getPhotoUrl());
     }
 
     @Test

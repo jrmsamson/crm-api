@@ -1,6 +1,7 @@
 package functional.controllers;
 
 import controllers.LoginController;
+import controllers.routes;
 import model.entities.LoginRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +44,7 @@ public class LoginControllerTest {
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(loginRequest))
-                .uri("/login");
+                .uri(controllers.routes.LoginController.login().url());
         Result result = route(app, request);
         assertEquals(OK, result.status());
     }
