@@ -1,4 +1,4 @@
-
+GET         /                                               @controllers.HomeController.welcome
 
 POST        /api/v1/login                                   @controllers.LoginController.login
 POST        /api/v1/logout                                  @controllers.LoginController.logout
