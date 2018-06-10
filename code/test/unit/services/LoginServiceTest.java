@@ -20,11 +20,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class LoginServiceTest {
 
     private static final Long USER_ID = 1L;
@@ -35,6 +37,9 @@ public class LoginServiceTest {
     private LoginService loginService;
     private UserService userService;
     private LoginRepository loginRepository;
+
+    @Captor
+    private ArgumentCaptor<Login> loginCaptor;
 
     public LoginServiceTest() {
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
@@ -82,22 +87,27 @@ public class LoginServiceTest {
 
     @Test
     public void shouldAddLoginWithAPasswordCyphered() {
-        AddLoginRequest addLoginRequest = new AddLoginRequest(USERNAME, PASSWORD, USER_ID);
-        loginService.addLoginForUser(addLoginRequest);
+        AddEditLogin addEditLogin = new AddEditLogin(USERNAME, PASSWORD, USER_ID);
+        loginService.addLoginForUser(addEditLogin);
         verify(loginRepository).addLogin(any());
     }
 
     @Test
     public void shouldEditLoginWithPasswordCyphered() {
+        String username = "jerome";
         String password = "newPassword";
         UUID passwordSalt = UUID.randomUUID();
         Long userId = 1L;
-
         when(loginRepository.getLoginPasswordSaltByUserId(userId)).thenReturn(Optional.of(passwordSalt));
-        loginService.editLoginPassword(new EditPasswordRequest(userId, password));
+        loginService.editLogin(new AddEditLogin(username, password, userId));
+
+        verify(loginRepository).editLogin(loginCaptor.capture());
+        Login login = loginCaptor.getValue();
 
         String passwordChecksum = CryptoUtils.generatePasswordCheckSum(password, passwordSalt) ;
-        verify(loginRepository).editLoginPassword(userId, passwordChecksum);
+        assertEquals(username, login.getUsername());
+        assertEquals(passwordChecksum, login.getPassword());
+        assertEquals(userId, login.getUserId());
     }
 
     @Test

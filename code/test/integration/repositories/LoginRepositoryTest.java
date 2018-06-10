@@ -72,14 +72,19 @@ public class LoginRepositoryTest  {
     }
 
     @Test
-    public void shouldEditPassword() {
-        String password = "myNewPassword";
-        loginRepository.editLoginPassword(LOGIN_USER_ID_CREATED, password);
-        LoginResponse loginResponse =
-                loginRepository.getLoginByUsername(USERNAME).get();
+    public void shouldEditLogin() {
+        Login login = new Login();
+        login.setUsername("jrm");
+        login.setPassword("password");
+        login.setUserId(LOGIN_USER_ID_CREATED);
+        loginRepository.editLogin(login);
 
-        assertEquals(password, loginResponse.getPassword());
+        LoginResponse loginResponse =
+                loginRepository.getLoginByUsername("jrm").get();
+
+        assertEquals(login.getPassword(), loginResponse.getPassword());
     }
+
 
     @Test
     public void shouldDeleteLoginByUserId() {

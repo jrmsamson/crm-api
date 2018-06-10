@@ -1,7 +1,7 @@
 package controllers;
 
 import com.google.inject.Inject;
-import model.entities.AddLoginRequest;
+import model.entities.AddEditLogin;
 import model.entities.AddUserResponse;
 import model.entities.UserRequest;
 import play.libs.Json;
@@ -45,7 +45,7 @@ public class UserController extends BaseController {
                     AddUserResponse addUserResponse = userService.addUser(userRequest);
 
                     loginService.addLoginForUser(
-                            new AddLoginRequest(
+                            new AddEditLogin(
                                     userRequest.getUsername(),
                                     userRequest.getPassword(),
                                     userService.getUserIdByUuid(addUserResponse.getUserUuid())
@@ -62,9 +62,17 @@ public class UserController extends BaseController {
 
     public CompletionStage<Result> editUser(String uuid) {
         UserRequest userRequest = Json.fromJson(request().body().asJson(), UserRequest.class);
-        return CompletableFuture.runAsync(() ->
-                this.userService.editUser(UUID.fromString(uuid), userRequest)
-        ).thenApply(aVoid -> ok());
+        return CompletableFuture.runAsync(() -> {
+                loginService.editLogin(
+                        new AddEditLogin(
+                                userRequest.getUsername(),
+                                userRequest.getPassword(),
+                                userService.getUserIdByUuid(UUID.fromString(uuid))
+                        )
+                );
+                userService.editUser(UUID.fromString(uuid), userRequest);
+
+        }).thenApplyAsync(aVoid -> ok(), ec.current());
     }
 
     public CompletionStage<Result> deleteUser(String uuid) {
@@ -74,6 +82,7 @@ public class UserController extends BaseController {
                     );
                     userService.deleteUser(UUID.fromString(uuid));
                 }
+
         ).thenApplyAsync(aVoid -> ok(), ec.current());
     }
 }

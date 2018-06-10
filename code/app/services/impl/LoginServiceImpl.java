@@ -54,34 +54,51 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         userService.removeCurrentUserToken();
     }
 
-    public void addLoginForUser(AddLoginRequest addLoginRequest) {
+    public void addLoginForUser(AddEditLogin addEditLogin) {
+        repositoryFactory
+                .getLoginRepository()
+                .addLogin(buildAddLogin(addEditLogin));
+    }
+
+    private Login buildAddLogin(AddEditLogin addEditLogin) {
         UUID passwordSalt = UUID.randomUUID();
         String passwordCheckSum = CryptoUtils.generatePasswordCheckSum(
-                addLoginRequest.getPassword(), passwordSalt
+                addEditLogin.getPassword(), passwordSalt
         );
 
         Login login = new Login();
-        login.setUsername(addLoginRequest.getUsername());
+        login.setUsername(addEditLogin.getUsername());
         login.setPassword(passwordCheckSum);
         login.setPasswordSalt(passwordSalt);
-        login.setUserId(addLoginRequest.getUserId());
+        login.setUserId(addEditLogin.getUserId());
 
-        repositoryFactory.getLoginRepository().addLogin(login);
+        return login;
     }
 
-    public void editLoginPassword(EditPasswordRequest editPasswordRequest) {
+    public void editLogin(AddEditLogin addEditLogin) {
+        repositoryFactory
+                .getLoginRepository()
+                .editLogin(buildEditLogin(addEditLogin));
+    }
+
+    private Login buildEditLogin(AddEditLogin addEditLogin) {
         UUID passwordSalt = repositoryFactory
                 .getLoginRepository()
-                .getLoginPasswordSaltByUserId(editPasswordRequest.getUserId())
+                .getLoginPasswordSaltByUserId(addEditLogin.getUserId())
                 .orElseThrow(LoginNotExistException::new);
 
-        repositoryFactory.getLoginRepository().editLoginPassword(
-                editPasswordRequest.getUserId(),
+        Login login = new Login();
+        login.setUsername(addEditLogin.getUsername());
+        login.setPassword(
                 CryptoUtils.generatePasswordCheckSum(
-                        editPasswordRequest.getPassword(),
+                        addEditLogin.getPassword(),
                         passwordSalt
                 )
         );
+
+        login.setUserId(addEditLogin.getUserId());
+
+        return login;
     }
 
     @Override

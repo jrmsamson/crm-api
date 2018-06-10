@@ -12,7 +12,7 @@ public interface LoginRepository extends BaseRepository {
 
     Optional<LoginResponse> getLoginByUsername(String username);
 
-    void editLoginPassword(Long userId, String password);
+    void editLogin(Login login);
 
     void deleteLoginByUserId(Long userId);
 

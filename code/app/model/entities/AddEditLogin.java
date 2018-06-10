@@ -1,12 +1,12 @@
 package model.entities;
 
-public class AddLoginRequest {
+public class AddEditLogin {
 
     private String username;
     private String password;
     private Long userId;
 
-    public AddLoginRequest(String username, String password, Long userId) {
+    public AddEditLogin(String username, String password, Long userId) {
         this.username = username;
         this.password = password;
         this.userId = userId;
