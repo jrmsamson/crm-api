@@ -1,7 +1,9 @@
 package util.annotation;
 
+import enums.Role;
 import exceptions.DatabaseCommitChangesException;
 import exceptions.DatabaseConnectionException;
+import exceptions.RoleDoesNotExistException;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
@@ -16,10 +18,12 @@ import util.Constants;
 import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import static util.Constants.ROLE_SESSION_KEY;
 import static util.Constants.USER_ID_SESSION_KEY;
 
 public class AuthorizationAction extends Action<Secured> {
@@ -36,7 +40,7 @@ public class AuthorizationAction extends Action<Secured> {
 
     @Override
     public CompletionStage<Result> call(Http.Context ctx) {
-        if (hasValidToken(ctx)) {
+        if (hasValidToken(ctx) && isUserRolAllowed(ctx)) {
             saveUserIdIntoRequestContext(ctx);
             return delegate.call(ctx);
         }
@@ -44,7 +48,6 @@ public class AuthorizationAction extends Action<Secured> {
         return CompletableFuture
                 .completedFuture(unauthorized("You're not allowed to access this resource."));
     }
-
     private boolean hasValidToken(Http.Context ctx) {
 
         Optional<Long> userId = getUserIdFromTheSession(ctx);
@@ -68,6 +71,12 @@ public class AuthorizationAction extends Action<Secured> {
         return false;
     }
 
+    private boolean isUserRolAllowed(Http.Context ctx) {
+        return getUserRole(ctx).filter(
+                role -> Arrays.asList(configuration.rolesAllowed()).contains(role)
+        ).isPresent();
+    }
+
     private void renewUserToken(Long userId) {
         userService.renewUserToken(userId);
         commitDatabaseChanges();
@@ -88,6 +97,20 @@ public class AuthorizationAction extends Action<Secured> {
 
     private Optional<String> getTokenFromTheSession(Http.Context ctx) {
         return Optional.ofNullable(ctx.session().get(Constants.TOKEN_SESSION_KEY));
+    }
+
+    private Optional<Role> getUserRole(Http.Context ctx) {
+        return Optional.ofNullable(
+                ctx.session().get(ROLE_SESSION_KEY)
+        ).flatMap(this::lookupRole);
+    }
+
+    private Optional<Role> lookupRole(String role) {
+        try {
+            return Optional.of(Role.lookup(role));
+        } catch (RoleDoesNotExistException e) {
+            return Optional.empty();
+        }
     }
 
     private void connectJooqToTheDatabase() {

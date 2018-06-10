@@ -1,5 +1,6 @@
 package controllers;
 
+import enums.Role;
 import model.entities.requests.LoginRequest;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
@@ -38,14 +39,14 @@ public class LoginController extends BaseController {
                 loginService.login(loginRequest)
         ).thenApplyAsync(userSession -> {
             session(USER_ID_SESSION_KEY, userSession.getUserId().toString());
-            session(ROLE_SESSION_KEY, userSession.getUserId().toString());
+            session(ROLE_SESSION_KEY, userSession.getRole().toString());
             session(TOKEN_SESSION_KEY, userSession.getToken());
             return ok();
             }, ec.current()
         );
     }
 
-    @Secured
+    @Secured(rolesAllowed = {Role.ADMIN, Role.USER})
     public CompletionStage<Result> logout() {
         return CompletableFuture.runAsync(loginService::logout).thenApplyAsync(
                 aVoid -> {

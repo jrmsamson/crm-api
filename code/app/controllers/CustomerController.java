@@ -4,6 +4,7 @@ import akka.stream.IOResult;
 import akka.stream.javadsl.FileIO;
 import akka.stream.javadsl.Source;
 import akka.util.ByteString;
+import enums.Role;
 import model.entities.requests.CustomerRequest;
 import model.entities.responses.CustomerResponse;
 import model.entities.requests.UpdateCustomerPhotoRequest;
@@ -29,7 +30,7 @@ import java.util.concurrent.CompletionStage;
 
 import static util.Constants.PHOTO_FILE_PART_NAME;
 
-@Secured
+@Secured(rolesAllowed = {Role.ADMIN, Role.USER})
 @Transactional
 public class CustomerController extends BaseController {
 

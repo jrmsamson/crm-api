@@ -1,5 +1,6 @@
 package util.annotation;
 
+import enums.Role;
 import play.mvc.With;
 
 import java.lang.annotation.ElementType;
@@ -11,4 +12,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Secured {
+    Role[] rolesAllowed();
 }

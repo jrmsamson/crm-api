@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.inject.Inject;
+import enums.Role;
 import model.entities.requests.AddEditLoginRequest;
 import model.entities.responses.AddUserResponse;
 import model.entities.requests.UserRequest;
@@ -16,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-@Secured
+@Secured(rolesAllowed = {Role.ADMIN})
 @Transactional
 public class UserController extends BaseController {
 
