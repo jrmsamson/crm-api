@@ -21,9 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class UserRepositoryTest {
 
@@ -32,7 +30,7 @@ public class UserRepositoryTest {
 
     private UserRepository userRepository;
     private Database database;
-    private Optional<UserResponse> userCreated;
+    private UserResponse userCreated;
 
     public UserRepositoryTest() {
         Application application = new GuiceApplicationBuilder().build();
@@ -55,28 +53,26 @@ public class UserRepositoryTest {
         user.setRoleId(USER_ROLE_ID);
         this.userCreated = userRepository.getUserByUuid(
                 userRepository.addUser(user)
-        );
+        ).get();
     }
 
     @Test
     public void shouldCreateANewUser() {
-        assertTrue(userCreated.isPresent());
+        assertNotNull(userCreated);
     }
 
     @Test
     public void shouldEditUser() {
-        userCreated.ifPresent(userCreated -> {
-            User user = new User();
-            user.setName("JR");
-            user.setSurname("R");
-            user.setRoleId(2);
-            user.setUuid(userCreated.getUuid());
-            userRepository.editUserByUuid(user);
-            UserResponse userEdited = userRepository.getUserByUuid(userCreated.getUuid()).get();
-            assertEquals(userCreated.getUuid(), userEdited.getUuid());
-            assertEquals(user.getName(), userEdited.getName());
-            assertEquals(user.getSurname(), userEdited.getSurname());
-        });
+        User user = new User();
+        user.setName("JR");
+        user.setSurname("R");
+        user.setRoleId(2);
+        user.setUuid(userCreated.getUuid());
+        userRepository.editUserByUuid(user);
+        UserResponse userEdited = userRepository.getUserByUuid(userCreated.getUuid()).get();
+        assertEquals(userCreated.getUuid(), userEdited.getUuid());
+        assertEquals(user.getName(), userEdited.getName());
+        assertEquals(user.getSurname(), userEdited.getSurname());
     }
 
     @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
@@ -90,27 +86,23 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldDeleteUser() {
-        userCreated.ifPresent(userCreated -> {
-            userRepository.deleteUserByUuid(userCreated.getUuid());
-            Optional<UserResponse> user = userRepository.getUserByUuid(userCreated.getUuid());
-            assertFalse(user.isPresent());
-        });
+        userRepository.deleteUserByUuid(userCreated.getUuid());
+        Optional<UserResponse> user = userRepository.getUserByUuid(userCreated.getUuid());
+        assertFalse(user.isPresent());
     }
 
     @Test
     public void shouldGetOnlyThoseUsersActive() {
-        userCreated.ifPresent(userCreated -> {
-            userRepository.deleteUserByUuid(userCreated.getUuid());
-            User user = new User();
-            user.setName("JR");
-            user.setSurname("SAM");
-            user.setRoleId(USER_ROLE_ID);
-            userRepository.addUser(user);
-            List<UserResponse> users = userRepository.getUsersActive(1L);
-            assertEquals(1, users.size());
-            assertEquals(users.get(0).getName(), "JR");
-            assertEquals(users.get(0).getSurname(), "SAM");
-        });
+        userRepository.deleteUserByUuid(userCreated.getUuid());
+        User user = new User();
+        user.setName("JR");
+        user.setSurname("SAM");
+        user.setRoleId(USER_ROLE_ID);
+        userRepository.addUser(user);
+        List<UserResponse> users = userRepository.getUsersActive(1L);
+        assertEquals(1, users.size());
+        assertEquals(users.get(0).getName(), "JR");
+        assertEquals(users.get(0).getSurname(), "SAM");
     }
 
     @Test
@@ -146,7 +138,16 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldGetUserIdByUuid() {
-        userRepository.getUserIdByUuid(userCreated.get().getUuid());
+        Optional<Long> userId = userRepository.getUserIdByUuid(userCreated.getUuid());
+        assertTrue(userId.isPresent());
+    }
+
+    @Test
+    public void shouldReturnTrueIfThereExistAnUserWithTheSameNameAndSurname() {
+        User user = new User();
+        user.setName(userCreated.getName());
+        user.setSurname(userCreated.getSurname());
+        assertTrue(userRepository.existAndUserWithTheSameNameAndSurname(user));
     }
 
     @After

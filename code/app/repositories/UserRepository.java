@@ -34,4 +34,6 @@ public interface UserRepository extends BaseRepository {
     void updateUserTokenExpirationByUserId(User user);
 
     Optional<Long> getUserIdByUuid(UUID uuid);
+
+    Boolean existAndUserWithTheSameNameAndSurname(User user);
 }

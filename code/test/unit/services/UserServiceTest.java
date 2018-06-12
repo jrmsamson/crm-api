@@ -3,6 +3,7 @@ package unit.services;
 import enums.Role;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
+import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
 import model.entities.requests.UserRequest;
 import model.entities.responses.UserResponse;
 import model.pojos.User;
@@ -12,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.MockitoJUnitRunner;
-import play.Logger;
 import repositories.RepositoryFactory;
 import repositories.RoleRepository;
 import repositories.UserRepository;
@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,6 +71,12 @@ public class UserServiceTest {
     public void shouldThrowAnUserRequestExceptionWhenNameOrSurnameAreEmptyWhenItsGoingToCreateANewUser() {
         UserRequest userRequest = new UserRequest("Jerome", "", Role.USER, null, null);
         userService.addUser(userRequest);
+    }
+
+    @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
+    public void shouldThrowAnExceptionWhenThereAlreaxyExistAnUserWithTheSameNameAndSurname() {
+        when(userRepositoryMock.existAndUserWithTheSameNameAndSurname(any())).thenReturn(true);
+        userService.addUser(new UserRequest("Jerome", "Samson", Role.USER, null, null));
     }
 
     @Test

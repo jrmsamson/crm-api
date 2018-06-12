@@ -1,13 +1,10 @@
 package repositories.impl;
 
 import enums.Role;
-import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.requests.UpdateUserTokenRequest;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
 import org.jooq.*;
-import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import repositories.UserRepository;
 
@@ -20,8 +17,6 @@ import static model.jooq.Tables.ROLE;
 import static model.jooq.Tables.USER;
 
 public class UserRepositoryImpl extends BaseRepositoryImpl implements UserRepository {
-
-    private static final String USER_NAME_SURNAME_DB_CONSTRAINT = "user_name_surname_uindex";
 
     public Optional<UserResponse> getUserByUuid(UUID userUuid) {
         return selectUser()
@@ -36,29 +31,14 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     public UUID addUser(User user) {
-        try {
-            return doAddUser(user);
-        } catch (DataAccessException exception) {
-            if (isConstraintUserAndSurnameUniqueException(exception))
-                throw new UserWithSameNameAndSurnameAlreadyExistException();
-            throw exception;
-        }
+            return create
+                    .insertInto(USER)
+                    .set(create.newRecord(USER, user))
+                    .returning(USER.UUID)
+                    .fetchOne()
+                    .getUuid();
     }
 
-    private boolean isConstraintUserAndSurnameUniqueException(DataAccessException exception) {
-        return exception.getMessage().contains(USER_NAME_SURNAME_DB_CONSTRAINT);
-    }
-
-    private UUID doAddUser(User user) {
-        return create
-                .insertInto(USER)
-                .set(create.newRecord(USER, user))
-                .returning(USER.UUID)
-                .fetchOne()
-                .getUuid();
-    }
-
-    @Override
     public void editUserByUuid(User user) {
         create
                 .update(USER)
@@ -69,7 +49,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .execute();
     }
 
-    @Override
     public void deleteUserByUuid(UUID userUuid) {
         create
                 .update(USER)
@@ -77,7 +56,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .execute();
     }
 
-    @Override
     public List<UserResponse> getUsersActive(Long currentUserId) {
         return selectUser()
                 .where(USER.ACTIVE.eq(Boolean.TRUE))
@@ -90,7 +68,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 ));
     }
 
-    @Override
     public Optional<Role> getUserRoleByUserId(Long userId) {
         return create
                 .select(ROLE.NAME)
@@ -101,7 +78,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 ).fetchOptional(record -> Role.lookup(record.value1()));
     }
 
-    @Override
     public Optional<UserTokenResponse> getUserTokenByUserId(Long userId) {
         return create
                 .select(USER.TOKEN, USER.TOKEN_EXPIRATION)
@@ -119,7 +95,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .execute();
     }
 
-    @Override
     public void removeUserToken(Long currentUserId) {
         create.update(USER)
                 .set(USER.TOKEN, DSL.val((String) null))
@@ -134,7 +109,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .execute();
     }
 
-    @Override
     public Optional<Long> getUserIdByUuid(UUID uuid) {
         return create.select(USER.ID)
                 .from(USER)
@@ -142,6 +116,18 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                         .and(USER.ACTIVE.eq(Boolean.TRUE))
                 )
                 .fetchOptionalInto(Long.class);
+    }
+
+    public Boolean existAndUserWithTheSameNameAndSurname(User user) {
+        SelectConditionStep<Record> query = create.select()
+                .from(USER)
+                .where(USER.NAME.eq(user.getName()))
+                .and(USER.SURNAME.eq(user.getSurname()));
+
+        if (user.getId() != null)
+            query.and(USER.ID.ne(user.getId()));
+
+        return query.execute() > 0;
     }
 
     private SelectOnConditionStep<Record4<String, String, UUID, String>> selectUser() {

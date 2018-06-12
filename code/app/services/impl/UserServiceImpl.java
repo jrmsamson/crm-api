@@ -4,6 +4,7 @@ import enums.Role;
 import exceptions.RoleDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
+import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
 import model.entities.requests.UserRequest;
 import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
@@ -17,7 +18,6 @@ import util.Notification;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class UserServiceImpl extends BaseServiceImpl implements UserService {
@@ -36,10 +36,16 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         if (userRequestNotification.hasErrors())
             throw new UserRequestException(userRequestNotification.errorMessage());
 
+        User user = buildUser(userRequest);
+
+        if (repositoryFactory.getUserRepository()
+                .existAndUserWithTheSameNameAndSurname(user))
+            throw new UserWithSameNameAndSurnameAlreadyExistException();
+
         return new AddUserResponse(
                 repositoryFactory
                 .getUserRepository()
-                .addUser(buildUser(userRequest))
+                .addUser(user)
         );
     }
 
