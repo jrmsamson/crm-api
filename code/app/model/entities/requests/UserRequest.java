@@ -1,5 +1,6 @@
 package model.entities.requests;
 
+import com.google.common.base.Strings;
 import enums.Role;
 import util.Notification;
 
@@ -7,6 +8,9 @@ public class UserRequest {
 
     public static final String NAME_REQUIRED_MESSAGE = "Name is required";
     public static final String SURNAME_REQUIRED_MESSAGE = "Surname is required";
+    public static final String ROLE_REQUIRED_MESSAGE = "Role is required";
+    public static final String USERNAME_REQUIRED_MESSAGE = "Username is required";
+    public static final String PASSWORD_REQUIRED_MESSAGE = "Password is required";
 
     private String name;
     private String surname;
@@ -28,11 +32,20 @@ public class UserRequest {
     public Notification validation() {
         Notification notification = new Notification();
 
-        if (name.isEmpty())
+        if (Strings.isNullOrEmpty(name))
             notification.addError(NAME_REQUIRED_MESSAGE);
 
-        if (surname.isEmpty())
+        if (Strings.isNullOrEmpty(surname))
             notification.addError(SURNAME_REQUIRED_MESSAGE);
+
+        if (role == null)
+            notification.addError(ROLE_REQUIRED_MESSAGE);
+
+        if (Strings.isNullOrEmpty(username))
+            notification.addError(USERNAME_REQUIRED_MESSAGE);
+
+        if (Strings.isNullOrEmpty(password))
+            notification.addError(PASSWORD_REQUIRED_MESSAGE);
 
         return notification;
     }

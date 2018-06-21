@@ -1,5 +1,7 @@
 package util;
 
+import org.apache.logging.log4j.util.Strings;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,9 @@ public class Notification {
     }
 
     public String errorMessage() {
+        if (errors.isEmpty())
+            return Strings.EMPTY;
+
         return errors.stream().map(error ->
                 error.message + (error.cause.map(e -> ", " + e.getMessage()).orElse(""))
         ).collect(Collectors.joining("\n"));
