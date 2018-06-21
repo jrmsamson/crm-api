@@ -4,9 +4,10 @@ import enums.Role;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
+import model.entities.EditUser;
+import model.entities.AddUser;
 import model.entities.requests.UserRequest;
 import model.entities.responses.UserResponse;
-import model.pojos.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +15,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.MockitoJUnitRunner;
 import repositories.RepositoryFactory;
-import repositories.RoleRepository;
 import repositories.UserRepository;
 import services.UserService;
 import services.impl.UserServiceImpl;
@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,25 +34,24 @@ public class UserServiceTest {
 
     private UserService userService;
     private UserRepository userRepositoryMock;
-    private RoleRepository roleRepository;
 
     @Captor
-    private ArgumentCaptor<User> userCaptor;
+    private ArgumentCaptor<AddUser> userCaptor;
+
+    @Captor
+    private ArgumentCaptor<EditUser> editUserCaptor;
 
     @Before
     public void setUp() {
         userRepositoryMock = mock(UserRepository.class);
-        roleRepository = mock(RoleRepository.class);
         RepositoryFactory repositoryFactoryMock = mock(RepositoryFactory.class);
         when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepositoryMock);
-        when(repositoryFactoryMock.getRoleRepository()).thenReturn(roleRepository);
         userService = new UserServiceImpl(repositoryFactoryMock);
         userService.setCurrentUserId(1L);
         setUpFixture();
     }
 
     private void setUpFixture() {
-        when(roleRepository.getRoleId(Role.USER)).thenReturn(Optional.of(2));
         UserRequest userRequest = new UserRequest("Jerome", "Samson", Role.USER, "jer0Me", "password");
         userService.addUser(userRequest);
     }
@@ -61,10 +59,10 @@ public class UserServiceTest {
     @Test
     public void shouldCreateANewUser() {
         verify(userRepositoryMock).addUser(userCaptor.capture());
-        User user = userCaptor.getValue();
+        AddUser user = userCaptor.getValue();
         assertEquals("Jerome", user.getName());
         assertEquals("Samson", user.getSurname());
-        assertEquals(2, user.getRoleId(), 0);
+        assertEquals(Role.USER, user.getRole());
     }
 
     @Test(expected = UserRequestException.class)
@@ -76,8 +74,8 @@ public class UserServiceTest {
     @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
     public void shouldThrowAnExceptionWhenThereAlreadyExistAnUserWithTheSameNameAndSurname() {
         UUID userUuid = UUID.randomUUID();
-        when(userRepositoryMock.getUserByNameAndSurname(any())).thenReturn(
-                Optional.of(new UserResponse("", "", userUuid, null))
+        when(userRepositoryMock.getUserByNameAndSurname("Jerome", "Samson")).thenReturn(
+                Optional.of(new UserResponse("Jerome", "Samson", userUuid, null))
         );
         userService.addUser(new UserRequest("Jerome", "Samson", Role.USER, "myusername", "mypassword"));
     }
@@ -85,13 +83,14 @@ public class UserServiceTest {
     @Test
     public void shouldEditAnUser() {
         UserRequest userRequest = new UserRequest("JRM", "SAM", Role.USER, "myusername", "mypassword");
-        UUID uuidMocked = UUID.randomUUID();
-        userService.editUser(uuidMocked, userRequest);
-        verify(userRepositoryMock).editUserByUuid(userCaptor.capture());
-        User user = userCaptor.getValue();
+        UUID uuid = UUID.randomUUID();
+        userService.editUser(uuid, userRequest);
+        verify(userRepositoryMock).editUser(editUserCaptor.capture());
+        EditUser user = editUserCaptor.getValue();
+        assertEquals(uuid, user.getUuid());
         assertEquals("JRM", user.getName());
         assertEquals("SAM", user.getSurname());
-        assertEquals(2, user.getRoleId(), 0);
+        assertEquals(Role.USER, user.getRole());
     }
 
     @Test

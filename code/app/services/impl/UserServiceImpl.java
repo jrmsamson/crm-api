@@ -1,10 +1,12 @@
 package services.impl;
 
 import enums.Role;
-import exceptions.RoleDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
+import model.entities.EditUser;
+import model.entities.AddUser;
+import model.entities.NewToken;
 import model.entities.requests.UserRequest;
 import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
@@ -38,7 +40,13 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         return new AddUserResponse(
                 repositoryFactory
                         .getUserRepository()
-                        .addUser(buildUser(userRequest))
+                        .addUser(
+                                new AddUser(
+                                        userRequest.getName(),
+                                        userRequest.getSurname(),
+                                        userRequest.getRole()
+                                )
+                        )
         );
     }
 
@@ -48,48 +56,22 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         if (userRequestNotification.hasErrors())
             throw new UserRequestException(userRequestNotification.errorMessage());
 
-        checkIfThereAlreadyExistUserWithSameNameAndSurname(
-                buildUser(userRequest)
-        );
-    }
+        Optional<UserResponse> userWithSameNameAndSurname = repositoryFactory.getUserRepository()
+                .getUserByNameAndSurname(userRequest.getName(), userRequest.getSurname());
 
-    private void checkIfThereAlreadyExistUserWithSameNameAndSurname(User user) {
-        Optional<UserResponse> existingUser = repositoryFactory.getUserRepository()
-                .getUserByNameAndSurname(user);
-
-        if (!existingUser.isPresent())
-            return;
-
-        if (isNotTheCurrentUserToBeEdited(user, existingUser.get())) {
+        if (userWithSameNameAndSurname.isPresent())
             throw new UserWithSameNameAndSurnameAlreadyExistException();
-        }
-    }
-
-    private boolean isNotTheCurrentUserToBeEdited(User user, UserResponse existingUser) {
-        return !existingUser.getUuid().equals(user.getUuid());
-    }
-
-    private Integer getUserRoleId(Role role) {
-        return repositoryFactory
-                .getRoleRepository()
-                .getRoleId(role)
-                .orElseThrow(RoleDoesNotExistException::new);
     }
 
     public void editUser(UUID userUuid, UserRequest userRequest) {
-        User user = buildUser(userRequest);
-        user.setUuid(userUuid);
         repositoryFactory
                 .getUserRepository()
-                .editUserByUuid(user);
-    }
-
-    private User buildUser(UserRequest userRequest) {
-        User user = new User();
-        user.setName(userRequest.getName());
-        user.setSurname(userRequest.getSurname());
-        user.setRoleId(getUserRoleId(userRequest.getRole()));
-        return user;
+                .editUser(new EditUser(
+                        userUuid,
+                        userRequest.getName(),
+                        userRequest.getSurname(),
+                        userRequest.getRole()
+                ));
     }
 
     public void deleteUser(UUID userUuid) {
@@ -125,12 +107,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     }
 
     public void renewUserToken(Long userId) {
-        User user = new User();
-        user.setTokenExpiration(getTokenExpiration());
-        user.setId(userId);
         repositoryFactory
                 .getUserRepository()
-                .updateUserTokenExpirationByUserId(user);
+                .updateUserTokenExpirationByUserId(userId, getTokenExpiration());
     }
 
     public Long getUserIdByUuid(UUID userUuid) {
@@ -149,19 +128,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
     public String buildUserToken(Long userId) {
         String token = CryptoUtils.generateSecureRandomToken();
-        repositoryFactory.getUserRepository().updateUserTokenByUserId(
-                buildUserToken(userId, token)
+        repositoryFactory.getUserRepository().updateUserToken(
+                userId, new NewToken(token, getTokenExpiration())
         );
         return token;
-    }
-
-
-    private User buildUserToken(Long userId, String token) {
-        User user = new User();
-        user.setId(userId);
-        user.setToken(token);
-        user.setTokenExpiration(getTokenExpiration());
-        return user;
     }
 
     private LocalDateTime getTokenExpiration() {
@@ -169,6 +139,4 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .now()
                 .plusMinutes(TOKEN_EXPIRATION_DURATION_MINUTES);
     }
-
-
 }

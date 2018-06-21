@@ -1,8 +1,9 @@
 package integration.repositories;
 
+import enums.Role;
+import model.entities.AddUser;
 import model.entities.responses.LoginResponse;
 import model.pojos.Login;
-import model.pojos.User;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -48,11 +49,9 @@ public class LoginRepositoryTest  {
     @Before
     public void setUp() {
         Evolutions.applyEvolutions(database);
-        User user = new User();
-        user.setName("Jerome");
-        user.setSurname("Samson");
-        user.setRoleId(1);
-        userRepository.addUser(user);
+        userRepository.addUser(
+                new AddUser("Jerome", "Samson", Role.ADMIN)
+        );
         setUpFixture();
     }
 

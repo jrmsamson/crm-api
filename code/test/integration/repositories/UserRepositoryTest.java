@@ -1,6 +1,9 @@
 package integration.repositories;
 
 import enums.Role;
+import model.entities.EditUser;
+import model.entities.AddUser;
+import model.entities.NewToken;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
@@ -52,12 +55,15 @@ public class UserRepositoryTest {
     }
 
     private void setUpFixture() {
+        AddUser addUser = new AddUser(
+                "Jerome", "Samson", Role.USER
+        );
         User user = new User();
         user.setName("Jerome");
         user.setSurname("Samson");
         user.setRoleId(USER_ROLE_ID);
         this.userCreated = userRepository.getUserByUuid(
-                userRepository.addUser(user)
+                userRepository.addUser(addUser)
         ).get();
     }
 
@@ -68,12 +74,8 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldEditUser() {
-        User user = new User();
-        user.setName("JR");
-        user.setSurname("R");
-        user.setRoleId(2);
-        user.setUuid(userCreated.getUuid());
-        userRepository.editUserByUuid(user);
+        EditUser user = new EditUser(userCreated.getUuid(), "JR", "R", Role.USER);
+        userRepository.editUser(user);
         UserResponse userEdited = userRepository.getUserByUuid(userCreated.getUuid()).get();
         assertEquals(userCreated.getUuid(), userEdited.getUuid());
         assertEquals(user.getName(), userEdited.getName());
@@ -90,10 +92,7 @@ public class UserRepositoryTest {
     @Test
     public void shouldGetOnlyThoseUsersActive() {
         userRepository.deleteUserByUuid(userCreated.getUuid());
-        User user = new User();
-        user.setName("JR");
-        user.setSurname("SAM");
-        user.setRoleId(USER_ROLE_ID);
+        AddUser user = new AddUser("JR", "SAM", Role.USER);
         userRepository.addUser(user);
         List<UserResponse> users = userRepository.getUsersActive(1L);
         assertEquals(1, users.size());
@@ -111,11 +110,7 @@ public class UserRepositoryTest {
     public void shouldUpdateUserToken() {
         String token = "mytoken";
         LocalDateTime tokenExpiration = LocalDateTime.now();
-        User user = new User();
-        user.setId(USER_ID);
-        user.setToken(token);
-        user.setTokenExpiration(tokenExpiration);
-        userRepository.updateUserTokenByUserId(user);
+        userRepository.updateUserToken(USER_ID, new NewToken(token, tokenExpiration));
         UserTokenResponse userTokenResponse = userRepository.getUserTokenByUserId(USER_ID).get();
         assertEquals(token, userTokenResponse.getToken());
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
@@ -124,10 +119,7 @@ public class UserRepositoryTest {
     @Test
     public void shouldUpdateUserTokenExpiration() {
         LocalDateTime tokenExpiration = LocalDateTime.now();
-        User user = new User();
-        user.setId(USER_ID);
-        user.setTokenExpiration(tokenExpiration);
-        userRepository.updateUserTokenExpirationByUserId(user);
+        userRepository.updateUserTokenExpirationByUserId(USER_ID, tokenExpiration);
         UserTokenResponse userTokenResponse = userRepository.getUserTokenByUserId(USER_ID).get();
         assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
     }
@@ -140,10 +132,11 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldReturnUserGottenByNameAndSurname() {
-        User user = new User();
-        user.setName(userCreated.getName());
-        user.setSurname(userCreated.getSurname());
-        assertTrue(userRepository.getUserByNameAndSurname(user).isPresent());
+        assertTrue(
+                userRepository.getUserByNameAndSurname(
+                        userCreated.getName(), userCreated.getSurname()
+                ).isPresent()
+        );
     }
 
 }

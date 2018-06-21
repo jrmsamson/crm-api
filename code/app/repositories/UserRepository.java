@@ -1,19 +1,23 @@
 package repositories;
 
 import enums.Role;
+import model.entities.EditUser;
+import model.entities.AddUser;
+import model.entities.NewToken;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends BaseRepository {
 
-    UUID addUser(User user);
+    UUID addUser(AddUser user);
 
-    void editUserByUuid(User user);
+    void editUser(EditUser user);
 
     void deleteUserByUuid(UUID userUuid);
 
@@ -25,13 +29,13 @@ public interface UserRepository extends BaseRepository {
 
     Optional<UserTokenResponse> getUserTokenByUserId(Long userId);
 
-    void updateUserTokenByUserId(User user);
+    void updateUserToken(Long userId, NewToken token);
 
     void removeUserToken(Long currentUserId);
 
-    void updateUserTokenExpirationByUserId(User user);
+    void updateUserTokenExpirationByUserId(Long userId, LocalDateTime tokenExpiration);
 
     Optional<Long> getUserIdByUuid(UUID uuid);
 
-    Optional<UserResponse> getUserByNameAndSurname(User user);
+    Optional<UserResponse> getUserByNameAndSurname(String name, String surname);
 }

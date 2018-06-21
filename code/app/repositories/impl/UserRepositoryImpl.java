@@ -1,6 +1,9 @@
 package repositories.impl;
 
 import enums.Role;
+import model.entities.EditUser;
+import model.entities.AddUser;
+import model.entities.NewToken;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
@@ -30,23 +33,33 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 ));
     }
 
-    public UUID addUser(User user) {
+    public UUID addUser(AddUser user) {
         return create
                 .insertInto(USER)
-                .set(create.newRecord(USER, user))
+                .set(USER.NAME, user.getName())
+                .set(USER.SURNAME, user.getSurname())
+                .set(USER.ROLE_ID, buildRoleIdQuery(user.getRole()))
                 .returning(USER.UUID)
                 .fetchOne()
                 .getUuid();
     }
 
-    public void editUserByUuid(User user) {
+    public void editUser(EditUser user) {
         create
                 .update(USER)
                 .set(USER.NAME, user.getName())
                 .set(USER.SURNAME, user.getSurname())
-                .set(USER.ROLE_ID, user.getRoleId())
+                .set(USER.ROLE_ID, buildRoleIdQuery(user.getRole()))
                 .where(USER.UUID.eq(user.getUuid()))
                 .execute();
+    }
+
+    private SelectConditionStep<Record1<Integer>> buildRoleIdQuery(Role role) {
+        return create.select(ROLE.ID)
+                .from(ROLE)
+                .where(ROLE.NAME.lower().eq(
+                        role.getName().toLowerCase())
+                );
     }
 
     public void deleteUserByUuid(UUID userUuid) {
@@ -87,11 +100,11 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 ).fetchOptionalInto(UserTokenResponse.class);
     }
 
-    public void updateUserTokenByUserId(User user) {
+    public void updateUserToken(Long userId, NewToken token) {
         create.update(USER)
-                .set(USER.TOKEN, user.getToken())
-                .set(USER.TOKEN_EXPIRATION, user.getTokenExpiration())
-                .where(USER.ID.eq(user.getId()))
+                .set(USER.TOKEN, token.getToken())
+                .set(USER.TOKEN_EXPIRATION, token.getTokenExpiration())
+                .where(USER.ID.eq(userId))
                 .execute();
     }
 
@@ -102,10 +115,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .execute();
     }
 
-    public void updateUserTokenExpirationByUserId(User user) {
+    public void updateUserTokenExpirationByUserId(Long userId, LocalDateTime tokenExpiration) {
         create.update(USER)
-                .set(USER.TOKEN_EXPIRATION, user.getTokenExpiration())
-                .where(USER.ID.eq(user.getId()))
+                .set(USER.TOKEN_EXPIRATION, tokenExpiration)
+                .where(USER.ID.eq(userId))
                 .execute();
     }
 
@@ -119,11 +132,11 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .fetchOptionalInto(Long.class);
     }
 
-    public Optional<UserResponse> getUserByNameAndSurname(User user) {
+    public Optional<UserResponse> getUserByNameAndSurname(String name, String surname) {
         return selectUser()
                 .where(
-                        USER.NAME.eq(user.getName())
-                                .and(USER.SURNAME.eq(user.getSurname()))
+                        USER.NAME.eq(name)
+                                .and(USER.SURNAME.eq(surname))
                 )
                 .fetchOptionalInto(UserResponse.class);
     }
