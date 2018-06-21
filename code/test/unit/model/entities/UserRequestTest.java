@@ -1,15 +1,12 @@
 package unit.model.entities;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import enums.Role;
 import model.entities.requests.UserRequest;
 import org.junit.Test;
-import play.Logger;
 import util.Notification;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UserRequestTest {
