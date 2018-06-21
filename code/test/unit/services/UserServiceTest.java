@@ -79,12 +79,12 @@ public class UserServiceTest {
         when(userRepositoryMock.getUserByNameAndSurname(any())).thenReturn(
                 Optional.of(new UserResponse("", "", userUuid, null))
         );
-        userService.addUser(new UserRequest("Jerome", "Samson", Role.USER, null, null));
+        userService.addUser(new UserRequest("Jerome", "Samson", Role.USER, "myusername", "mypassword"));
     }
 
     @Test
     public void shouldEditAnUser() {
-        UserRequest userRequest = new UserRequest("JRM", "SAM", Role.USER, null, null);
+        UserRequest userRequest = new UserRequest("JRM", "SAM", Role.USER, "myusername", "mypassword");
         UUID uuidMocked = UUID.randomUUID();
         userService.editUser(uuidMocked, userRequest);
         verify(userRepositoryMock).editUserByUuid(userCaptor.capture());
