@@ -1,7 +1,6 @@
 package integration.repositories;
 
 import enums.Role;
-import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
@@ -46,6 +45,12 @@ public class UserRepositoryTest {
         setUpFixture();
     }
 
+    @After
+    public void tearDown() {
+        Evolutions.cleanupEvolutions(database);
+        this.database.shutdown();
+    }
+
     private void setUpFixture() {
         User user = new User();
         user.setName("Jerome");
@@ -73,15 +78,6 @@ public class UserRepositoryTest {
         assertEquals(userCreated.getUuid(), userEdited.getUuid());
         assertEquals(user.getName(), userEdited.getName());
         assertEquals(user.getSurname(), userEdited.getSurname());
-    }
-
-    @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
-    public void shouldNotBeAbleToCreateANewUserWithTheSameNameAndSurname() {
-        User user = new User();
-        user.setName("Jerome");
-        user.setSurname("Samson");
-        user.setRoleId(USER_ROLE_ID);
-        userRepository.addUser(user);
     }
 
     @Test
@@ -143,16 +139,11 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void shouldReturnTrueIfThereExistAnUserWithTheSameNameAndSurname() {
+    public void shouldReturnUserGottenByNameAndSurname() {
         User user = new User();
         user.setName(userCreated.getName());
         user.setSurname(userCreated.getSurname());
-        assertTrue(userRepository.existAndUserWithTheSameNameAndSurname(user));
+        assertTrue(userRepository.getUserByNameAndSurname(user).isPresent());
     }
 
-    @After
-    public void tearDown() {
-        Evolutions.cleanupEvolutions(database);
-        this.database.shutdown();
-    }
 }

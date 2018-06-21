@@ -16,6 +16,7 @@ import repositories.impl.CustomerRepositoryImpl;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class CustomerRepositoryTest {
@@ -100,6 +101,15 @@ public class CustomerRepositoryTest {
         customerRepository.deleteCustomerUuid(lastCustomerCreated.getUuid());
         List<CustomerResponse> customers = customerRepository.getCustomersActive();
         assertEquals(0, customers.size());
+    }
+
+    @Test
+    public void shouldReturnCustomerGottenByNameAndSurname() {
+        Customer user = new Customer();
+        user.setSurname(lastCustomerCreated.getSurname());
+        assertTrue(customerRepository.getCustomerByNameAndSurname(
+                lastCustomerCreated.getName(), lastCustomerCreated.getSurname()
+        ).isPresent());
     }
 
 }

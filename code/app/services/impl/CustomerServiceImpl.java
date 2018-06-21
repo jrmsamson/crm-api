@@ -1,9 +1,6 @@
 package services.impl;
 
-import exceptions.CustomerDoesNotExistException;
-import exceptions.ImageExtensionNotSupportedException;
-import exceptions.PhotoDoesNotExistException;
-import exceptions.ImageUploadException;
+import exceptions.*;
 import model.entities.responses.AddCustomerResponse;
 import model.entities.requests.CustomerRequest;
 import model.entities.responses.CustomerResponse;
@@ -20,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static util.Constants.IMAGE_CONTENT_TYPE_EXTENSIONS;
@@ -37,11 +35,37 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
     }
 
     public AddCustomerResponse addCustomer(CustomerRequest customerRequest) {
+        validateCustomerRequest(customerRequest);
+
         return new AddCustomerResponse(
                 repositoryFactory
                         .getCustomerRepository()
                         .addCustomer(buildAddCustomer(customerRequest))
         );
+    }
+
+    private void validateCustomerRequest(CustomerRequest customerRequest) {
+
+        checkIfThereAlreadyExistCustomerWithSameNameAndSurname(
+                buildAddCustomer(customerRequest)
+        );
+
+    }
+
+    private void checkIfThereAlreadyExistCustomerWithSameNameAndSurname(Customer customer) {
+        Optional<CustomerResponse> existingCustomer = repositoryFactory.getCustomerRepository()
+                .getCustomerByNameAndSurname(customer.getName(), customer.getSurname());
+
+        if (!existingCustomer.isPresent())
+            return;
+
+        if (isNotCurrentCustomerToBeEdited(customer, existingCustomer.get())) {
+            throw new CustomerWithSameNameAndSurnameAlreadyExistException();
+        }
+    }
+
+    private boolean isNotCurrentCustomerToBeEdited(Customer customer, CustomerResponse existingCustomer) {
+        return !existingCustomer.getUuid().equals(customer.getUuid());
     }
 
     private Customer buildAddCustomer(CustomerRequest customerRequest) {

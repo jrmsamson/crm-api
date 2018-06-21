@@ -74,8 +74,11 @@ public class UserServiceTest {
     }
 
     @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
-    public void shouldThrowAnExceptionWhenThereAlreaxyExistAnUserWithTheSameNameAndSurname() {
-        when(userRepositoryMock.existAndUserWithTheSameNameAndSurname(any())).thenReturn(true);
+    public void shouldThrowAnExceptionWhenThereAlreadyExistAnUserWithTheSameNameAndSurname() {
+        UUID userUuid = UUID.randomUUID();
+        when(userRepositoryMock.getUserByNameAndSurname(any())).thenReturn(
+                Optional.of(new UserResponse("", "", userUuid, null))
+        );
         userService.addUser(new UserRequest("Jerome", "Samson", Role.USER, null, null));
     }
 
@@ -136,7 +139,7 @@ public class UserServiceTest {
     }
 
     @Test(expected = UserDoesNotExistException.class)
-    public void shouldThrowAnExceptionIfDoesNotExistTheUserWhenItsGoingToFindHimByUuid() {
+    public void shouldReturnUserGottenByUserNameAndSurname() {
         UUID userUuid = UUID.randomUUID();
         when(userRepositoryMock.getUserByUuid(userUuid)).thenReturn(
                 Optional.empty()

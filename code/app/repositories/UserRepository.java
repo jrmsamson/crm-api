@@ -1,8 +1,6 @@
 package repositories;
 
 import enums.Role;
-import model.entities.requests.UpdateUserTokenExpirationRequest;
-import model.entities.requests.UpdateUserTokenRequest;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
 import model.pojos.User;
@@ -35,5 +33,5 @@ public interface UserRepository extends BaseRepository {
 
     Optional<Long> getUserIdByUuid(UUID uuid);
 
-    Boolean existAndUserWithTheSameNameAndSurname(User user);
+    Optional<UserResponse> getUserByNameAndSurname(User user);
 }

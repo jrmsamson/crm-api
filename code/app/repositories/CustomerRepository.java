@@ -20,4 +20,6 @@ public interface CustomerRepository extends BaseRepository {
     void deleteCustomerUuid(UUID uuid);
 
     void updateCustomerPhotoName(Customer customer);
+
+    Optional<CustomerResponse> getCustomerByNameAndSurname(String name, String surname);
 }

@@ -33,17 +33,6 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
                 .fetchInto(CustomerResponse.class);
     }
 
-    private SelectJoinStep<Record4<UUID, String, String, String>> selectCustomer() {
-        return create
-                .select(
-                        CUSTOMER.UUID,
-                        CUSTOMER.NAME,
-                        CUSTOMER.SURNAME,
-                        CUSTOMER.PHOTO_NAME
-                )
-                .from(CUSTOMER);
-    }
-
     public UUID addCustomer(Customer customer) {
         try {
             return doAddCustomer(customer);
@@ -87,4 +76,26 @@ public class CustomerRepositoryImpl extends BaseRepositoryImpl implements Custom
                 .where(CUSTOMER.UUID.eq(customer.getUuid()))
                 .execute();
     }
+
+    @Override
+    public Optional<CustomerResponse> getCustomerByNameAndSurname(String name, String surname) {
+        return selectCustomer()
+                .where(
+                        CUSTOMER.NAME.eq(name)
+                                .and(CUSTOMER.SURNAME.eq(surname))
+                )
+                .fetchOptionalInto(CustomerResponse.class);
+    }
+
+    private SelectJoinStep<Record4<UUID, String, String, String>> selectCustomer() {
+        return create
+                .select(
+                        CUSTOMER.UUID,
+                        CUSTOMER.NAME,
+                        CUSTOMER.SURNAME,
+                        CUSTOMER.PHOTO_NAME
+                )
+                .from(CUSTOMER);
+    }
+
 }

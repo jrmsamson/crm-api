@@ -18,6 +18,7 @@ import util.Notification;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserServiceImpl extends BaseServiceImpl implements UserService {
@@ -32,21 +33,40 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     }
 
     public AddUserResponse addUser(UserRequest userRequest) {
-        Notification userRequestNotification = userRequest.validation();
-        if (userRequestNotification.hasErrors())
-            throw new UserRequestException(userRequestNotification.errorMessage());
-
-        User user = buildUser(userRequest);
-
-        if (repositoryFactory.getUserRepository()
-                .existAndUserWithTheSameNameAndSurname(user))
-            throw new UserWithSameNameAndSurnameAlreadyExistException();
+        validateUserRequest(userRequest);
 
         return new AddUserResponse(
                 repositoryFactory
-                .getUserRepository()
-                .addUser(user)
+                        .getUserRepository()
+                        .addUser(buildUser(userRequest))
         );
+    }
+
+    private void validateUserRequest(UserRequest userRequest) {
+        Notification userRequestNotification = userRequest.validation();
+
+        if (userRequestNotification.hasErrors())
+            throw new UserRequestException(userRequestNotification.errorMessage());
+
+        checkIfThereAlreadyExistUserWithSameNameAndSurname(
+                buildUser(userRequest)
+        );
+    }
+
+    private void checkIfThereAlreadyExistUserWithSameNameAndSurname(User user) {
+        Optional<UserResponse> existingUser = repositoryFactory.getUserRepository()
+                .getUserByNameAndSurname(user);
+
+        if (!existingUser.isPresent())
+            return;
+
+        if (isNotTheCurrentUserToBeEdited(user, existingUser.get())) {
+            throw new UserWithSameNameAndSurnameAlreadyExistException();
+        }
+    }
+
+    private boolean isNotTheCurrentUserToBeEdited(User user, UserResponse existingUser) {
+        return !existingUser.getUuid().equals(user.getUuid());
     }
 
     private Integer getUserRoleId(Role role) {

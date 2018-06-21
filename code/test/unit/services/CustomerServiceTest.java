@@ -1,11 +1,13 @@
 package unit.services;
 
 import exceptions.CustomerDoesNotExistException;
+import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
 import exceptions.ImageExtensionNotSupportedException;
 import model.entities.requests.CustomerRequest;
 import model.entities.responses.CustomerResponse;
 import model.entities.requests.UpdateCustomerPhotoRequest;
 import model.pojos.Customer;
+import model.pojos.Role;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,6 +76,17 @@ public class CustomerServiceTest {
         assertNull(customer.getId());
         assertNull(customer.getPhotoName());
         assertNull(customer.getUuid());
+    }
+
+    @Test(expected = CustomerWithSameNameAndSurnameAlreadyExistException.class)
+    public void shouldThrowAnExceptionWhenThereAlreadyExistAnCustomerWithTheSameNameAndSurname() {
+        String customerName = "Jerome";
+        String customerSurname = "Samson";
+        UUID customerUuid = UUID.randomUUID();
+        when(customerRepository.getCustomerByNameAndSurname(customerName, customerSurname)).thenReturn(
+                Optional.of(new CustomerResponse(customerUuid, customerName, customerSurname, null))
+        );
+        customerService.addCustomer(new CustomerRequest(customerName, customerSurname));
     }
 
     @Test

@@ -21,8 +21,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     public Optional<UserResponse> getUserByUuid(UUID userUuid) {
         return selectUser()
                 .where(USER.ACTIVE.eq(Boolean.TRUE)
-                        .and(USER.UUID.eq(userUuid)
-                        )).fetchOptional(record -> new UserResponse(
+                        .and(USER.UUID.eq(userUuid)))
+                .fetchOptional(record -> new UserResponse(
                         record.value1(),
                         record.value2(),
                         record.value3(),
@@ -31,12 +31,12 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     public UUID addUser(User user) {
-            return create
-                    .insertInto(USER)
-                    .set(create.newRecord(USER, user))
-                    .returning(USER.UUID)
-                    .fetchOne()
-                    .getUuid();
+        return create
+                .insertInto(USER)
+                .set(create.newRecord(USER, user))
+                .returning(USER.UUID)
+                .fetchOne()
+                .getUuid();
     }
 
     public void editUserByUuid(User user) {
@@ -110,7 +110,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
     }
 
     public Optional<Long> getUserIdByUuid(UUID uuid) {
-        return create.select(USER.ID)
+        return create
+                .select(USER.ID)
                 .from(USER)
                 .where(USER.UUID.eq(uuid)
                         .and(USER.ACTIVE.eq(Boolean.TRUE))
@@ -118,16 +119,13 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
                 .fetchOptionalInto(Long.class);
     }
 
-    public Boolean existAndUserWithTheSameNameAndSurname(User user) {
-        SelectConditionStep<Record> query = create.select()
-                .from(USER)
-                .where(USER.NAME.eq(user.getName()))
-                .and(USER.SURNAME.eq(user.getSurname()));
-
-        if (user.getId() != null)
-            query.and(USER.ID.ne(user.getId()));
-
-        return query.execute() > 0;
+    public Optional<UserResponse> getUserByNameAndSurname(User user) {
+        return selectUser()
+                .where(
+                        USER.NAME.eq(user.getName())
+                                .and(USER.SURNAME.eq(user.getSurname()))
+                )
+                .fetchOptionalInto(UserResponse.class);
     }
 
     private SelectOnConditionStep<Record4<String, String, UUID, String>> selectUser() {
