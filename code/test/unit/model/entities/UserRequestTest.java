@@ -22,7 +22,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfNameIsNull() {
-        UserRequest userRequest = new UserRequest(null, SURNAME, Role.USER, USERNAME, PASSWORD);
+        UserRequest userRequest = new UserRequest(null, SURNAME, ROLE, USERNAME, PASSWORD);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.NAME_REQUIRED_MESSAGE);
@@ -30,7 +30,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfNameIsEmpty() {
-        UserRequest userRequest = new UserRequest("", SURNAME, Role.USER, USERNAME, PASSWORD);
+        UserRequest userRequest = new UserRequest("", SURNAME, ROLE, USERNAME, PASSWORD);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.NAME_REQUIRED_MESSAGE);
@@ -38,7 +38,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfSurnameIsNull() {
-        UserRequest userRequest = new UserRequest(NAME, null, Role.USER, USERNAME, PASSWORD);
+        UserRequest userRequest = new UserRequest(NAME, null, ROLE, USERNAME, PASSWORD);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.SURNAME_REQUIRED_MESSAGE);
@@ -46,7 +46,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfSurnameIsEmpty() {
-        UserRequest userRequest = new UserRequest(NAME, "", Role.USER, USERNAME, PASSWORD);
+        UserRequest userRequest = new UserRequest(NAME, "", ROLE, USERNAME, PASSWORD);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.SURNAME_REQUIRED_MESSAGE);
@@ -54,7 +54,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfUsernameIsNull() {
-        UserRequest userRequest = new UserRequest(NAME, SURNAME, Role.USER, null, PASSWORD);
+        UserRequest userRequest = new UserRequest(NAME, SURNAME, ROLE, null, PASSWORD);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.USERNAME_REQUIRED_MESSAGE);
@@ -70,7 +70,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfUsernameIsEmpty() {
-        UserRequest userRequest = new UserRequest(NAME, SURNAME, Role.USER, "", PASSWORD);
+        UserRequest userRequest = new UserRequest(NAME, SURNAME, ROLE, "", PASSWORD);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.USERNAME_REQUIRED_MESSAGE);
@@ -78,7 +78,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfPasswordIsNull() {
-        UserRequest userRequest = new UserRequest(NAME, SURNAME, Role.USER, USERNAME, null);
+        UserRequest userRequest = new UserRequest(NAME, SURNAME, ROLE, USERNAME, null);
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.PASSWORD_REQUIRED_MESSAGE);
@@ -86,7 +86,7 @@ public class UserRequestTest {
 
     @Test
     public void shouldNotifyAnErrorIfPasswordIsEmpty() {
-        UserRequest userRequest = new UserRequest(NAME, SURNAME, Role.USER, USERNAME, "");
+        UserRequest userRequest = new UserRequest(NAME, SURNAME, ROLE, USERNAME, "");
         Notification notification = userRequest.validation();
         assertTrue(notification.hasErrors());
         assertEquals(notification.errorMessage(), UserRequest.PASSWORD_REQUIRED_MESSAGE);
