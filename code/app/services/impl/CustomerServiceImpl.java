@@ -10,6 +10,7 @@ import play.Application;
 import repositories.RepositoryFactory;
 import services.CustomerService;
 import util.ConfigPath;
+import util.Notification;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -45,6 +46,10 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
     }
 
     private void validateCustomerRequest(CustomerRequest customerRequest) {
+        Notification notification = customerRequest.validation();
+
+        if (notification.hasErrors())
+            throw new CustomerRequestException(notification.errorMessage());
 
         checkIfThereAlreadyExistCustomerWithSameNameAndSurname(
                 buildAddCustomer(customerRequest)

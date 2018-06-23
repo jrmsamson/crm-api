@@ -11,7 +11,6 @@ import model.entities.requests.UserRequest;
 import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserTokenResponse;
-import model.pojos.User;
 import repositories.RepositoryFactory;
 import services.UserService;
 import util.CryptoUtils;

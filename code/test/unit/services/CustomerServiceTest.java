@@ -1,6 +1,7 @@
 package unit.services;
 
 import exceptions.CustomerDoesNotExistException;
+import exceptions.CustomerRequestException;
 import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
 import exceptions.ImageExtensionNotSupportedException;
 import model.entities.requests.CustomerRequest;
@@ -76,6 +77,13 @@ public class CustomerServiceTest {
         assertNull(customer.getId());
         assertNull(customer.getPhotoName());
         assertNull(customer.getUuid());
+    }
+
+
+    @Test(expected = CustomerRequestException.class)
+    public void shouldThrowAnExceptionIfCustomerRequestIsNotValid() {
+        CustomerRequest customerRequest = new CustomerRequest("", "");
+        customerService.addCustomer(customerRequest);
     }
 
     @Test(expected = CustomerWithSameNameAndSurnameAlreadyExistException.class)
