@@ -188,7 +188,7 @@ public class UserServiceTest {
         user.setToken(token);
         user.setTokenExpiration(tokenExpiration);
         when(userRepositoryMock.getById(1L)).thenReturn(Optional.of(user));
-        userService.removeCurrentUserToken();
+        userService.removeUserToken(1L);
 
         verify(userRepositoryMock).update(userCaptor.capture());
         User userToUpdate = userCaptor.getValue();

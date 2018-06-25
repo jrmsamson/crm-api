@@ -17,7 +17,6 @@ import static util.Constants.ROLE_SESSION_KEY;
 import static util.Constants.TOKEN_SESSION_KEY;
 import static util.Constants.USER_ID_SESSION_KEY;
 
-
 @Transactional
 public class LoginController extends BaseController {
 
@@ -39,7 +38,7 @@ public class LoginController extends BaseController {
                 loginService.login(loginRequest)
         ).thenApplyAsync(userSession -> {
             session(USER_ID_SESSION_KEY, userSession.getUserId().toString());
-            session(ROLE_SESSION_KEY, userSession.getRole().toString());
+            session(ROLE_SESSION_KEY, userSession.getRole());
             session(TOKEN_SESSION_KEY, userSession.getToken());
             return ok();
             }, ec.current()

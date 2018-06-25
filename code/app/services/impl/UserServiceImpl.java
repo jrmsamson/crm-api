@@ -9,7 +9,6 @@ import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserToken;
 import model.pojos.User;
-import play.Logger;
 import repositories.RepositoryFactory;
 import services.UserService;
 import util.CryptoUtils;
@@ -115,8 +114,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         );
     }
 
-    public void removeCurrentUserToken() {
-        User user = getUserById(currentUserId);
+    public void removeUserToken(Long userId) {
+        User user = getUserById(userId);
         user.setToken(null);
         user.setTokenExpiration(null);
         repositoryFactory

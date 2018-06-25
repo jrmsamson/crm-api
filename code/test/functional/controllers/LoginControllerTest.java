@@ -49,17 +49,23 @@ public class LoginControllerTest {
 
     @Test
     public void shouldLogout() {
+        Result result;
+
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(new LoginRequest("admin", "admin")))
                 .uri(controllers.routes.LoginController.login().url());
-        Http.Session session = route(app, request).session();
+
+        result = route(app, request);
+        Http.Session session = result.session();
+        assertEquals(OK, result.status());
 
         request = new Http.RequestBuilder()
                 .method(POST)
                 .uri(controllers.routes.LoginController.logout().url())
                 .session(session);
-        Result result = route(app, request);
+
+        result = route(app, request);
         assertEquals(OK, result.status());
     }
 

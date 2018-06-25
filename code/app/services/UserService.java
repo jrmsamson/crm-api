@@ -1,8 +1,7 @@
 package services;
 
-import enums.Role;
-import model.entities.responses.AddUserResponse;
 import model.entities.requests.UserRequest;
+import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
 import model.entities.responses.UserToken;
 
@@ -21,7 +20,7 @@ public interface UserService extends BaseService {
 
     UserToken getUserTokenByUserId(Long userId);
 
-    void removeCurrentUserToken();
+    void removeUserToken(Long userId);
 
     String setUserTokenByUserId(Long userId);
 

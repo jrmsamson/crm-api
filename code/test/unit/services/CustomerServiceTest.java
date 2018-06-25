@@ -8,7 +8,6 @@ import model.entities.requests.CustomerRequest;
 import model.entities.responses.CustomerResponse;
 import model.entities.requests.UpdateCustomerPhotoRequest;
 import model.pojos.Customer;
-import model.pojos.Role;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +16,7 @@ import org.mockito.Captor;
 import org.mockito.junit.MockitoJUnitRunner;
 import play.Application;
 import play.inject.guice.GuiceApplicationBuilder;
+import play.test.WithApplication;
 import repositories.CustomerRepository;
 import repositories.RepositoryFactory;
 import services.CustomerService;
@@ -37,31 +37,35 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CustomerServiceTest {
+public class CustomerServiceTest extends WithApplication {
 
+    private final RepositoryFactory repositoryFactory;
     private CustomerService customerService;
     private CustomerRepository customerRepository;
     private CustomerRequest customerRequest;
 
-    private final String IMAGES_PATH;
+    private String IMAGES_PATH;
 
     @Captor
     private ArgumentCaptor<Customer> customerArgumentCaptor;
 
-    public CustomerServiceTest() {
-        customerRepository = mock(CustomerRepository.class);
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        when(repositoryFactory.getCustomerRepository()).thenReturn(customerRepository);
-        Application application = new GuiceApplicationBuilder().build();
-        customerService = new CustomerServiceImpl(repositoryFactory, application);
+    @Override
+    protected Application provideApplication() {
+        return new GuiceApplicationBuilder().build();
+    }
 
-        customerService.setCurrentUserId(1L);
-        IMAGES_PATH = application.config().getString(ConfigPath.IMAGES_PATH_CONFIG);
+    public CustomerServiceTest() {
+        customerRequest = new CustomerRequest("Jerome", "Samson");
+        customerRepository = mock(CustomerRepository.class);
+        repositoryFactory = mock(RepositoryFactory.class);
+        when(repositoryFactory.getCustomerRepository()).thenReturn(customerRepository);
     }
 
     @Before
-    public void setUpFixture() {
-        customerRequest = new CustomerRequest("Jerome", "Samson");
+    public void setUp() {
+        customerService = new CustomerServiceImpl(repositoryFactory, app);
+        customerService.setCurrentUserId(1L);
+        IMAGES_PATH = app.config().getString(ConfigPath.IMAGES_PATH_CONFIG);
     }
 
     @Test

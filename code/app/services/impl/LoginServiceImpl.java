@@ -54,7 +54,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     }
 
     public void logout() {
-        userService.removeCurrentUserToken();
+        userService.removeUserToken(currentUserId);
     }
 
     public void addLoginForUser(AddEditLoginRequest addEditLoginRequest) {
