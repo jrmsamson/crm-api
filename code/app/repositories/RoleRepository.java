@@ -1,10 +1,12 @@
 package repositories;
 
-import enums.Role;
+import model.pojos.Role;
 
 import java.util.Optional;
 
 public interface RoleRepository extends BaseRepository {
 
-    Optional<Integer> getRoleId(Role role);
+    Optional<Role> getById(Integer roleId);
+
+    Optional<Role> getByName(String name);
 }

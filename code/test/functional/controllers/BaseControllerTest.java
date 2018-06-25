@@ -36,18 +36,18 @@ public class BaseControllerTest {
         doLogin();
     }
 
+    @After
+    public void tearDown() {
+        Evolutions.cleanupEvolutions(database);
+        database.shutdown();
+    }
+
     private void doLogin() {
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(new LoginRequest(USERNAME, PASSWORD)))
                 .uri(controllers.routes.LoginController.login().url());
         session = route(app, request).session();
-    }
-
-    @After
-    public void tearDown() {
-        Evolutions.cleanupEvolutions(database);
-        database.shutdown();
     }
 
     protected Http.RequestBuilder buildRequest(String httpMethod, String uri) {

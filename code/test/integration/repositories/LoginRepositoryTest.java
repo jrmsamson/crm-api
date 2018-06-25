@@ -1,9 +1,8 @@
 package integration.repositories;
 
-import enums.Role;
-import model.entities.AddUser;
 import model.entities.responses.LoginResponse;
 import model.pojos.Login;
+import model.pojos.User;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -21,11 +20,9 @@ import repositories.impl.UserRepositoryImpl;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class LoginRepositoryTest  {
+public class LoginRepositoryTest {
 
     private static final String USERNAME = "jer0Me";
     private static final Long LOGIN_USER_ID_CREATED = 2L;
@@ -49,10 +46,20 @@ public class LoginRepositoryTest  {
     @Before
     public void setUp() {
         Evolutions.applyEvolutions(database);
-        userRepository.addUser(
-                new AddUser("Jerome", "Samson", Role.ADMIN)
-        );
+
+        User user = new User();
+        user.setName("Jerome");
+        user.setSurname("Samson");
+        user.setRoleId(1);
+        userRepository.add(user);
+
         setUpFixture();
+    }
+
+    @After
+    public void tearDown() {
+        Evolutions.cleanupEvolutions(database);
+        this.database.shutdown();
     }
 
     private void setUpFixture() {
@@ -97,11 +104,5 @@ public class LoginRepositoryTest  {
     public void shouldGetLoginPasswordSaltByUserId() {
         UUID passwordSalt = loginRepository.getLoginPasswordSaltByUserId(LOGIN_USER_ID_CREATED).get();
         assertEquals(PASSWORD_SALT, passwordSalt);
-    }
-
-    @After
-    public void tearDown() {
-        Evolutions.cleanupEvolutions(database);
-        this.database.shutdown();
     }
 }

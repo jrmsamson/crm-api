@@ -5,7 +5,7 @@ import exceptions.IncorrectUsernameOrPasswordException;
 import model.entities.requests.AddEditLoginRequest;
 import model.entities.requests.LoginRequest;
 import model.entities.responses.LoginResponse;
-import model.entities.responses.UserSessionResponse;
+import model.entities.responses.UserSession;
 import model.pojos.Login;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +60,7 @@ public class LoginServiceTest {
         );
         when(loginRepository.getLoginByUsername(USERNAME))
                 .thenReturn(Optional.of(loginResponse));
-        when(userService.getUserRole(1L)).thenReturn(Role.USER);
+        when(userService.getUserRoleByUserId(1L)).thenReturn("User");
     }
 
     @Test
@@ -71,8 +71,8 @@ public class LoginServiceTest {
         when(loginRepository.getLoginByUsername(USERNAME)).thenReturn(
                 Optional.of(new LoginResponse(1L, passwordChecksum, PASSWORD_SALT))
         );
-        UserSessionResponse userSessionResponse = loginService.login(loginRequest);
-        assertNotNull(userSessionResponse);
+        UserSession userSession = loginService.login(loginRequest);
+        assertNotNull(userSession);
     }
 
     @Test(expected = IncorrectUsernameOrPasswordException.class)

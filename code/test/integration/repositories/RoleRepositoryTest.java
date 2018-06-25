@@ -1,6 +1,6 @@
 package integration.repositories;
 
-import enums.Role;
+import model.pojos.Role;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -16,6 +16,9 @@ import java.util.Optional;
 import static org.junit.Assert.assertTrue;
 
 public class RoleRepositoryTest {
+
+    private static final String ADMIN_ROLE = "Admin";
+    private static final String USER_ROLE = "User";
 
     private Database database;
     private RoleRepository roleRepository;
@@ -33,15 +36,24 @@ public class RoleRepositoryTest {
         Evolutions.applyEvolutions(database);
     }
 
-    @Test
-    public void shouldGetRoleIdByName() {
-        Optional<Integer> roleId = roleRepository.getRoleId(Role.USER);
-        assertTrue(roleId.isPresent());
-    }
-
     @After
     public void tearDown() {
         Evolutions.cleanupEvolutions(database);
         this.database.shutdown();
+    }
+
+    @Test
+    public void shouldGetRoleById() {
+        Optional<Role> roleId = roleRepository.getById(1);
+        assertTrue(roleId.isPresent());
+    }
+
+    @Test
+
+    public void shouldGetRoleByName() {
+        Optional<Role> adminRole = roleRepository.getByName(ADMIN_ROLE);
+        Optional<Role> userRole = roleRepository.getByName(USER_ROLE);
+        assertTrue(adminRole.isPresent());
+        assertTrue(userRole.isPresent());
     }
 }

@@ -13,7 +13,7 @@ public class UserRequestTest {
 
     private static final String NAME = "Jerome";
     private static final String SURNAME = "Samson";
-    private static final Role ROLE = Role.USER;
+    private static final String ROLE = Role.USER.getName();
     private static final String USERNAME = "myusername";
     private static final String PASSWORD = "mypassword";
 

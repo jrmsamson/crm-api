@@ -2,12 +2,12 @@ package model.entities.responses;
 
 import java.time.LocalDateTime;
 
-public class UserTokenResponse {
+public class UserToken {
 
     private String token;
     private LocalDateTime tokenExpiration;
 
-    public UserTokenResponse(String token, LocalDateTime tokenExpiration) {
+    public UserToken(String token, LocalDateTime tokenExpiration) {
         this.token = token;
         this.tokenExpiration = tokenExpiration;
     }

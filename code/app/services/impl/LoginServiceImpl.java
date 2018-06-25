@@ -5,7 +5,7 @@ import exceptions.LoginNotExistException;
 import model.entities.requests.AddEditLoginRequest;
 import model.entities.requests.LoginRequest;
 import model.entities.responses.LoginResponse;
-import model.entities.responses.UserSessionResponse;
+import model.entities.responses.UserSession;
 import model.pojos.Login;
 import repositories.RepositoryFactory;
 import services.LoginService;
@@ -26,7 +26,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         this.userService = userService;
     }
 
-    public UserSessionResponse login(LoginRequest loginRequest) {
+    public UserSession login(LoginRequest loginRequest) {
         LoginResponse loginResponse = repositoryFactory
                 .getLoginRepository()
                 .getLoginByUsername(loginRequest.getUsername())
@@ -37,11 +37,11 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         return buildUserSession(loginResponse);
     }
 
-    private UserSessionResponse buildUserSession(LoginResponse loginResponse) {
-        return new UserSessionResponse(
+    private UserSession buildUserSession(LoginResponse loginResponse) {
+        return new UserSession(
                 loginResponse.getUserId(),
-                userService.getUserRole(loginResponse.getUserId()),
-                userService.buildUserToken(loginResponse.getUserId())
+                userService.getUserRoleByUserId(loginResponse.getUserId()),
+                userService.setUserTokenByUserId(loginResponse.getUserId())
         );
     }
 

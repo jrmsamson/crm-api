@@ -71,7 +71,7 @@ public class UserController extends BaseController {
                                 userService.getUserIdByUuid(UUID.fromString(uuid))
                         )
                 );
-                userService.editUser(UUID.fromString(uuid), userRequest);
+                userService.updateUser(UUID.fromString(uuid), userRequest);
 
         }).thenApplyAsync(aVoid -> ok(), ec.current());
     }

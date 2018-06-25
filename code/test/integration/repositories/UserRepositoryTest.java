@@ -1,23 +1,18 @@
 package integration.repositories;
 
-import enums.Role;
-import model.entities.EditUser;
-import model.entities.AddUser;
-import model.entities.NewToken;
-import model.entities.responses.UserResponse;
-import model.entities.responses.UserTokenResponse;
+import exceptions.UserRepositoryException;
 import model.pojos.User;
 import org.jooq.DSLContext;
-import play.Application;
-import play.inject.guice.GuiceApplicationBuilder;
-import repositories.UserRepository;
-import repositories.impl.UserRepositoryImpl;
 import org.jooq.impl.DSL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import play.Application;
 import play.db.Database;
 import play.db.evolutions.Evolutions;
+import play.inject.guice.GuiceApplicationBuilder;
+import repositories.UserRepository;
+import repositories.impl.UserRepositoryImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,12 +22,12 @@ import static org.junit.Assert.*;
 
 public class UserRepositoryTest {
 
-    private static final Long USER_ID = 1L;
     private static final Integer USER_ROLE_ID = 2;
+    private static final int ADMIN_ROLE_ID = 1;
 
     private UserRepository userRepository;
     private Database database;
-    private UserResponse userCreated;
+    private User userAdded;
 
     public UserRepositoryTest() {
         Application application = new GuiceApplicationBuilder().build();
@@ -55,87 +50,92 @@ public class UserRepositoryTest {
     }
 
     private void setUpFixture() {
-        AddUser addUser = new AddUser(
-                "Jerome", "Samson", Role.USER
-        );
         User user = new User();
         user.setName("Jerome");
         user.setSurname("Samson");
         user.setRoleId(USER_ROLE_ID);
-        this.userCreated = userRepository.getUserByUuid(
-                userRepository.addUser(addUser)
+        this.userAdded = userRepository.getByUuid(
+                userRepository.add(user)
         ).get();
     }
 
     @Test
-    public void shouldCreateANewUser() {
-        assertNotNull(userCreated);
+    public void shouldAddUser() {
+        assertNotNull(userAdded);
+    }
+
+    @Test(expected = UserRepositoryException.class)
+    public void shouldThrowAnExceptionWhenNewUserNameIsNull() {
+        User user = new User();
+        user.setSurname("Samson");
+        user.setRoleId(ADMIN_ROLE_ID);
+        userRepository.add(user);
+    }
+
+    @Test(expected = UserRepositoryException.class)
+    public void shouldThrowAnExceptionWhenNewUserSurnameIsNull() {
+        User user = new User();
+        user.setName("Jerome");
+        user.setRoleId(ADMIN_ROLE_ID);
+        userRepository.add(user);
     }
 
     @Test
-    public void shouldEditUser() {
-        EditUser user = new EditUser(userCreated.getUuid(), "JR", "R", Role.USER);
-        userRepository.editUser(user);
-        UserResponse userEdited = userRepository.getUserByUuid(userCreated.getUuid()).get();
-        assertEquals(userCreated.getUuid(), userEdited.getUuid());
-        assertEquals(user.getName(), userEdited.getName());
-        assertEquals(user.getSurname(), userEdited.getSurname());
+    public void shouldUpdateUser() {
+        LocalDateTime tokenExpiration = LocalDateTime.now();
+        User user = new User(userAdded);
+        user.setId(100L);
+        user.setName("JR");
+        user.setSurname("SAM");
+        user.setRoleId(ADMIN_ROLE_ID);
+        user.setToken("Mytoken");
+        user.setTokenExpiration(tokenExpiration);
+
+        userRepository.update(user);
+        Optional<User> userEdited = userRepository.getByUuid(userAdded.getUuid());
+        assertTrue(userEdited.isPresent());
+        assertEquals(userAdded.getId(), userEdited.get().getId());
+        assertEquals("JR", userEdited.get().getName());
+        assertEquals("SAM", userEdited.get().getSurname());
+        assertEquals(ADMIN_ROLE_ID, userEdited.get().getRoleId(), 0);
+        assertEquals("Mytoken", userEdited.get().getToken());
+        assertEquals(tokenExpiration, userEdited.get().getTokenExpiration());
     }
 
     @Test
     public void shouldDeleteUser() {
-        userRepository.deleteUserByUuid(userCreated.getUuid());
-        Optional<UserResponse> user = userRepository.getUserByUuid(userCreated.getUuid());
+        userRepository.deleteByUuid(userAdded.getUuid());
+        Optional<User> user = userRepository.getByUuid(userAdded.getUuid());
         assertFalse(user.isPresent());
     }
 
     @Test
     public void shouldGetOnlyThoseUsersActive() {
-        userRepository.deleteUserByUuid(userCreated.getUuid());
-        AddUser user = new AddUser("JR", "SAM", Role.USER);
-        userRepository.addUser(user);
-        List<UserResponse> users = userRepository.getUsersActive(1L);
+        userRepository.deleteByUuid(userAdded.getUuid());
+        User user = new User();
+        user.setName("JR");
+        user.setSurname("SAM");
+        user.setRoleId(USER_ROLE_ID);
+        userRepository.add(user);
+        List<User> users = userRepository.getActive(1L);
         assertEquals(1, users.size());
-        assertEquals(users.get(0).getName(), "JR");
-        assertEquals(users.get(0).getSurname(), "SAM");
+        assertEquals(users.get(0).getName(), user.getName());
+        assertEquals(users.get(0).getSurname(), user.getSurname());
     }
 
     @Test
-    public void shouldReturnTheUserRole() {
-        Optional<Role> userRole = userRepository.getUserRoleByUserId(USER_ID);
-        assertTrue(userRole.isPresent());
-    }
-
-    @Test
-    public void shouldUpdateUserToken() {
-        String token = "mytoken";
-        LocalDateTime tokenExpiration = LocalDateTime.now();
-        userRepository.updateUserToken(USER_ID, new NewToken(token, tokenExpiration));
-        UserTokenResponse userTokenResponse = userRepository.getUserTokenByUserId(USER_ID).get();
-        assertEquals(token, userTokenResponse.getToken());
-        assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
-    }
-
-    @Test
-    public void shouldUpdateUserTokenExpiration() {
-        LocalDateTime tokenExpiration = LocalDateTime.now();
-        userRepository.updateUserTokenExpirationByUserId(USER_ID, tokenExpiration);
-        UserTokenResponse userTokenResponse = userRepository.getUserTokenByUserId(USER_ID).get();
-        assertEquals(tokenExpiration, userTokenResponse.getTokenExpiration());
-    }
-
-    @Test
-    public void shouldGetUserIdByUuid() {
-        Optional<Long> userId = userRepository.getUserIdByUuid(userCreated.getUuid());
-        assertTrue(userId.isPresent());
-    }
-
-    @Test
-    public void shouldReturnUserGottenByNameAndSurname() {
+    public void shouldGetUserByNameAndSurname() {
         assertTrue(
-                userRepository.getUserByNameAndSurname(
-                        userCreated.getName(), userCreated.getSurname()
+                userRepository.getByNameAndSurname(
+                        userAdded.getName(), userAdded.getSurname()
                 ).isPresent()
+        );
+    }
+
+    @Test
+    public void shouldGetUserById() {
+        assertTrue(
+                userRepository.getById(userAdded.getId()).isPresent()
         );
     }
 

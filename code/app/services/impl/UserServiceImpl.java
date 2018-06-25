@@ -1,16 +1,15 @@
 package services.impl;
 
-import enums.Role;
+import exceptions.RoleDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 import exceptions.UserRequestException;
 import exceptions.UserWithSameNameAndSurnameAlreadyExistException;
-import model.entities.EditUser;
-import model.entities.AddUser;
-import model.entities.NewToken;
 import model.entities.requests.UserRequest;
 import model.entities.responses.AddUserResponse;
 import model.entities.responses.UserResponse;
-import model.entities.responses.UserTokenResponse;
+import model.entities.responses.UserToken;
+import model.pojos.User;
+import play.Logger;
 import repositories.RepositoryFactory;
 import services.UserService;
 import util.CryptoUtils;
@@ -21,11 +20,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
     private static final Integer TOKEN_EXPIRATION_DURATION_MINUTES = 30;
-
 
     @Inject
     public UserServiceImpl(RepositoryFactory repositoryFactory) {
@@ -36,18 +35,44 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     public AddUserResponse addUser(UserRequest userRequest) {
         validateUserRequest(userRequest);
 
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setSurname(userRequest.getSurname());
+        user.setRoleId(getRoleId(userRequest));
+
         return new AddUserResponse(
                 repositoryFactory
                         .getUserRepository()
-                        .addUser(
-                                new AddUser(
-                                        userRequest.getName(),
-                                        userRequest.getSurname(),
-                                        userRequest.getRole()
-                                )
-                        )
+                        .add(user)
         );
     }
+
+    private Integer getRoleId(UserRequest userRequest) {
+        return repositoryFactory
+                .getRoleRepository()
+                .getByName(userRequest.getRole())
+                .orElseThrow(RoleDoesNotExistException::new)
+                .getId();
+    }
+
+    public void updateUser(UUID userUuid, UserRequest userRequest) {
+        User user = getUserByUuidFromRepository(userUuid);
+        user.setName(userRequest.getName());
+        user.setSurname(userRequest.getSurname());
+        user.setRoleId(getUserRole(userRequest.getRole()));
+        repositoryFactory
+                .getUserRepository()
+                .update(user);
+    }
+
+    private Integer getUserRole(String roleName) {
+        return repositoryFactory
+                .getRoleRepository()
+                .getByName(roleName)
+                .orElseThrow(RoleDoesNotExistException::new)
+                .getId();
+    }
+
 
     private void validateUserRequest(UserRequest userRequest) {
         Notification userRequestNotification = userRequest.validation();
@@ -55,81 +80,108 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
         if (userRequestNotification.hasErrors())
             throw new UserRequestException(userRequestNotification.errorMessage());
 
-        Optional<UserResponse> userWithSameNameAndSurname = repositoryFactory.getUserRepository()
-                .getUserByNameAndSurname(userRequest.getName(), userRequest.getSurname());
+        Optional<User> userWithSameNameAndSurname = repositoryFactory.getUserRepository()
+                .getByNameAndSurname(userRequest.getName(), userRequest.getSurname());
 
         if (userWithSameNameAndSurname.isPresent())
             throw new UserWithSameNameAndSurnameAlreadyExistException();
     }
 
-    public void editUser(UUID userUuid, UserRequest userRequest) {
-        repositoryFactory
-                .getUserRepository()
-                .editUser(new EditUser(
-                        userUuid,
-                        userRequest.getName(),
-                        userRequest.getSurname(),
-                        userRequest.getRole()
-                ));
-    }
-
     public void deleteUser(UUID userUuid) {
         repositoryFactory
                 .getUserRepository()
-                .deleteUserByUuid(userUuid);
+                .deleteByUuid(userUuid);
     }
 
     public List<UserResponse> getUsersActive() {
         return repositoryFactory
                 .getUserRepository()
-                .getUsersActive(currentUserId);
+                .getActive(currentUserId)
+                .stream()
+                .map(
+                        user -> new UserResponse(
+                                user, getUserRoleByRoleId(user.getRoleId())
+                        )
+                )
+                .collect(Collectors.toList());
     }
 
-    public Role getUserRole(Long userId) {
-        return repositoryFactory
-                .getUserRepository()
-                .getUserRoleByUserId(userId)
-                .orElseThrow(UserDoesNotExistException::new);
-    }
+    public UserToken getUserTokenByUserId(Long userId) {
+        User user = getUserById(userId);
 
-    public UserTokenResponse getUserToken(Long userId) {
-        return repositoryFactory
-                .getUserRepository()
-                .getUserTokenByUserId(userId)
-                .orElseThrow(UserDoesNotExistException::new);
+        return new UserToken(
+                user.getToken(),
+                user.getTokenExpiration()
+        );
     }
 
     public void removeCurrentUserToken() {
+        User user = getUserById(currentUserId);
+        user.setToken(null);
+        user.setTokenExpiration(null);
         repositoryFactory
                 .getUserRepository()
-                .removeUserToken(currentUserId);
+                .update(user);
     }
 
     public void renewUserToken(Long userId) {
+        User user = getUserById(userId);
+        user.setTokenExpiration(getTokenExpiration());
         repositoryFactory
                 .getUserRepository()
-                .updateUserTokenExpirationByUserId(userId, getTokenExpiration());
+                .update(user);
+    }
+
+    private User getUserById(Long userId) {
+        return repositoryFactory
+                .getUserRepository()
+                .getById(userId)
+                .orElseThrow(UserDoesNotExistException::new);
     }
 
     public Long getUserIdByUuid(UUID userUuid) {
-        return repositoryFactory
-                .getUserRepository()
-                .getUserIdByUuid(userUuid)
-                .orElseThrow(UserDoesNotExistException::new);
+        return getUserByUuidFromRepository(userUuid)
+                .getId();
     }
 
     public UserResponse getUserByUuid(UUID userUuid) {
+        User user = getUserByUuidFromRepository(userUuid);
+
+        return new UserResponse(user, getUserRoleByRoleId(user.getRoleId()));
+    }
+
+    public String getUserRoleByUserId(Long userId) {
+        return getUserRoleByRoleId(
+                getUserById(userId).getRoleId()
+        );
+    }
+
+    private String getUserRoleByRoleId(Integer roleId) {
+        return repositoryFactory
+                .getRoleRepository()
+                .getById(roleId)
+                .orElseThrow(RoleDoesNotExistException::new)
+                .getName();
+    }
+
+    private User getUserByUuidFromRepository(UUID userUuid) {
         return repositoryFactory
                 .getUserRepository()
-                .getUserByUuid(userUuid)
+                .getByUuid(userUuid)
                 .orElseThrow(UserDoesNotExistException::new);
     }
 
-    public String buildUserToken(Long userId) {
+    public String setUserTokenByUserId(Long userId) {
+        User user = getUserById(userId);
+
         String token = CryptoUtils.generateSecureRandomToken();
-        repositoryFactory.getUserRepository().updateUserToken(
-                userId, new NewToken(token, getTokenExpiration())
-        );
+        user.setToken(token);
+        user.setTokenExpiration(getTokenExpiration());
+
+        repositoryFactory
+                .getUserRepository()
+                .update(user);
+
         return token;
     }
 

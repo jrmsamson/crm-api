@@ -61,7 +61,7 @@ public class AuthorizationAction extends Action<Secured> {
             establishConnectionWithTheDatabase();
             connectJooqToTheDatabase();
             Boolean tokenValid = userService
-                    .getUserToken(userId.get())
+                    .getUserTokenByUserId(userId.get())
                     .validate(token.get());
 
             if (tokenValid)

@@ -1,14 +1,12 @@
 package model.entities.responses;
 
-import enums.Role;
-
-public class UserSessionResponse {
+public class UserSession {
 
     private Long userId;
-    private Role role;
+    private String role;
     private String token;
 
-    public UserSessionResponse(Long userId, Role role, String token) {
+    public UserSession(Long userId, String role, String token) {
         this.userId = userId;
         this.role = role;
         this.token = token;
@@ -22,11 +20,11 @@ public class UserSessionResponse {
         this.userId = userId;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

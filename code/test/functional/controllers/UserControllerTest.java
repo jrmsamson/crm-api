@@ -1,12 +1,10 @@
 package functional.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import enums.Role;
 import model.entities.responses.AddUserResponse;
 import model.entities.requests.UserRequest;
 import org.junit.Before;
 import org.junit.Test;
-import play.Logger;
 import play.libs.Json;
 
 import java.io.IOException;
@@ -28,7 +26,7 @@ public class UserControllerTest extends BaseControllerTest {
     @Before
     public void setUpAddUserFixture() {
         userRequest = new UserRequest(
-                "Jerome", "Samson", Role.USER, "jer0Me", "password"
+                "Jerome", "Samson", "User", "jer0Me", "password"
         );
         buildRequest(POST, BASE_URL)
                 .bodyJson(Json.toJson(userRequest));
@@ -59,7 +57,7 @@ public class UserControllerTest extends BaseControllerTest {
     public void shouldBeAvailableEditUser() throws IOException {
         AddUserResponse addUserResponse = getAddUserResponseFromResult();
         userRequest = new UserRequest(
-                "JRM", "SAM", Role.USER, null, null
+                "JRM", "SAM", "User", null, null
         );
         buildRequest(PUT, BASE_URL + "/" + addUserResponse.getUserUuid())
                 .bodyJson(Json.toJson(userRequest));

@@ -1,7 +1,6 @@
 package model.entities.requests;
 
 import com.google.common.base.Strings;
-import enums.Role;
 import util.Notification;
 
 public class UserRequest {
@@ -14,14 +13,14 @@ public class UserRequest {
 
     private String name;
     private String surname;
-    private Role role;
+    private String role;
     private String username;
     private String password;
 
     public UserRequest() {
     }
 
-    public UserRequest(String name, String surname, Role role, String username, String password) {
+    public UserRequest(String name, String surname, String role, String username, String password) {
         this.name = name;
         this.surname = surname;
         this.role = role;
@@ -38,7 +37,7 @@ public class UserRequest {
         if (Strings.isNullOrEmpty(surname))
             notification.addError(SURNAME_REQUIRED_MESSAGE);
 
-        if (role == null)
+        if (Strings.isNullOrEmpty(role))
             notification.addError(ROLE_REQUIRED_MESSAGE);
 
         if (Strings.isNullOrEmpty(username))
@@ -66,11 +65,11 @@ public class UserRequest {
         this.surname = surname;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
