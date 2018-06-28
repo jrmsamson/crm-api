@@ -80,7 +80,7 @@ public class CustomerController extends BaseController {
     public CompletionStage<Result> editCustomer(String uuid) {
         CustomerRequest customerRequest = getCustomerRequestFromRequest();
         return CompletableFuture.runAsync(() ->
-            customerService.editCustomer(
+            customerService.updateCustomer(
                     UUID.fromString(uuid),
                     customerRequest
             )
@@ -91,7 +91,7 @@ public class CustomerController extends BaseController {
 
     public CompletionStage<Result> deleteCustomer(String uuid) {
         return CompletableFuture.runAsync(() ->
-                customerService.deleteCustomer(UUID.fromString(uuid))
+                customerService.deleteCustomerByUuid(UUID.fromString(uuid))
         ).thenApply(
                 aVoid -> ok()
         );

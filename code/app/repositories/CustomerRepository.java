@@ -1,6 +1,5 @@
 package repositories;
 
-import model.entities.responses.CustomerResponse;
 import model.pojos.Customer;
 
 import java.util.List;
@@ -9,17 +8,15 @@ import java.util.UUID;
 
 public interface CustomerRepository extends BaseRepository {
 
-    Optional<CustomerResponse> getCustomerByUuid(UUID uuid);
+    Optional<Customer> getByUuid(UUID uuid);
 
-    List<CustomerResponse> getCustomersActive();
+    List<Customer> getActive();
 
-    UUID addCustomer(Customer customer);
+    UUID add(Customer customer);
 
-    void editCustomerByUuid(Customer customer);
+    void update(Customer customer);
 
-    void deleteCustomerUuid(UUID uuid);
+    void deleteByUuid(UUID uuid);
 
-    void updateCustomerPhotoName(Customer customer);
-
-    Optional<CustomerResponse> getCustomerByNameAndSurname(String name, String surname);
+    Optional<Customer> getByNameAndSurname(String name, String surname);
 }

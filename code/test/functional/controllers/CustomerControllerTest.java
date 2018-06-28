@@ -72,9 +72,9 @@ public class CustomerControllerTest extends BaseControllerTest {
     }
 
     @Test()
-    public void shouldBeAvailableEditCustomer() {
+    public void shouldBeAvailableUpdateCustomer() {
         buildRequest(PUT, BASE_URL + "/" + UUID.randomUUID())
-                .bodyJson(Json.toJson(new CustomerRequest("", "")));
+                .bodyJson(Json.toJson(new CustomerRequest("jerome", "samson")));
         makeRequest();
         assertEquals(OK, result.status());
     }

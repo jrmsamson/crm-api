@@ -5,7 +5,6 @@ import exceptions.CustomerRequestException;
 import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
 import exceptions.ImageExtensionNotSupportedException;
 import model.entities.requests.CustomerRequest;
-import model.entities.responses.CustomerResponse;
 import model.entities.requests.UpdateCustomerPhotoRequest;
 import model.pojos.Customer;
 import org.junit.Before;
@@ -71,7 +70,7 @@ public class CustomerServiceTest extends WithApplication {
     @Test
     public void shouldAddCustomer() {
         customerService.addCustomer(customerRequest);
-        verify(customerRepository).addCustomer(customerArgumentCaptor.capture());
+        verify(customerRepository).add(customerArgumentCaptor.capture());
         Customer customer = customerArgumentCaptor.getValue();
 
         assertEquals("Jerome", customer.getName());
@@ -92,20 +91,44 @@ public class CustomerServiceTest extends WithApplication {
 
     @Test(expected = CustomerWithSameNameAndSurnameAlreadyExistException.class)
     public void shouldThrowAnExceptionWhenThereAlreadyExistAnCustomerWithTheSameNameAndSurname() {
-        String customerName = "Jerome";
-        String customerSurname = "Samson";
-        UUID customerUuid = UUID.randomUUID();
-        when(customerRepository.getCustomerByNameAndSurname(customerName, customerSurname)).thenReturn(
-                Optional.of(new CustomerResponse(customerUuid, customerName, customerSurname, null))
+        when(customerRepository.getByNameAndSurname(any(), any())).thenReturn(
+                Optional.of(new Customer())
         );
-        customerService.addCustomer(new CustomerRequest(customerName, customerSurname));
+        customerService.addCustomer(new CustomerRequest("Jerome", "Samson"));
+    }
+
+    @Test(expected = CustomerRequestException.class)
+    public void shouldThrowAnExceptionIfCustomerRequestIsNotValidWhenItsGoingToUpdateTheCustomer() {
+        CustomerRequest customerRequest = new CustomerRequest("", "");
+        customerService.updateCustomer(UUID.randomUUID(), customerRequest);
+    }
+
+    @Test(expected = CustomerWithSameNameAndSurnameAlreadyExistException.class)
+    public void shouldThrowAnExceptionWhenThereAlreadyExistAnCustomerWithTheSameNameAndSurnameWhenItsGoingToUpdateTheCustomer() {
+        Customer customer = new Customer();
+        customer.setUuid(UUID.randomUUID());
+        when(customerRepository.getByNameAndSurname(any(), any())).thenReturn(
+                Optional.of(customer)
+        );
+        customerService.updateCustomer(UUID.randomUUID(), new CustomerRequest("Jerome", "Samson"));
+    }
+
+    @Test()
+    public void shouldAllowUpdateTheCustomerIfTheCustomerWithTheSameNameAndSurnameIsTheCurrentCustomerToBeEdited() {
+        UUID uuid = UUID.randomUUID();
+        Customer customer = new Customer();
+        customer.setUuid(uuid);
+        when(customerRepository.getByNameAndSurname(any(), any())).thenReturn(
+                Optional.of(customer)
+        );
+        customerService.updateCustomer(uuid, new CustomerRequest("Jerome", "Samson"));
     }
 
     @Test
-    public void shouldEditCustomer() {
+    public void shouldUpdateCustomer() {
         UUID customerUUID = UUID.randomUUID();
-        customerService.editCustomer(customerUUID, customerRequest);
-        verify(customerRepository).editCustomerByUuid(
+        customerService.updateCustomer(customerUUID, customerRequest);
+        verify(customerRepository).update(
                 customerArgumentCaptor.capture()
         );
         Customer customer = customerArgumentCaptor.getValue();
@@ -119,21 +142,21 @@ public class CustomerServiceTest extends WithApplication {
     }
 
     @Test
-    public void shouldDeleteCustomer() {
+    public void shouldDeleteCustomerByUuid() {
         UUID customerUUID = UUID.randomUUID();
-        customerService.deleteCustomer(customerUUID);
-        verify(customerRepository).deleteCustomerUuid(customerUUID);
+        customerService.deleteCustomerByUuid(customerUUID);
+        verify(customerRepository).deleteByUuid(customerUUID);
     }
 
     @Test
     public void shouldGetCustomersActive() {
         customerService.getCustomersActive();
-        verify(customerRepository).getCustomersActive();
+        verify(customerRepository).getActive();
     }
 
     @Test(expected = CustomerDoesNotExistException.class)
     public void shouldAllowToUploadPhotoForCustomersAlreadyExist() {
-        when(customerRepository.getCustomerByUuid(any()))
+        when(customerRepository.getByUuid(any()))
                 .thenReturn(Optional.empty());
 
         UpdateCustomerPhotoRequest updateCustomerPhotoRequest = new UpdateCustomerPhotoRequest(
@@ -145,8 +168,8 @@ public class CustomerServiceTest extends WithApplication {
     @Test
     public void shouldUpdateCustomerPhotoName() {
         UUID userUuid = UUID.randomUUID();
-        when(customerRepository.getCustomerByUuid(any()))
-                .thenReturn(Optional.of(new CustomerResponse(userUuid, "", "", "")));
+        when(customerRepository.getByUuid(any()))
+                .thenReturn(Optional.of(new Customer()));
 
         File file = new File(getClass().getResource("/photo_test.png").getPath());
 
@@ -157,11 +180,11 @@ public class CustomerServiceTest extends WithApplication {
         String photoName = userUuid + ".png";
 
         customerService.updateCustomerPhoto(updateCustomerPhotoRequest);
-        verify(customerRepository).updateCustomerPhotoName(customerArgumentCaptor.capture());
+        verify(customerRepository).update(customerArgumentCaptor.capture());
+
         Customer customer = customerArgumentCaptor.getValue();
         File newImageFile = new File(IMAGES_PATH + photoName);
 
-        assertEquals(userUuid, customer.getUuid());
         assertEquals(photoName, customer.getPhotoName());
         assertTrue(newImageFile.exists());
 
@@ -175,8 +198,8 @@ public class CustomerServiceTest extends WithApplication {
 
         UUID userUuid = UUID.randomUUID();
 
-        when(customerRepository.getCustomerByUuid(any()))
-                .thenReturn(Optional.of(new CustomerResponse(userUuid, "", "", "")));
+        when(customerRepository.getByUuid(any()))
+                .thenReturn(Optional.of(new Customer()));
 
         UpdateCustomerPhotoRequest updateCustomerPhotoRequest = new UpdateCustomerPhotoRequest(
                 userUuid, file, "image/png"
@@ -187,10 +210,9 @@ public class CustomerServiceTest extends WithApplication {
     @Test
     public void shouldGetCustomerByUuid() {
         UUID userUuid = UUID.randomUUID();
-        CustomerResponse customerResponse = new CustomerResponse(UUID.randomUUID(), "", "", "");
-        when(customerRepository.getCustomerByUuid(userUuid)).thenReturn(Optional.of(customerResponse));
+        when(customerRepository.getByUuid(userUuid)).thenReturn(Optional.of(new Customer()));
         customerService.getCustomerByUuid(userUuid);
-        verify(customerRepository).getCustomerByUuid(userUuid);
+        verify(customerRepository).getByUuid(userUuid);
     }
 
 

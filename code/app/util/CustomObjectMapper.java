@@ -11,7 +11,6 @@ public class CustomObjectMapper {
     CustomObjectMapper() {
         ObjectMapper mapper = Json.newDefaultMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(Role.class, new RoleDeserializer());
         mapper.registerModule(module);
         Json.setObjectMapper(mapper);
     }

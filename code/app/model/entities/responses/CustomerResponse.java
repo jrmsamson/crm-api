@@ -1,5 +1,7 @@
 package model.entities.responses;
 
+import model.pojos.Customer;
+
 import java.util.UUID;
 
 public class CustomerResponse {
@@ -14,6 +16,13 @@ public class CustomerResponse {
         this.name = name;
         this.surname = surname;
         this.photoUrl = photoUrl;
+    }
+
+    public CustomerResponse(Customer customer) {
+        this.uuid = customer.getUuid();
+        this.name = customer.getName();
+        this.surname = customer.getSurname();
+        this.photoUrl = customer.getPhotoName();
     }
 
     public UUID getUuid() {

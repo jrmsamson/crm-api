@@ -13,9 +13,9 @@ public interface CustomerService extends BaseService {
 
     AddCustomerResponse addCustomer(CustomerRequest customerRequest);
 
-    void editCustomer(UUID customerUUID, CustomerRequest customerRequest);
+    void updateCustomer(UUID customerUUID, CustomerRequest customerRequest);
 
-    void deleteCustomer(UUID customerUUID);
+    void deleteCustomerByUuid(UUID customerUUID);
 
     List<CustomerResponse> getCustomersActive();
 

@@ -1,5 +1,6 @@
 package integration.repositories;
 
+import exceptions.CustomerRepositoryException;
 import exceptions.CustomerWithSameNameAndSurnameAlreadyExistException;
 import model.entities.responses.CustomerResponse;
 import model.pojos.Customer;
@@ -26,7 +27,7 @@ public class CustomerRepositoryTest {
 
     private CustomerRepositoryImpl customerRepository;
     private Database database;
-    private CustomerResponse lastCustomerCreated;
+    private Customer lastCustomerCreated;
 
     public CustomerRepositoryTest() {
         Application application = new GuiceApplicationBuilder().build();
@@ -54,8 +55,8 @@ public class CustomerRepositoryTest {
         customer.setSurname(SURNAME);
         customer.setCreatedBy(1L);
         customer.setModifiedBy(1L);
-        customerRepository.addCustomer(customer);
-        List<CustomerResponse> customers = customerRepository.getCustomersActive();
+        customerRepository.add(customer);
+        List<Customer> customers = customerRepository.getActive();
         lastCustomerCreated = customers.get(customers.size() - 1);
     }
 
@@ -65,7 +66,21 @@ public class CustomerRepositoryTest {
         assertEquals("Samson", lastCustomerCreated.getSurname());
     }
 
-    @Test(expected = CustomerWithSameNameAndSurnameAlreadyExistException.class)
+    @Test(expected = CustomerRepositoryException.class)
+    public void shouldThrowAnExceptionWhenNewUserNameIsNull() {
+        Customer customer = new Customer();
+        customer.setSurname("Samson");
+        customerRepository.add(customer);
+    }
+
+    @Test(expected = CustomerRepositoryException.class)
+    public void shouldThrowAnExceptionWhenNewUserSurnameIsNull() {
+        Customer customer = new Customer();
+        customer.setName("Jerome");
+        customerRepository.add(customer);
+    }
+
+    @Test(expected = CustomerRepositoryException.class)
     public void shouldThrowAnExceptionWhenTheCustomerToBeAddedAlreadyExist() {
         setUpFixture();
     }
@@ -77,29 +92,19 @@ public class CustomerRepositoryTest {
         customer.setSurname("SAM");
         customer.setUuid(lastCustomerCreated.getUuid());
         customer.setModifiedBy(1L);
-        customerRepository.editCustomerByUuid(customer);
-        CustomerResponse customerEdited =
-                customerRepository.getCustomerByUuid(lastCustomerCreated.getUuid()).get();
+        customer.setPhotoName("myphoto");
+        customerRepository.update(customer);
+        Customer customerEdited =
+                customerRepository.getByUuid(lastCustomerCreated.getUuid()).get();
         assertEquals("JRM", customerEdited.getName());
         assertEquals("SAM", customerEdited.getSurname());
-    }
-
-    @Test
-    public void shouldUpdateCustomerPhotoUrl() {
-        String photoName = "myphotoname";
-        Customer customer = new Customer();
-        customer.setUuid(lastCustomerCreated.getUuid());
-        customer.setPhotoName(photoName);
-        customerRepository.updateCustomerPhotoName(customer);
-        CustomerResponse customerEdited = customerRepository
-                .getCustomerByUuid(lastCustomerCreated.getUuid()).get();
-        assertEquals(photoName, customerEdited.getPhotoUrl());
+        assertEquals("myphoto", customerEdited.getPhotoName());
     }
 
     @Test
     public void shouldDeleteCustomer() {
-        customerRepository.deleteCustomerUuid(lastCustomerCreated.getUuid());
-        List<CustomerResponse> customers = customerRepository.getCustomersActive();
+        customerRepository.deleteByUuid(lastCustomerCreated.getUuid());
+        List<Customer> customers = customerRepository.getActive();
         assertEquals(0, customers.size());
     }
 
@@ -107,7 +112,7 @@ public class CustomerRepositoryTest {
     public void shouldReturnCustomerGottenByNameAndSurname() {
         Customer user = new Customer();
         user.setSurname(lastCustomerCreated.getSurname());
-        assertTrue(customerRepository.getCustomerByNameAndSurname(
+        assertTrue(customerRepository.getByNameAndSurname(
                 lastCustomerCreated.getName(), lastCustomerCreated.getSurname()
         ).isPresent());
     }

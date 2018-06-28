@@ -20,6 +20,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static util.Constants.IMAGE_CONTENT_TYPE_EXTENSIONS;
 
@@ -37,40 +38,13 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
 
     public AddCustomerResponse addCustomer(CustomerRequest customerRequest) {
         validateCustomerRequest(customerRequest);
+        checkIfExistCustomerWithSameNameAndSurname(customerRequest);
 
         return new AddCustomerResponse(
                 repositoryFactory
                         .getCustomerRepository()
-                        .addCustomer(buildAddCustomer(customerRequest))
+                        .add(buildAddCustomer(customerRequest))
         );
-    }
-
-    private void validateCustomerRequest(CustomerRequest customerRequest) {
-        Notification notification = customerRequest.validation();
-
-        if (notification.hasErrors())
-            throw new CustomerRequestException(notification.errorMessage());
-
-        checkIfThereAlreadyExistCustomerWithSameNameAndSurname(
-                buildAddCustomer(customerRequest)
-        );
-
-    }
-
-    private void checkIfThereAlreadyExistCustomerWithSameNameAndSurname(Customer customer) {
-        Optional<CustomerResponse> existingCustomer = repositoryFactory.getCustomerRepository()
-                .getCustomerByNameAndSurname(customer.getName(), customer.getSurname());
-
-        if (!existingCustomer.isPresent())
-            return;
-
-        if (isNotCurrentCustomerToBeEdited(customer, existingCustomer.get())) {
-            throw new CustomerWithSameNameAndSurnameAlreadyExistException();
-        }
-    }
-
-    private boolean isNotCurrentCustomerToBeEdited(Customer customer, CustomerResponse existingCustomer) {
-        return !existingCustomer.getUuid().equals(customer.getUuid());
     }
 
     private Customer buildAddCustomer(CustomerRequest customerRequest) {
@@ -82,12 +56,42 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
         return customer;
     }
 
-    public void editCustomer(UUID customerUUID, CustomerRequest customerRequest) {
+    public void updateCustomer(UUID customerUUID, CustomerRequest customerRequest) {
+        validateCustomerRequest(customerRequest);
+        checkIfExistCustomerWithSameNameAndSurnameDistinctToTheCurrentCustomer(
+                customerUUID, customerRequest
+        );
+
         Customer customer = buildEditCustomer(customerRequest);
         customer.setUuid(customerUUID);
         repositoryFactory
                 .getCustomerRepository()
-                .editCustomerByUuid(customer);
+                .update(customer);
+    }
+
+    private void checkIfExistCustomerWithSameNameAndSurnameDistinctToTheCurrentCustomer(UUID currentCustomerUuid,
+                                                                                        CustomerRequest customerRequest) {
+        Optional<Customer> existingCustomer = repositoryFactory.getCustomerRepository()
+                .getByNameAndSurname(customerRequest.getName(), customerRequest.getSurname());
+
+        if (existingCustomer.isPresent()
+                && !existingCustomer.get().getUuid().equals(currentCustomerUuid))
+            throw new CustomerWithSameNameAndSurnameAlreadyExistException();
+    }
+
+    private void checkIfExistCustomerWithSameNameAndSurname(CustomerRequest customerRequest) {
+        Optional<Customer> existingCustomer = repositoryFactory.getCustomerRepository()
+                .getByNameAndSurname(customerRequest.getName(), customerRequest.getSurname());
+
+        if (existingCustomer.isPresent())
+            throw new CustomerWithSameNameAndSurnameAlreadyExistException();
+    }
+
+    private void validateCustomerRequest(CustomerRequest customerRequest) {
+        Notification notification = customerRequest.validation();
+
+        if (notification.hasErrors())
+            throw new CustomerRequestException(notification.errorMessage());
     }
 
     private Customer buildEditCustomer(CustomerRequest customerRequest) {
@@ -98,16 +102,19 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
         return customer;
     }
 
-    public void deleteCustomer(UUID customerUUID) {
+    public void deleteCustomerByUuid(UUID customerUUID) {
         repositoryFactory
                 .getCustomerRepository()
-                .deleteCustomerUuid(customerUUID);
+                .deleteByUuid(customerUUID);
     }
 
     public List<CustomerResponse> getCustomersActive() {
         return repositoryFactory
                 .getCustomerRepository()
-                .getCustomersActive();
+                .getActive()
+                .stream()
+                .map(CustomerResponse::new)
+                .collect(Collectors.toList());
     }
 
     public String updateCustomerPhoto(UpdateCustomerPhotoRequest updateCustomerPhotoRequest) {
@@ -139,12 +146,15 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
     }
 
     private void updateCustomerPhotoName(UpdateCustomerPhotoRequest updateCustomerPhotoRequest, String fileName) {
-        Customer customer = new Customer();
-        customer.setUuid(updateCustomerPhotoRequest.getCustomerUuuid());
+        Customer customer = getCustomerFromRepositoryByUuid(
+                updateCustomerPhotoRequest.getCustomerUuuid()
+        );
+
         customer.setPhotoName(fileName);
+
         repositoryFactory
                 .getCustomerRepository()
-                .updateCustomerPhotoName(customer);
+                .update(customer);
     }
 
     public File getCustomerImage(String imageName) {
@@ -157,9 +167,15 @@ public class CustomerServiceImpl extends BaseServiceImpl implements CustomerServ
     }
 
     public CustomerResponse getCustomerByUuid(UUID userUuid) {
+        return new CustomerResponse(
+                getCustomerFromRepositoryByUuid(userUuid)
+        );
+    }
+
+    private Customer getCustomerFromRepositoryByUuid(UUID uuid) {
         return repositoryFactory
                 .getCustomerRepository()
-                .getCustomerByUuid(userUuid)
+                .getByUuid(uuid)
                 .orElseThrow(CustomerDoesNotExistException::new);
     }
 
