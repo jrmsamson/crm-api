@@ -20,13 +20,14 @@ import services.UserService;
 import services.impl.UserServiceImpl;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
@@ -36,7 +37,7 @@ public class UserServiceTest {
     private static final String USER_ROLE = enums.Role.USER.getName();
 
     private UserService userService;
-    private UserRepository userRepositoryMock;
+    private UserRepository userRepository;
     private RoleRepository roleRepositoryMock;
 
     @Captor
@@ -44,10 +45,10 @@ public class UserServiceTest {
 
     @Before
     public void setUp() {
-        userRepositoryMock = mock(UserRepository.class);
+        userRepository = mock(UserRepository.class);
         roleRepositoryMock = mock(RoleRepository.class);
         RepositoryFactory repositoryFactoryMock = mock(RepositoryFactory.class);
-        when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepositoryMock);
+        when(repositoryFactoryMock.getUserRepository()).thenReturn(userRepository);
         when(repositoryFactoryMock.getRoleRepository()).thenReturn(roleRepositoryMock);
 
         Role role = new Role();
@@ -70,7 +71,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldAddUser() {
-        verify(userRepositoryMock).add(userCaptor.capture());
+        verify(userRepository).add(userCaptor.capture());
         User user = userCaptor.getValue();
         assertEquals("Jerome", user.getName());
         assertEquals("Samson", user.getSurname());
@@ -85,12 +86,43 @@ public class UserServiceTest {
 
     @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
     public void shouldThrowAnExceptionWhenThereAlreadyExistAnUserWithTheSameNameAndSurname() {
-        when(userRepositoryMock.getByNameAndSurname("Jerome", "Samson")).thenReturn(
+        when(userRepository.getByNameAndSurname("Jerome", "Samson")).thenReturn(
                 Optional.of(new User())
         );
         userService.addUser(
                 new UserRequest(
                         "Jerome", "Samson", USER_ROLE, "myusername", "mypassword"
+                )
+        );
+    }
+
+    @Test(expected = UserWithSameNameAndSurnameAlreadyExistException.class)
+    public void shouldThrowAnExceptionWhenThereAlreadyExistAnUserWithTheSameNameAndSurnameWhenItsGoingToUpdateTheUser() {
+        User user = new User();
+        user.setUuid(UUID.randomUUID());
+        when(userRepository.getByNameAndSurname(any(), any())).thenReturn(
+                Optional.of(user)
+        );
+        userService.updateUser(
+                UUID.randomUUID(),
+                new UserRequest(
+                        "Jerome", "Samson", USER_ROLE, "jer0Me", "password"
+                )
+        );
+    }
+
+    @Test
+    public void shouldAllowUpdateTheCustomerIfTheCustomerWithTheSameNameAndSurnameIsTheCurrentCustomerToBeEdited() {
+        UUID uuid = UUID.randomUUID();
+        User user = new User();
+        user.setUuid(uuid);
+        when(userRepository.getByUuid(uuid)).thenReturn(
+                Optional.of(user)
+        );
+        userService.updateUser(
+                uuid,
+                new UserRequest(
+                        "Jerome", "Samson", USER_ROLE, "jer0Me", "password"
                 )
         );
     }
@@ -105,12 +137,12 @@ public class UserServiceTest {
         User userAdded = new User();
         userAdded.setUuid(uuid);
 
-        when(userRepositoryMock.getByUuid(uuid)).thenReturn(
+        when(userRepository.getByUuid(uuid)).thenReturn(
                 Optional.of(userAdded)
         );
 
         userService.updateUser(uuid, userRequest);
-        verify(userRepositoryMock).update(userCaptor.capture());
+        verify(userRepository).update(userCaptor.capture());
         User user = userCaptor.getValue();
         assertEquals(uuid, user.getUuid());
         assertEquals("JRM", user.getName());
@@ -122,14 +154,14 @@ public class UserServiceTest {
     public void shouldDeleteAnUser() {
         UUID uuidMocked = UUID.randomUUID();
         userService.deleteUser(uuidMocked);
-        verify(userRepositoryMock).deleteByUuid(uuidMocked);
+        verify(userRepository).deleteByUuid(uuidMocked);
     }
 
     @Test
     public void shouldGetAllUsersActive() {
         List<User> usersMocked = new ArrayList<>();
         usersMocked.add(new User());
-        when(userRepositoryMock.getActive(1L)).thenReturn(usersMocked);
+        when(userRepository.getActive(1L)).thenReturn(usersMocked);
         assertEquals(1, userService.getUsersActive().size());
     }
 
@@ -138,7 +170,7 @@ public class UserServiceTest {
         UUID userUuid = UUID.randomUUID();
         User user = new User();
         user.setId(2L);
-        when(userRepositoryMock.getByUuid(userUuid)).thenReturn(Optional.of(user));
+        when(userRepository.getByUuid(userUuid)).thenReturn(Optional.of(user));
         assertEquals(2L, userService.getUserIdByUuid(userUuid), 0);
     }
 
@@ -150,17 +182,17 @@ public class UserServiceTest {
     @Test
     public void shouldGetUserByUuid() {
         UUID userUuid = UUID.randomUUID();
-        when(userRepositoryMock.getByUuid(userUuid)).thenReturn(
+        when(userRepository.getByUuid(userUuid)).thenReturn(
                 Optional.of(new User())
         );
         userService.getUserByUuid(userUuid);
-        verify(userRepositoryMock).getByUuid(userUuid);
+        verify(userRepository).getByUuid(userUuid);
     }
 
     @Test(expected = UserDoesNotExistException.class)
     public void shouldReturnUserGottenByUserNameAndSurname() {
         UUID userUuid = UUID.randomUUID();
-        when(userRepositoryMock.getByUuid(userUuid)).thenReturn(
+        when(userRepository.getByUuid(userUuid)).thenReturn(
                 Optional.empty()
         );
         userService.getUserByUuid(userUuid);
@@ -173,7 +205,7 @@ public class UserServiceTest {
         User user = new User();
         user.setToken(token);
         user.setTokenExpiration(tokenExpiration);
-        when(userRepositoryMock.getById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getById(1L)).thenReturn(Optional.of(user));
 
         UserToken userToken = userService.getUserTokenByUserId(1L);
         assertEquals(token, userToken.getToken());
@@ -187,10 +219,10 @@ public class UserServiceTest {
         User user = new User();
         user.setToken(token);
         user.setTokenExpiration(tokenExpiration);
-        when(userRepositoryMock.getById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getById(1L)).thenReturn(Optional.of(user));
         userService.removeUserToken(1L);
 
-        verify(userRepositoryMock).update(userCaptor.capture());
+        verify(userRepository).update(userCaptor.capture());
         User userToUpdate = userCaptor.getValue();
         assertNull(userToUpdate.getToken());
         assertNull(userToUpdate.getTokenExpiration());
@@ -203,10 +235,10 @@ public class UserServiceTest {
         User user = new User();
         user.setToken(token);
         user.setTokenExpiration(tokenExpiration);
-        when(userRepositoryMock.getById(2L)).thenReturn(Optional.of(user));
+        when(userRepository.getById(2L)).thenReturn(Optional.of(user));
         userService.renewUserToken(2L);
 
-        verify(userRepositoryMock).update(userCaptor.capture());
+        verify(userRepository).update(userCaptor.capture());
         User userToUpdate = userCaptor.getValue();
         assertTrue(tokenExpiration.isBefore(userToUpdate.getTokenExpiration()));
     }
@@ -214,10 +246,10 @@ public class UserServiceTest {
     @Test
     public void shouldSetUserToken() {
         User user = new User();
-        when(userRepositoryMock.getById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getById(1L)).thenReturn(Optional.of(user));
         userService.setUserTokenByUserId(1L);
 
-        verify(userRepositoryMock).update(userCaptor.capture());
+        verify(userRepository).update(userCaptor.capture());
 
         User userUpdatedWithNewToken = userCaptor.getValue();
         assertNotNull(userUpdatedWithNewToken.getToken());
@@ -228,7 +260,7 @@ public class UserServiceTest {
     public void shouldGetUserRoleByUserId() {
         User user = new User();
         user.setRoleId(2);
-        when(userRepositoryMock.getById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getById(1L)).thenReturn(Optional.of(user));
         assertEquals(USER_ROLE, userService.getUserRoleByUserId(1L));
     }
 

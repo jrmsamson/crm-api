@@ -54,10 +54,10 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void shouldBeAvailableEditUser() throws IOException {
+    public void shouldBeAvailableUpdateUser() throws IOException {
         AddUserResponse addUserResponse = getAddUserResponseFromResult();
         userRequest = new UserRequest(
-                "JRM", "SAM", "User", null, null
+                "JRM", "SAM", "User", "Jerome", "mypassword"
         );
         buildRequest(PUT, BASE_URL + "/" + addUserResponse.getUserUuid())
                 .bodyJson(Json.toJson(userRequest));

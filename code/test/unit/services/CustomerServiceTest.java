@@ -113,7 +113,7 @@ public class CustomerServiceTest extends WithApplication {
         customerService.updateCustomer(UUID.randomUUID(), new CustomerRequest("Jerome", "Samson"));
     }
 
-    @Test()
+    @Test
     public void shouldAllowUpdateTheCustomerIfTheCustomerWithTheSameNameAndSurnameIsTheCurrentCustomerToBeEdited() {
         UUID uuid = UUID.randomUUID();
         Customer customer = new Customer();

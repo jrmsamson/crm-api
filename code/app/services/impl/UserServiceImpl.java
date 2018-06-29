@@ -33,6 +33,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
     public AddUserResponse addUser(UserRequest userRequest) {
         validateUserRequest(userRequest);
+        checkIfExistUserWithSameNameAndSurname(userRequest);
 
         User user = new User();
         user.setName(userRequest.getName());
@@ -55,6 +56,11 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
     }
 
     public void updateUser(UUID userUuid, UserRequest userRequest) {
+        validateUserRequest(userRequest);
+        checkIfExistUserWithSameNameAndSurnameDistinctToTheCurrentUser(
+                userUuid, userRequest
+        );
+
         User user = getUserByUuidFromRepository(userUuid);
         user.setName(userRequest.getName());
         user.setSurname(userRequest.getSurname());
@@ -64,26 +70,36 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
                 .update(user);
     }
 
+    private void validateUserRequest(UserRequest userRequest) {
+        Notification userRequestNotification = userRequest.validation();
+
+        if (userRequestNotification.hasErrors())
+            throw new UserRequestException(userRequestNotification.errorMessage());
+    }
+
+    private void checkIfExistUserWithSameNameAndSurname(UserRequest userRequest) {
+        Optional<User> userWithSameNameAndSurname = repositoryFactory.getUserRepository()
+                .getByNameAndSurname(userRequest.getName(), userRequest.getSurname());
+
+        if (userWithSameNameAndSurname.isPresent())
+            throw new UserWithSameNameAndSurnameAlreadyExistException();
+    }
+
+    private void checkIfExistUserWithSameNameAndSurnameDistinctToTheCurrentUser(UUID userUuid, UserRequest userRequest) {
+        Optional<User> existingUser = repositoryFactory.getUserRepository()
+                .getByNameAndSurname(userRequest.getName(), userRequest.getSurname());
+
+        if (existingUser.isPresent()
+                && !existingUser.get().getUuid().equals(userUuid))
+            throw new UserWithSameNameAndSurnameAlreadyExistException();
+    }
+
     private Integer getUserRole(String roleName) {
         return repositoryFactory
                 .getRoleRepository()
                 .getByName(roleName)
                 .orElseThrow(RoleDoesNotExistException::new)
                 .getId();
-    }
-
-
-    private void validateUserRequest(UserRequest userRequest) {
-        Notification userRequestNotification = userRequest.validation();
-
-        if (userRequestNotification.hasErrors())
-            throw new UserRequestException(userRequestNotification.errorMessage());
-
-        Optional<User> userWithSameNameAndSurname = repositoryFactory.getUserRepository()
-                .getByNameAndSurname(userRequest.getName(), userRequest.getSurname());
-
-        if (userWithSameNameAndSurname.isPresent())
-            throw new UserWithSameNameAndSurnameAlreadyExistException();
     }
 
     public void deleteUser(UUID userUuid) {
