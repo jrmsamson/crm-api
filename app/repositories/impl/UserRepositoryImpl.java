@@ -81,6 +81,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl implements UserReposi
         create
                 .update(USER)
                 .set(USER.ACTIVE, Boolean.FALSE)
+                .where(USER.UUID.eq(uuid))
                 .execute();
     }
 

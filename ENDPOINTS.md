@@ -126,7 +126,7 @@
  * Sample Call
 
     ```
-    curl -X GET http://localhost:9000/api/v1/user
+    curl -X GET http://localhost:9000/api/v1/users
     ```
 
 ## Add User
